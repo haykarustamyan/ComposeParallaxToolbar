@@ -1,0 +1,24 @@
+[versions]
+agp = "8.7.3"
+kotlin = "2.0.21"
+android-minSdk = "24"
+android-compileSdk = "35"
+compose-plugin = "1.7.0"
+maven = "0.29.0"
+uiToolingPreviewAndroid = "1.7.8"
+compose-ui = "1.7.8"
+
+[libraries]
+ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroid" }
+
+# UI tooling dependencies
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose-ui" }
+ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose-ui" }
+ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-ui" }
+
+[plugins]
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "maven" }

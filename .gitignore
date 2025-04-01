@@ -1,0 +1,16 @@
+*.iml
+.gradle
+.idea
+.DS_Store
+build
+captures
+.externalNativeBuild
+.cxx
+local.properties
+xcuserdata
+.kotlin
+# Generated frameworks
+*.xcframework
+#So we don't accidentally commit our private keys
+*.gpg
+gradle.properties
