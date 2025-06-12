@@ -22,12 +22,11 @@ kotlin {
     listOf(
         iosX64(),
         iosArm64(),
-        iosSimulatorArm64(),
-        macosX64(),
-        macosArm64()
+        iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
             baseName = "compose-parallax-toolbar-kmp"
+            freeCompilerArgs += listOf("-Xbinary=bundleId=am.highapps.parallaxtoolbar")
             isStatic = true
         }
     }
@@ -38,11 +37,15 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
                 implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
             }
         }
         val androidMain by getting {
             dependencies {
+                implementation(compose.uiTooling)
+                implementation(compose.preview)
                 implementation(libs.ui.tooling.preview.android)
                 implementation(libs.ui.tooling)
                 implementation(libs.ui.tooling.preview)
@@ -53,7 +56,6 @@ kotlin {
             dependencies {
                 implementation(compose.ui)
                 implementation(compose.foundation)
-                implementation(compose.material3)
                 implementation(compose.components.resources)
             }
         }

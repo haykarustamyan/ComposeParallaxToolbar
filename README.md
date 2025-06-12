@@ -1,7 +1,7 @@
 # ComposeParallaxToolbar - Compose Multiplatform
 
 [![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://search.maven.org/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
-[![Kotlin](https://img.shields.io/badge/kotlin-v1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-v2.1.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-Compatible-blue)](https://github.com/JetBrains/compose-multiplatform)
 [![Platform](https://img.shields.io/badge/platform-Android%20|%20iOS-green.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -64,38 +64,40 @@ dependencies {
 </details>
 
 <details>
-<summary><b>iOS Installation Options</b></summary>
+<summary><b>iOS Installation</b></summary>
 
-There are several ways to integrate the library in your iOS project:
+### Direct XCFramework Integration
 
-#### Option 1: Swift Package Manager (Recommended)
+For direct integration:
 
-Integrate the published Maven Central artifact via SPM:
+1. Download the project
+   from [GitHub repository](https://github.com/haykarustamyan/ComposeParallaxToolbar)
 
-1. In Xcode: File → Add Package Dependencies...
-2. Enter the repository URL: `https://github.com/haykarustamyan/ComposeParallaxToolbar`
-3. Select the version rules you want to follow
-4. Click "Add Package"
-
-#### Option 2: CocoaPods
-
-Use the published Maven Central artifact via CocoaPods:
-
-```ruby
-pod 'compose_parallax_toolbar_kmp', 'version'
+2. After downloading, run the following command to build the iOS framework:
+```bash
+./gradlew buildIosFramework
 ```
 
-#### Option 3: Manual Integration
+3. Create XCFramework by running:
+```bash
+xcodebuild -create-xcframework \
+-framework compose-parallax-toolbar-kmp/build/bin/iosArm64/releaseFramework/compose_parallax_toolbar_kmp.framework \
+-framework compose-parallax-toolbar-kmp/build/bin/iosSimulatorArm64/releaseFramework/compose_parallax_toolbar_kmp.framework \
+-output compose-parallax-toolbar-kmp.xcframework
+```
 
-For direct integration without package managers:
+4. **Integrate XCFramework with Xcode:**
+   - Open ios folder in Xcode
+   - Add the XCFramework to ios project:
+     - Go to Targets → Project → General → Frameworks, Libraries, and Embedded Content
+     - Click + → Add Other → Add Files
+     - Navigate to generated `compose-parallax-toolbar-kmp.xcframework` and add it
 
-1. Download the XCFramework from the [releases page](https://github.com/haykarustamyan/ComposeParallaxToolbar/releases)
-2. Drag the XCFramework into your Xcode project
-3. Ensure it's added to "Frameworks, Libraries, and Embedded Content" with "Embed & Sign" option
+5. Import in your Swift files:
 
-#### Option 4: Build from Source
-
-For custom modifications or using the latest code, follow the instructions in the [iOS Integration Guide](compose-parallax-toolbar-kmp/iOS-README.md) to build the framework from source.
+```swift
+import compose_parallax_toolbar_kmp
+```
 </details>
 
 ## Basic Usage
@@ -217,6 +219,51 @@ iOS Sample View Controllers:
 - `MinimalParallaxToolbarViewController()` - Minimalist implementation
 - `InitiallyCollapsedToolbarViewController()` - Starts with collapsed toolbar
 
+### Custom Implementations
+
+To create custom implementations, you need to add your custom composable functions in the **common
+code** (specifically in the iOS part of the multiplatform module), then use them from your iOS
+application.
+
+**Step 1:** Add your custom implementation in the common code (iOS part):
+
+```kotlin
+// Add this in src/iosMain/kotlin (common code - iOS part)
+fun MyCustomToolbarViewController() = ComposeUIViewController {
+    MaterialTheme {
+        ComposeParallaxToolbarLayout(
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "My Custom Title",
+                    fontSize = if (isCollapsed) 18.sp else 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            headerContent = {
+                // Your header content
+            },
+            content = {
+                // Your main content
+            }
+        )
+    }
+}
+```
+
+**Step 2:** After adding your custom implementation, rebuild the framework:
+```bash
+./gradlew buildIosFramework
+```
+
+**Step 3:** Use it in your iOS application:
+```swift
+// In your iOS app
+let customVC = IosParallaxToolbarSampleKt.MyCustomToolbarViewController()
+```
+
+> **Note:** Custom implementations cannot be created directly in the iOS application code. They must
+> be added to the common multiplatform code (iOS part) and then accessed from the iOS app.
+
 For more details:
 - **[iOS Integration Guide](compose-parallax-toolbar-kmp/iOS-README.md)** - Setup and basic usage
 - **[iOS Sample Implementation Guide](compose-parallax-toolbar-kmp/src/iosMain/kotlin/am/highapps/parallaxtoolbar/iOS-Samples.md)** - Detailed examples
@@ -281,9 +328,9 @@ For detailed information on all components, parameters, and configuration option
 <details>
 <summary><b>Compatibility</b></summary>
 
-- **Kotlin**: 1.9.0+
-- **Compose Multiplatform**: 1.5.0+
-- **Android**: API 21+ (Android 5.0+)
+- **Kotlin**: 2.1.21
+- **Compose Multiplatform**: 1.8.2
+- **Android**: API 24+ (Android 7.0+)
 - **iOS**: iOS 14+
 
 </details>
