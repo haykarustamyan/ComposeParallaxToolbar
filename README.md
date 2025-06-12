@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:version")
+                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.1.0")
             }
         }
     }
@@ -50,7 +50,7 @@ Add the dependency to your module's build.gradle.kts file:
 
 ```kotlin
 dependencies {
-    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:version")
+    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.1.0")
 }
 ```
 
@@ -58,7 +58,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:version'
+    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.1.0'
 }
 ```
 </details>
@@ -377,6 +377,12 @@ For detailed information on all components, parameters, and configuration option
 
 <details>
 <summary><b>Changelog</b></summary>
+
+### Version 1.1.0
+
+- Updated to Kotlin 2.1.20
+- Updated to Compose Multiplatform 1.8.1
+- Ios integration details update
 
 ### Version 1.0.0
 
