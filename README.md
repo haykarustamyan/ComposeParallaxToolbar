@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.1.0")
+                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.2.0")
             }
         }
     }
@@ -50,7 +50,7 @@ Add the dependency to your module's build.gradle.kts file:
 
 ```kotlin
 dependencies {
-    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.1.0")
+    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.2.0")
 }
 ```
 
@@ -58,7 +58,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.1.0'
+    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.2.0'
 }
 ```
 </details>
@@ -445,6 +445,15 @@ For detailed information on all components, parameters, and configuration option
 
 <details>
 <summary><b>Changelog</b></summary>
+
+### Version 1.2.0
+
+- **NEW**: Introduced unified `ParallaxContent` sealed class system for content types:
+  - `ParallaxContent.Regular` - Regular scrollable content using Column with vertical scroll
+  - `ParallaxContent.Lazy` - LazyColumn content for better performance with large lists
+- **API Enhancement**: New unified `ComposeParallaxToolbarLayout` with single `content: ParallaxContent` parameter
+- **Backward Compatibility**: Legacy API maintained but marked as deprecated
+- **Developer Experience**: Clearer API with explicit content type declarations
 
 ### Version 1.1.0
 
