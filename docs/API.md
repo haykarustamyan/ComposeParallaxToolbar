@@ -25,7 +25,7 @@ The main composable function that implements a parallax toolbar with collapsing 
 fun ComposeParallaxToolbarLayout(
     titleContent: @Composable (Boolean) -> Unit,
     headerContent: @Composable () -> Unit,
-    content: @Composable (Boolean) -> Unit,
+    content: ParallaxContent,
     modifier: Modifier = Modifier,
     subtitleContent: (@Composable (Boolean) -> Unit)? = null,
     navigationIcon: (@Composable (Boolean) -> Unit)? = null,
@@ -34,9 +34,97 @@ fun ComposeParallaxToolbarLayout(
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
-    scroll: ScrollState = rememberScrollState()
-){
+    scrollState: ScrollState = rememberScrollState(),
+    lazyListState: LazyListState = rememberLazyListState()
+)
+```
+
+### ParallaxContent Types
+
+The `content` parameter accepts a `ParallaxContent` sealed class that represents different types of scrollable content:
+
+#### Regular Content
+For traditional scrollable content using Column with vertical scroll:
+
+```kotlin
+content = ParallaxContent.Regular { isCollapsed ->
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        repeat(10) { index ->
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Item ${index + 1}",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+    }
 }
+```
+
+#### LazyColumn Content
+For high-performance lazy loading with large lists:
+
+```kotlin
+content = ParallaxContent.Lazy { isCollapsed ->
+    items(1000) { index ->
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = "Lazy Item ${index + 1}",
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+}
+```
+
+### Simple Usage Examples
+
+#### Basic Example with Regular Content
+```kotlin
+ComposeParallaxToolbarLayout(
+    titleContent = { isCollapsed ->
+        Text(
+            text = "My App",
+            fontSize = if (isCollapsed) 18.sp else 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+    },
+    headerContent = {
+        Box(
+            modifier = Modifier
+                .background(Color.Blue)
+                .fillMaxSize()
+        )
+    },
+    content = ParallaxContent.Regular { isCollapsed ->
+        // Your regular content here
+    }
+)
+```
+
+#### LazyColumn Example
+```kotlin
+ComposeParallaxToolbarLayout(
+    titleContent = { isCollapsed ->
+        Text("Lazy Content")
+    },
+    headerContent = {
+        // Your header content
+    },
+    content = ParallaxContent.Lazy { isCollapsed ->
+        items(100) { index ->
+            // Your lazy items here
+        }
+    }
+)
 ```
 
 #### Parameters
@@ -45,7 +133,7 @@ fun ComposeParallaxToolbarLayout(
 |-----------|------|-------------|---------------|
 | `titleContent` | `@Composable (Boolean) -> Unit` | Composable lambda for the title that is provided with a boolean parameter indicating whether the toolbar is collapsed | (Required) |
 | `headerContent` | `@Composable () -> Unit` | Composable lambda for the header area (typically an image) | (Required) |
-| `content` | `@Composable (Boolean) -> Unit` | Composable lambda for the main content area that is provided with a boolean parameter indicating whether the toolbar is collapsed | (Required) |
+| `content` | `ParallaxContent` | The main content area - either ParallaxContent.Regular or ParallaxContent.Lazy | (Required) |
 | `modifier` | `Modifier` | Modifier to be applied to the layout | `Modifier` |
 | `subtitleContent` | `(@Composable (Boolean) -> Unit)?` | Optional composable lambda for the subtitle that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
 | `navigationIcon` | `(@Composable (Boolean) -> Unit)?` | Optional composable lambda for the navigation icon that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
@@ -55,6 +143,7 @@ fun ComposeParallaxToolbarLayout(
 | `titleConfig` | `ParallaxTitleConfig` | Configuration for the title and subtitle animations and behavior | `ParallaxToolbarDefaults.titleConfig()` |
 | `bodyConfig` | `ParallaxBodyConfig` | Configuration for the content body layout | `ParallaxToolbarDefaults.bodyConfig()` |
 | `scroll` | `ScrollState` | ScrollState to control the scrolling behavior (can be externally controlled) | `rememberScrollState()` |
+| `lazyListState` | `LazyListState` | LazyListState to control the LazyColumn scrolling behavior (can be externally controlled) | `rememberLazyListState()` |
 
 #### Behavior
 
@@ -481,7 +570,7 @@ fun SimpleParallaxToolbarScreen() {
                 ).fillMaxSize()
             )
         },
-        content = {
+        content = ParallaxContent.Regular {
             // Simple content
             Column(
                 modifier = Modifier
@@ -533,7 +622,7 @@ fun MinimalParallaxToolbarScreen() {
                     .fillMaxSize()
             )
         },
-        content = {
+        content = ParallaxContent.Regular {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

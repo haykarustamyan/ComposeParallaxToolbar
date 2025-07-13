@@ -100,6 +100,31 @@ The library includes ready-to-use view controllers:
 - `InitiallyCollapsedToolbarViewController()` - Starts collapsed
 - `AllSamplesViewController()` - Container with all samples
 
+## API Overview
+
+The library uses a unified API with a single `content` parameter that supports both regular and
+LazyColumn content:
+
+### Regular Content
+
+```kotlin
+// In your Kotlin common code
+content = ParallaxContent.Regular { isCollapsed ->
+    // Your scrollable content here
+}
+```
+
+### LazyColumn Content
+
+```kotlin
+// In your Kotlin common code
+content = ParallaxContent.Lazy { isCollapsed ->
+    items(100) { index ->
+        // Your lazy items here
+    }
+}
+```
+
 ## Custom Implementations
 
 To create custom implementations, you need to add your custom composable functions in the **common
@@ -117,14 +142,43 @@ fun MyCustomToolbarViewController() = ComposeUIViewController {
                     Text(
                         text = "My Custom Title",
                         fontSize = if (isCollapsed) 18.sp else 24.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = if (isCollapsed)
+                            MaterialTheme.colorScheme.onSurface
+                        else
+                            Color.White
                     )
                 },
                 headerContent = {
-                    // Your header content
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color(0xFF2196F3), Color(0xFF1976D2))
+                                )
+                            )
+                            .fillMaxSize()
+                    )
                 },
-                content = {
-                    // Your main content
+                content = ParallaxContent.Regular { isCollapsed ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        repeat(20) { index ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "Item ${index + 1}",
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             )
         }
@@ -147,6 +201,78 @@ let customVC = IosParallaxToolbarSampleKt.MyCustomToolbarViewController()
 > **Note:** Custom implementations cannot be created directly in the iOS application code. They must
 > be added to the common multiplatform code (iOS part) and then accessed from the iOS app.
 
+## Configuration Examples
+
+### Basic Configuration
+
+```kotlin
+// Simple configuration with default settings
+ComposeParallaxToolbarLayout(
+    titleContent = { isCollapsed ->
+        Text(
+            text = "Simple Title",
+            fontSize = if (isCollapsed) 18.sp else 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+    },
+    headerContent = {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary)
+                .fillMaxSize()
+        )
+    },
+    content = ParallaxContent.Regular { isCollapsed ->
+        // Your content here
+    }
+)
+```
+
+### Advanced Configuration
+
+```kotlin
+// Custom configuration with styling
+val headerConfig = ParallaxToolbarDefaults.headerConfig(
+    height = 400.dp,
+    gradient = Brush.verticalGradient(
+        colors = listOf(
+            Color.Transparent,
+            Color.Black.copy(alpha = 0.3f),
+            Color.Black.copy(alpha = 0.7f)
+        )
+    )
+)
+
+val titleConfig = ParallaxToolbarDefaults.titleConfig(
+    paddingStart = 20.dp,
+    paddingEnd = 20.dp,
+    paddingTop = 40.dp,
+    paddingBottom = 16.dp
+)
+
+ComposeParallaxToolbarLayout(
+    titleContent = { isCollapsed ->
+        Text(
+            text = "Advanced Title",
+            fontSize = if (isCollapsed) 18.sp else 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (isCollapsed)
+                MaterialTheme.colorScheme.onSurface
+            else
+                Color.White
+        )
+    },
+    headerContent = {
+        // Your custom header
+    },
+    content = ParallaxContent.Lazy { isCollapsed ->
+        items(100) { index ->
+            // Your lazy items
+        }
+    },
+    headerConfig = headerConfig,
+    titleConfig = titleConfig
+)
 ```
 
 ## Troubleshooting
@@ -154,16 +280,46 @@ let customVC = IosParallaxToolbarSampleKt.MyCustomToolbarViewController()
 If you encounter issues:
 
 1. **"No such module" errors:**
-   - Make sure the framework is properly embedded with "Embed & Sign"
-   - Verify Framework Search Paths in Build Settings
-   - Clean build folder (Cmd+Shift+K) and rebuild
-   - For M1/M2 Macs, ensure you're using the arm64 simulator version
+    - Make sure the framework is properly embedded with "Embed & Sign"
+    - Verify Framework Search Paths in Build Settings
+    - Clean build folder (Cmd+Shift+K) and rebuild
+    - For M1/M2 Macs, ensure you're using the arm64 simulator version
 
-2. **Other common issues:**
-   - Check you're using the correct import: `import compose_parallax_toolbar_kmp`
-   - Make sure Kotlin functions are called with the `Kt` suffix
-   - For UI issues, check that you've provided appropriate sizes
+2. **Content not scrolling properly:**
+    - Ensure you're using the correct content type (`ParallaxContent.Regular` for regular content,
+      `ParallaxContent.Lazy` for LazyColumn)
+    - Check that your content has proper sizing and padding
+
+3. **Title animation issues:**
+    - Verify that you're using the `isCollapsed` parameter in your title content
+    - Check that font sizes and colors are properly configured for both states
+
+4. **Other common issues:**
+    - Check you're using the correct import: `import compose_parallax_toolbar_kmp`
+    - Make sure Kotlin functions are called with the `Kt` suffix
+    - For UI issues, check that you've provided appropriate sizes and constraints
+
+## Performance Tips
+
+1. **Use LazyColumn for large lists:**
+   ```kotlin
+   content = ParallaxContent.Lazy { isCollapsed ->
+       items(largeItemCount) { index ->
+           // Efficient lazy item rendering
+       }
+   }
+   ```
+
+2. **Optimize header content:**
+    - Use lightweight composables in headerContent
+    - Avoid complex animations in the header area
+    - Consider using AsyncImage for remote images
+
+3. **Minimize recompositions:**
+    - Use `remember` and `derivedStateOf` for expensive calculations
+    - Stable data classes for complex state
 
 ## Detailed Examples
 
-For more detailed examples and sample app implementations, see [iOS-Samples.md](src/iosMain/kotlin/am/highapps/parallaxtoolbar/iOS-Samples.md).
+For more detailed examples and sample app implementations,
+see [iOS-Samples.md](src/iosMain/kotlin/am/highapps/parallaxtoolbar/iOS-Samples.md).

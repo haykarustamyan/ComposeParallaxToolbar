@@ -251,33 +251,310 @@ struct ParallaxNavigationApp: App {
 }
 ```
 
-## Troubleshooting Tips
+## Creating Custom Implementations
 
-### Framework Integration Issues
+### Basic Custom Implementation
 
-If you encounter "No such module" errors:
+To create a custom implementation, add this to your iOS multiplatform code (src/iosMain/kotlin):
 
-1. Verify that the framework is properly added:
-   ```
-   Project Settings → General → Frameworks, Libraries, and Embedded Content
-   ```
+```kotlin
+fun MyBasicToolbarViewController() = ComposeUIViewController {
+    MaterialTheme {
+        ComposeParallaxToolbarLayout(
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "My Custom App",
+                    fontSize = if (isCollapsed) 18.sp else 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color(0xFF6200EE), Color(0xFF3700B3))
+                            )
+                        )
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Regular { isCollapsed ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    repeat(15) { index ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Custom Item ${index + 1}",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+```
 
-2. Check Framework Search Paths:
-   ```
-   Project Settings → Build Settings → Framework Search Paths
-   ```
-   
-   Add the correct path, such as:
-   ```
-   $(SRCROOT)/../ComposeParallaxToolbar
-   ```
+### Advanced Custom Implementation with LazyColumn
 
-3. Clean and rebuild:
-   - Clean Project (⇧⌘K)
-   - Build (⌘B)
+```kotlin
+fun MyAdvancedToolbarViewController() = ComposeUIViewController {
+    MaterialTheme {
+        ComposeParallaxToolbarLayout(
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "Advanced Example",
+                    fontSize = if (isCollapsed) 18.sp else 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
+                )
+            },
+            subtitleContent = { isCollapsed ->
+                Text(
+                    text = "With LazyColumn and styling",
+                    fontSize = if (isCollapsed) 14.sp else 16.sp,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) 
+                    else 
+                        Color.White.copy(alpha = 0.9f)
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color(0xFF4CAF50), 
+                                    Color(0xFF2E7D32)
+                                )
+                            )
+                        )
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Lazy { isCollapsed ->
+                items(100) { index ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Advanced Item $index",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = "This is a detailed description for item $index",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+                }
+            },
+            navigationIcon = { isCollapsed ->
+                IconButton(onClick = { /* Handle navigation */ }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = if (isCollapsed) 
+                            MaterialTheme.colorScheme.onSurface 
+                        else 
+                            Color.White
+                    )
+                }
+            },
+            actions = { isCollapsed ->
+                IconButton(onClick = { /* Handle action */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                        tint = if (isCollapsed) 
+                            MaterialTheme.colorScheme.onSurface 
+                        else 
+                            Color.White
+                    )
+                }
+            }
+        )
+    }
+}
+```
 
-### Memory Management
+### Custom Configuration Example
 
-For memory management issues:
-- Maintain strong references to Compose view controllers
-- Use proper child view controller containment APIs 
+```kotlin
+fun MyConfiguredToolbarViewController() = ComposeUIViewController {
+    MaterialTheme {
+        val headerConfig = ParallaxToolbarDefaults.headerConfig(
+            height = 400.dp,
+            gradient = Brush.verticalGradient(
+                colors = listOf(
+                    Color.Transparent,
+                    Color.Black.copy(alpha = 0.3f),
+                    Color.Black.copy(alpha = 0.7f)
+                )
+            )
+        )
+        
+        val titleConfig = ParallaxToolbarDefaults.titleConfig(
+            paddingStart = 24.dp,
+            paddingEnd = 24.dp,
+            paddingTop = 50.dp,
+            paddingBottom = 20.dp
+        )
+        
+        ComposeParallaxToolbarLayout(
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "Configured Toolbar",
+                    fontSize = if (isCollapsed) 18.sp else 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color(0xFFFF5722), Color(0xFFD84315))
+                            )
+                        )
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Regular { isCollapsed ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    repeat(20) { index ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Configured Item ${index + 1}",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            headerConfig = headerConfig,
+            titleConfig = titleConfig
+        )
+    }
+}
+```
+
+## Using Custom Implementations in Swift
+
+After adding your custom implementations to the Kotlin code, use them in Swift:
+
+```swift
+// UIKit
+let myCustomVC = IosParallaxToolbarSampleKt.MyBasicToolbarViewController()
+let myAdvancedVC = IosParallaxToolbarSampleKt.MyAdvancedToolbarViewController()
+let myConfiguredVC = IosParallaxToolbarSampleKt.MyConfiguredToolbarViewController()
+
+// SwiftUI
+struct MyCustomWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return IosParallaxToolbarSampleKt.MyBasicToolbarViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+```
+
+## Performance Considerations
+
+1. **Use LazyColumn for large lists**: For lists with many items, use `ParallaxContent.Lazy` for better performance
+2. **Optimize header content**: Keep header content lightweight to maintain smooth scrolling
+3. **Minimize state changes**: Use stable data structures and avoid unnecessary recompositions
+
+## Common Patterns
+
+### Content Type Selection
+```kotlin
+// Choose based on your data size
+val content = if (itemCount > 50) {
+    ParallaxContent.Lazy { isCollapsed ->
+        items(itemCount) { index ->
+            // Lazy item content
+        }
+    }
+} else {
+    ParallaxContent.Regular { isCollapsed ->
+        Column {
+            repeat(itemCount) { index ->
+                // Regular item content
+            }
+        }
+    }
+}
+```
+
+### Dynamic Header
+```kotlin
+headerContent = {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Background image or gradient
+        Box(
+            modifier = Modifier
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.secondary
+                        )
+                    )
+                )
+                .fillMaxSize()
+        )
+        
+        // Optional overlay for better text visibility
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.3f)
+                        )
+                    )
+                )
+        )
+    }
+}
+```
+
+This guide provides comprehensive examples for integrating and customizing the Compose Parallax Toolbar in iOS applications. For more information, refer to the main [API documentation](../../../docs/API.md). 

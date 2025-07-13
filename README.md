@@ -106,6 +106,7 @@ Here's a simple example of how to implement the parallax toolbar in your Compose
 
 ```kotlin
 import am.highapps.parallaxtoolbar.ComposeParallaxToolbarLayout
+import am.highapps.parallaxtoolbar.ParallaxContent
 
 @Composable
 fun MyScreen() {
@@ -128,17 +129,21 @@ fun MyScreen() {
                 modifier = Modifier.fillMaxSize()
             )
         },
-        content = { _ ->
+        content = ParallaxContent.Regular { isCollapsed ->
             // Your main content
-            Column(modifier = Modifier.padding(16.dp)) {
-                repeat(10) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                repeat(10) { index ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                     ) {
                         Text(
-                            text = "Item $it",
+                            text = "Item ${index + 1}",
                             modifier = Modifier.padding(16.dp)
                         )
                     }
@@ -157,13 +162,43 @@ fun MyScreen() {
 For Android, you can use the component directly in your Compose UI:
 
 ```kotlin
+import am.highapps.parallaxtoolbar.ParallaxContent
+
 @Composable
 fun AndroidScreen() {
     // Use Material Theme from your Android app
     MaterialTheme {
         ComposeParallaxToolbarLayout(
-            // Component parameters as shown in Basic Usage
-            // ...
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "Android App",
+                    fontSize = if (isCollapsed) 18.sp else 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Regular { isCollapsed ->
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(20) { index ->
+                        ListItem(
+                            headlineContent = { Text("Item $index") },
+                            supportingContent = { Text("Supporting text") }
+                        )
+                    }
+                }
+            }
         )
     }
 }
@@ -229,6 +264,8 @@ application.
 
 ```kotlin
 // Add this in src/iosMain/kotlin (common code - iOS part)
+import am.highapps.parallaxtoolbar.ParallaxContent
+
 fun MyCustomToolbarViewController() = ComposeUIViewController {
     MaterialTheme {
         ComposeParallaxToolbarLayout(
@@ -236,14 +273,37 @@ fun MyCustomToolbarViewController() = ComposeUIViewController {
                 Text(
                     text = "My Custom Title",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
                 )
             },
             headerContent = {
-                // Your header content
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))
+                            )
+                        )
+                        .fillMaxSize()
+                )
             },
-            content = {
-                // Your main content
+            content = ParallaxContent.Lazy { isCollapsed ->
+                items(50) { index ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Custom Item ${index + 1}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
             }
         )
     }
@@ -275,6 +335,9 @@ For more details:
 For more control, use the `ParallaxToolbarDefaults` object to customize various aspects:
 
 ```kotlin
+import am.highapps.parallaxtoolbar.ParallaxContent
+import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
+
 // Create customized configurations using factory methods
 val headerConfig = ParallaxToolbarDefaults.headerConfig(
     height = 400.dp,
@@ -310,7 +373,7 @@ ComposeParallaxToolbarLayout(
     // Required parameters
     titleContent = { /* ... */ },
     headerContent = { /* ... */ },
-    content = { /* ... */ },
+    content = ParallaxContent.Regular { /* ... */ },
     
     // Optional customizations
     headerConfig = headerConfig,
@@ -346,15 +409,18 @@ For detailed information on all components, parameters, and configuration option
 
 ### Performance Optimization
 
+- Use `ParallaxContent.Lazy` for large lists to ensure optimal performance
 - Avoid heavy computations in recomposing content
 - Use `remember` and `derivedStateOf` for scroll-based calculations
 - Optimize images for mobile rendering
+- Keep header content lightweight to maintain smooth scrolling
 
 ### Multiplatform Considerations
 
 - Use platform-agnostic libraries for image loading
 - Handle differences in status bar behavior
 - Test across screen sizes for responsive layouts
+- Choose appropriate content type based on your data size
 
 </details>
 
@@ -367,11 +433,13 @@ For detailed information on all components, parameters, and configuration option
 
 - Ensure you're using a compatible Material 3 theme
 - Use proper insets handling to avoid system UI overlaps
+- Make sure you're using the correct content type (`ParallaxContent.Regular` for regular scrollable content, `ParallaxContent.Lazy` for LazyColumn)
 
 #### iOS
 
-- "No such module" errors: check framework linkage
+- "No such module" errors: check framework linkage and make sure the framework is properly embedded
 - Memory issues: maintain strong references to view controllers
+- Custom implementations must be added to the common multiplatform code (iOS part), not directly in iOS app code
 
 </details>
 
