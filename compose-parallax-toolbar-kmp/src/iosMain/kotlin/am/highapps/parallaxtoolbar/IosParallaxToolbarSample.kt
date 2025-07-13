@@ -19,32 +19,12 @@ fun SimpleParallaxToolbarViewController() = ComposeUIViewController {
 }
 
 /**
- * Creates a UIViewController with the SampleParallaxToolbarScreen content.
- * This provides a more customized example of the parallax toolbar for iOS.
+ * Creates a UIViewController with the LazyParallaxToolbarScreen content.
+ * This provides an example with lazy content for better performance with large lists.
  */
-fun CustomParallaxToolbarViewController() = ComposeUIViewController {
+fun LazyParallaxToolbarViewController() = ComposeUIViewController {
     MaterialTheme {
-        SampleParallaxToolbarScreen()
-    }
-}
-
-/**
- * Creates a UIViewController with the MinimalParallaxToolbarScreen content.
- * This provides a minimal example with only required parameters.
- */
-fun MinimalParallaxToolbarViewController() = ComposeUIViewController {
-    MaterialTheme {
-        MinimalParallaxToolbarScreen()
-    }
-}
-
-/**
- * Creates a UIViewController with the InitiallyCollapsedToolbarScreen content.
- * This example shows a toolbar that starts in a collapsed state.
- */
-fun InitiallyCollapsedToolbarViewController() = ComposeUIViewController {
-    MaterialTheme {
-        InitiallyCollapsedToolbarScreen()
+        LazyParallaxToolbarScreen()
     }
 }
 
@@ -59,13 +39,11 @@ fun AllSamplesViewController() = ComposeUIViewController {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            // By default, show the custom sample
-            SampleParallaxToolbarScreen()
+            // By default, show the simple sample
+            SimpleParallaxToolbarScreen()
             
             // Other samples can be switched by updating the code:
-            // SimpleParallaxToolbarScreen()
-            // MinimalParallaxToolbarScreen()
-            // InitiallyCollapsedToolbarScreen()
+            // LazyParallaxToolbarScreen()
         }
     }
 } 
