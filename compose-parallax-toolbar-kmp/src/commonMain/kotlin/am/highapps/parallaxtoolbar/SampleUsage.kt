@@ -15,12 +15,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -548,4 +552,228 @@ fun LazyParallaxToolbarWithScrollControlScreen() {
             }
         }
     )
-} 
+}
+
+
+@Composable
+fun ScaffoldIntegrationWithPaddingPreview1() {
+    MaterialTheme {
+        Scaffold(
+            bottomBar = {
+                BottomAppBar {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        repeat(4) { index ->
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = "Tab ${index + 1}"
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {}) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "FAB"
+                    )
+                }
+            }
+        ) { paddingValues ->
+            // ✅ FIXED: Using contentPadding to respect Scaffold padding
+            ComposeParallaxToolbarLayout(
+                contentPadding = paddingValues, // This prevents content from drawing behind bottom bar
+                titleContent = { isCollapsed ->
+                    Text(
+                        text = "Scaffold Fixed",
+                        fontSize = if (isCollapsed) 18.sp else 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    )
+                },
+                subtitleContent = { isCollapsed ->
+                    if (!isCollapsed) {
+                        Text(
+                            text = "Content respects bottom bar padding",
+                            fontSize = 14.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                },
+                headerContent = {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color(0xFF2196F3),
+                                        Color(0xFF1976D2)
+                                    )
+                                )
+                            )
+                            .fillMaxSize()
+                    )
+                },
+                content = ParallaxContent.Regular { isCollapsed ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        repeat(15) { index ->
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (index >= 12) Color(0xFF4CAF50) else MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Text(
+                                    text = if (index >= 12) "✅ Last items don't hide behind bottom bar" else "Content item ${index + 1}",
+                                    modifier = Modifier.padding(16.dp),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (index >= 12) Color.White else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                },
+                navigationIcon = { isCollapsed ->
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        )
+                    }
+                },
+                actions = { isCollapsed ->
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share",
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+
+@Composable
+fun ScaffoldIntegrationWithoutPaddingPreview1() {
+    MaterialTheme {
+        Scaffold(
+            bottomBar = {
+                BottomAppBar {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        repeat(4) { index ->
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = "Tab ${index + 1}"
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {}) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "FAB"
+                    )
+                }
+            }
+        ) { paddingValues ->
+            // ❌ BROKEN: NOT using contentPadding (old behavior)
+            ComposeParallaxToolbarLayout(
+                // contentPadding = paddingValues, // Missing this line causes the issue
+                titleContent = { isCollapsed ->
+                    Text(
+                        text = "Scaffold Broken",
+                        fontSize = if (isCollapsed) 18.sp else 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    )
+                },
+                subtitleContent = { isCollapsed ->
+                    if (!isCollapsed) {
+                        Text(
+                            text = "Content draws behind bottom bar",
+                            fontSize = 14.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                },
+                headerContent = {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color(0xFFFF5722),
+                                        Color(0xFFD84315)
+                                    )
+                                )
+                            )
+                            .fillMaxSize()
+                    )
+                },
+                content = ParallaxContent.Regular { isCollapsed ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        repeat(15) { index ->
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (index >= 12) Color(0xFFFF5722) else MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Text(
+                                    text = if (index >= 12) "❌ Last items hide behind bottom bar" else "Content item ${index + 1}",
+                                    modifier = Modifier.padding(16.dp),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (index >= 12) Color.White else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                },
+                navigationIcon = { isCollapsed ->
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        )
+                    }
+                },
+                actions = { isCollapsed ->
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share",
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        )
+                    }
+                }
+            )
+        }
+    }
+}

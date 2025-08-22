@@ -28,6 +28,7 @@ fun ComposeParallaxToolbarLayout(
     headerContent: @Composable () -> Unit,
     content: ParallaxContent,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     subtitleContent: (@Composable (Boolean) -> Unit)? = null,
     navigationIcon: (@Composable (Boolean) -> Unit)? = null,
     actions: (@Composable RowScope.(Boolean) -> Unit)? = null,
@@ -150,6 +151,7 @@ ComposeParallaxToolbarLayout(
 | `headerContent` | `@Composable () -> Unit` | Composable lambda for the header area (typically an image) | (Required) |
 | `content` | `ParallaxContent` | The main content area - either ParallaxContent.Regular or ParallaxContent.Lazy | (Required) |
 | `modifier` | `Modifier` | Modifier to be applied to the layout | `Modifier` |
+| `contentPadding` | `PaddingValues` | Padding applied to the content area, typically passed from Scaffold to prevent drawing behind bottom bars | `PaddingValues(0.dp)` |
 | `subtitleContent` | `(@Composable (Boolean) -> Unit)?` | Optional composable lambda for the subtitle that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
 | `navigationIcon` | `(@Composable (Boolean) -> Unit)?` | Optional composable lambda for the navigation icon that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
 | `actions` | `(@Composable RowScope.(Boolean) -> Unit)?` | Optional composable lambda for toolbar actions that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
@@ -166,6 +168,125 @@ ComposeParallaxToolbarLayout(
 - The parallax effect automatically adjusts as the user scrolls
 - Title animation occurs along a curved path during collapse/expansion
 - The toolbar background color animates between `initialColor` and `targetColor` based on scroll position
+
+## Scaffold Integration
+
+When using `ComposeParallaxToolbarLayout` within a Scaffold (especially with bottom bars), you must pass the Scaffold's `paddingValues` to the `contentPadding` parameter to prevent content from drawing behind bottom navigation or other UI elements.
+
+### Basic Scaffold Integration
+
+```kotlin
+@Composable
+fun MyScreen() {
+    Scaffold(
+        bottomBar = {
+            BottomAppBar {
+                // Your bottom navigation items
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Home, "Home")
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Search, "Search")
+                    }
+                }
+            }
+        }
+    ) { paddingValues ->
+        ComposeParallaxToolbarLayout(
+            contentPadding = paddingValues, // Essential for proper spacing
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "My App",
+                    fontSize = if (isCollapsed) 18.sp else 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Regular { isCollapsed ->
+                // Your content here - will respect bottom bar padding
+                Column {
+                    repeat(20) { index ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Item ${index + 1}",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+```
+
+### What happens without contentPadding?
+
+```kotlin
+// ❌ BROKEN: Content draws behind bottom bar
+Scaffold(
+    bottomBar = { /* Bottom navigation */ }
+) { paddingValues ->
+    ComposeParallaxToolbarLayout(
+        // Missing contentPadding = paddingValues
+        // Last items will be hidden behind bottom bar
+    )
+}
+```
+
+### What happens with contentPadding?
+
+```kotlin
+// ✅ FIXED: Content respects Scaffold padding
+Scaffold(
+    bottomBar = { /* Bottom navigation */ }
+) { paddingValues ->
+    ComposeParallaxToolbarLayout(
+        contentPadding = paddingValues, // This fixes the issue
+        // Last items are properly visible above bottom bar
+    )
+}
+```
+
+### Works with Both Content Types
+
+The `contentPadding` parameter works with both regular and lazy content:
+
+```kotlin
+// Regular content
+ComposeParallaxToolbarLayout(
+    contentPadding = paddingValues,
+    content = ParallaxContent.Regular { /* ... */ }
+)
+
+// Lazy content  
+ComposeParallaxToolbarLayout(
+    contentPadding = paddingValues,
+    content = ParallaxContent.Lazy(
+        content = { /* ... */ },
+        config = ParallaxToolbarDefaults.lazyColumnConfig(
+            // LazyColumn's own contentPadding is merged with external contentPadding
+            contentPadding = PaddingValues(16.dp)
+        )
+    )
+)
+```
+
+For more detailed information and examples, see the [Scaffold Integration Guide](SCAFFOLD_INTEGRATION.md).
 
 ## Configuration Classes
 

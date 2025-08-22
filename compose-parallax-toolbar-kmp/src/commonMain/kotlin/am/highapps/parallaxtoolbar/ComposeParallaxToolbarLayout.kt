@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -237,6 +239,7 @@ fun ComposeParallaxToolbarLayout(
     headerContent: @Composable () -> Unit,
     content: ParallaxContent,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     subtitleContent: (@Composable (Boolean) -> Unit)? = null,
     navigationIcon: (@Composable (Boolean) -> Unit)? = null,
     actions: (@Composable RowScope.(Boolean) -> Unit)? = null,
@@ -254,6 +257,7 @@ fun ComposeParallaxToolbarLayout(
                 headerContent = headerContent,
                 content = content.content,
                 modifier = modifier,
+                contentPadding = contentPadding,
                 subtitleContent = subtitleContent,
                 navigationIcon = navigationIcon,
                 actions = actions,
@@ -273,6 +277,7 @@ fun ComposeParallaxToolbarLayout(
                 headerContent = headerContent,
                 content = { _ -> /* Empty since we're using lazy content */ },
                 modifier = modifier,
+                contentPadding = contentPadding,
                 subtitleContent = subtitleContent,
                 navigationIcon = navigationIcon,
                 actions = actions,
@@ -299,6 +304,7 @@ fun ComposeParallaxToolbarLayout(
     headerContent: @Composable () -> Unit,
     content: @Composable (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     subtitleContent: (@Composable (Boolean) -> Unit)? = null,
     navigationIcon: (@Composable (Boolean) -> Unit)? = null,
     actions: (@Composable RowScope.(Boolean) -> Unit)? = null,
@@ -380,7 +386,8 @@ fun ComposeParallaxToolbarLayout(
                     lazyContent = { lazyContent(isCollapsed.value) },
                     modifier = Modifier.offset(y = topInset),
                     minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
-                    config = lazyColumnConfig
+                    config = lazyColumnConfig,
+                    contentPadding = contentPadding
                 )
             } else {
                 Body(
@@ -390,7 +397,8 @@ fun ComposeParallaxToolbarLayout(
                     toolbarHeight = toolbarHeight,
                     content = { content(isCollapsed.value) },
                     modifier = Modifier.offset(y = topInset),
-                    minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight
+                    minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
+                    contentPadding = contentPadding
                 )
             }
             Toolbar(
@@ -506,7 +514,8 @@ private fun Body(
     toolbarHeight: Dp,
     content: @Composable (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    minBottomSpacerHeight: Dp = 0.dp
+    minBottomSpacerHeight: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     var contentHeight by remember { mutableStateOf(0) }
 
@@ -533,10 +542,16 @@ private fun Body(
 
         val contentHeightDp = with(LocalDensity.current) { contentHeight.toDp() }
         val availableHeight = screenHeight - headerHeight + toolbarHeight
-        val minimumSpacerHeight = (screenHeight - contentHeightDp + toolbarHeight)
+        val bottomPadding = contentPadding.calculateBottomPadding()
+        val minimumSpacerHeight = (screenHeight - contentHeightDp + toolbarHeight - bottomPadding)
             .coerceAtLeast(minBottomSpacerHeight)
 
         Spacer(Modifier.height(minimumSpacerHeight.coerceAtLeast(0.dp)))
+
+        // Add bottom padding as additional spacer to respect Scaffold padding
+        if (bottomPadding > 0.dp) {
+            Spacer(Modifier.height(bottomPadding))
+        }
     }
 }
 
@@ -549,7 +564,8 @@ private fun LazyBody(
     lazyContent: LazyListScope.() -> Unit,
     modifier: Modifier = Modifier,
     minBottomSpacerHeight: Dp = 0.dp,
-    config: LazyColumnConfig = LazyColumnConfig()
+    config: LazyColumnConfig = LazyColumnConfig(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val density = LocalDensity.current
     val headerHeightPx = with(density) { headerHeight.toPx() }
@@ -573,10 +589,22 @@ private fun LazyBody(
         }
     }
 
+    // Merge external contentPadding with LazyColumn's own contentPadding
+    val mergedContentPadding = PaddingValues(
+        start = config.contentPadding.calculateStartPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) +
+                contentPadding.calculateStartPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
+        top = config.contentPadding.calculateTopPadding() +
+                contentPadding.calculateTopPadding(),
+        end = config.contentPadding.calculateEndPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) +
+                contentPadding.calculateEndPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
+        bottom = config.contentPadding.calculateBottomPadding() +
+                contentPadding.calculateBottomPadding()
+    )
+
     LazyColumn(
         state = lazyListState,
         modifier = modifier.fillMaxSize(),
-        contentPadding = config.contentPadding,
+        contentPadding = mergedContentPadding,
         verticalArrangement = config.verticalArrangement,
         horizontalAlignment = config.horizontalAlignment,
         flingBehavior = config.flingBehavior ?: ScrollableDefaults.flingBehavior(),
