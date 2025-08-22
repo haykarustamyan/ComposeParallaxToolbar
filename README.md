@@ -218,7 +218,7 @@ class MyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let composeVC = IosParallaxToolbarSampleKt.CustomParallaxToolbarViewController()
+        let composeVC = IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
         addChild(composeVC)
         view.addSubview(composeVC.view)
         composeVC.view.frame = view.bounds
@@ -235,7 +235,7 @@ import compose_parallax_toolbar_kmp
 
 struct ComposeToolbarView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        return IosParallaxToolbarSampleKt.CustomParallaxToolbarViewController()
+        return IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
     }
     func updateUIViewController(_ uivc: UIViewController, context: Context) {}
 }
@@ -249,10 +249,14 @@ struct ContentView: View {
 ```
 
 iOS Sample View Controllers:
-- `SimpleParallaxToolbarViewController()` - Basic implementation
-- `CustomParallaxToolbarViewController()` - Implementation with custom styling
-- `MinimalParallaxToolbarViewController()` - Minimalist implementation
-- `InitiallyCollapsedToolbarViewController()` - Starts with collapsed toolbar
+- `SimpleParallaxToolbarViewController()` - Basic implementation with regular content
+- `LazyParallaxToolbarViewController()` - LazyColumn content example
+- `LazyWithPaddingViewController()` - Custom padding configuration
+- `LazyWithSpacingViewController()` - Custom spacing and arrangement
+- `LazyWithScrollControlViewController()` - Custom scroll behavior
+- `IOSSettingsStyleViewController()` - iOS Settings app style with grouped sections
+- `IOSPhotoGalleryViewController()` - iOS Photos app style with grid layout
+- `AllSamplesViewController()` - Container with all samples
 
 ### Custom Implementations
 
@@ -291,20 +295,27 @@ fun MyCustomToolbarViewController() = ComposeUIViewController {
                         .fillMaxSize()
                 )
             },
-            content = ParallaxContent.Lazy { isCollapsed ->
-                items(50) { index ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "Custom Item ${index + 1}",
-                            modifier = Modifier.padding(16.dp)
-                        )
+            content = ParallaxContent.Lazy(
+                content = { isCollapsed ->
+                    items(50) { index ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Custom Item ${index + 1}",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
-                }
-            }
+                },
+                config = ParallaxToolbarDefaults.lazyColumnConfig(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ),
+                lazyListState = rememberLazyListState()
+            )
         )
     }
 }
@@ -380,6 +391,62 @@ ComposeParallaxToolbarLayout(
     toolbarConfig = toolbarConfig,
     titleConfig = titleConfig,
     bodyConfig = bodyConfig
+)
+```
+
+### LazyColumn Customization
+
+For `ParallaxContent.Lazy`, you can customize the LazyColumn behavior using `LazyColumnConfig`:
+
+```kotlin
+import am.highapps.parallaxtoolbar.ParallaxContent
+import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
+
+// Create a custom LazyColumn configuration
+val lazyConfig = ParallaxToolbarDefaults.lazyColumnConfig(
+    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    verticalArrangement = Arrangement.spacedBy(12.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    userScrollEnabled = true,
+    flingBehavior = null, // Uses default
+    overscrollEffect = null // Uses default
+)
+
+// Example with external LazyListState control
+val lazyListState = rememberLazyListState()
+
+// You can programmatically control scrolling
+LaunchedEffect(someCondition) {
+    lazyListState.animateScrollToItem(index = 10)
+}
+
+ComposeParallaxToolbarLayout(
+    titleContent = { isCollapsed ->
+        Text(
+            text = "Custom LazyList",
+            fontSize = if (isCollapsed) 18.sp else 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+    },
+    headerContent = { /* ... */ },
+    content = ParallaxContent.Lazy(
+        content = { isCollapsed ->
+            items(100) { index ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = "Item ${index + 1}",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        },
+        config = lazyConfig,
+        lazyListState = lazyListState // Pass your controlled state
+    )
 )
 ```
 </details>

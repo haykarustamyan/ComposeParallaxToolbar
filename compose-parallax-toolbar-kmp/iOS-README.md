@@ -94,11 +94,19 @@ struct MyApp: App {
 
 The library includes ready-to-use view controllers:
 
+### Basic Examples
 - `SimpleParallaxToolbarViewController()` - Basic example with default settings
-- `CustomParallaxToolbarViewController()` - Customized implementation
-- `MinimalParallaxToolbarViewController()` - Minimal configuration
-- `InitiallyCollapsedToolbarViewController()` - Starts collapsed
+- `LazyParallaxToolbarViewController()` - LazyColumn content example
 - `AllSamplesViewController()` - Container with all samples
+
+### LazyColumn Configuration Examples
+- `LazyWithPaddingViewController()` - Custom padding configuration
+- `LazyWithSpacingViewController()` - Custom spacing and arrangement
+- `LazyWithScrollControlViewController()` - Custom scroll behavior
+
+### iOS-Style Examples
+- `IOSSettingsStyleViewController()` - iOS Settings app style with grouped sections
+- `IOSPhotoGalleryViewController()` - iOS Photos app style with grid layout
 
 ## API Overview
 
@@ -117,13 +125,41 @@ content = ParallaxContent.Regular { isCollapsed ->
 ### LazyColumn Content
 
 ```kotlin
-// In your Kotlin common code
-content = ParallaxContent.Lazy { isCollapsed ->
-    items(100) { index ->
-        // Your lazy items here
+// Basic LazyColumn content
+content = ParallaxContent.Lazy(
+    content = { isCollapsed ->
+        items(100) { index ->
+            // Your lazy items here
+        }
     }
-}
+)
+
+// LazyColumn with custom configuration
+content = ParallaxContent.Lazy(
+    content = { isCollapsed ->
+        items(100) { index ->
+            // Your lazy items here
+        }
+    },
+    config = ParallaxToolbarDefaults.lazyColumnConfig(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        userScrollEnabled = true
+    )
+)
 ```
+
+### LazyColumnConfig Options
+
+The `lazyColumnConfig` function provides the following customization options:
+
+- `contentPadding` - Padding around the entire content
+- `verticalArrangement` - Spacing and arrangement of items (e.g., `Arrangement.spacedBy(8.dp)`)
+- `horizontalAlignment` - Horizontal alignment of items
+- `flingBehavior` - Custom scroll/fling behavior
+- `userScrollEnabled` - Enable/disable user scrolling
+- `overscrollEffect` - Custom overscroll effects
 
 ## Custom Implementations
 

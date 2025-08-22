@@ -10,6 +10,7 @@ This document provides detailed API documentation for the ComposeParallaxToolbar
   - [ParallaxToolbarConfig](#parallaxtoolbarconfig)
   - [ParallaxTitleConfig](#parallaxtitleconfig)
   - [ParallaxBodyConfig](#parallaxbodyconfig)
+  - [LazyColumnConfig](#lazycolumnconfig)
 - [iOS Integration](#ios-integration)
 - [Default Values](#default-values)
 - [Internal Components](#internal-components)
@@ -34,8 +35,7 @@ fun ComposeParallaxToolbarLayout(
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
-    scrollState: ScrollState = rememberScrollState(),
-    lazyListState: LazyListState = rememberLazyListState()
+    scrollState: ScrollState = rememberScrollState()
 )
 ```
 
@@ -69,21 +69,30 @@ content = ParallaxContent.Regular { isCollapsed ->
 For high-performance lazy loading with large lists:
 
 ```kotlin
-content = ParallaxContent.Lazy { isCollapsed ->
-    items(1000) { index ->
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Text(
-                text = "Lazy Item ${index + 1}",
-                modifier = Modifier.padding(16.dp)
-            )
+content = ParallaxContent.Lazy(
+    content = { isCollapsed ->
+        items(1000) { index ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "Lazy Item ${index + 1}",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         }
-    }
-}
+    },
+    config = ParallaxToolbarDefaults.lazyColumnConfig(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ),
+    lazyListState = rememberLazyListState()
+)
 ```
+
+**Note**: For `ParallaxContent.Lazy`, the `lazyListState` parameter controls the LazyColumn's scroll behavior and can be used for external scroll control. The `scrollState` parameter in the main function only applies to `ParallaxContent.Regular` content.
 
 ### Simple Usage Examples
 
@@ -119,11 +128,17 @@ ComposeParallaxToolbarLayout(
     headerContent = {
         // Your header content
     },
-    content = ParallaxContent.Lazy { isCollapsed ->
-        items(100) { index ->
-            // Your lazy items here
-        }
-    }
+    content = ParallaxContent.Lazy(
+        content = { isCollapsed ->
+            items(100) { index ->
+                // Your lazy items here
+            }
+        },
+        config = ParallaxToolbarDefaults.lazyColumnConfig(
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        )
+    )
 )
 ```
 
@@ -240,6 +255,97 @@ data class ParallaxBodyConfig(
 |----------|------|-------------|---------------|
 | `minBottomSpacerHeight` | `Dp` | Minimum spacing after content | `0.dp` |
 
+### LazyColumnConfig
+
+Configuration for LazyColumn behavior when using `ParallaxContent.Lazy`.
+
+```kotlin
+data class LazyColumnConfig(
+    val contentPadding: PaddingValues,
+    val verticalArrangement: Arrangement.Vertical,
+    val horizontalAlignment: Alignment.Horizontal,
+    val flingBehavior: FlingBehavior?,
+    val userScrollEnabled: Boolean,
+    val overscrollEffect: OverscrollEffect?
+)
+```
+
+#### Properties
+
+| Property | Type | Description | Default Value |
+|----------|------|-------------|---------------|
+| `contentPadding` | `PaddingValues` | Padding around the entire LazyColumn content | `PaddingValues(0.dp)` |
+| `verticalArrangement` | `Arrangement.Vertical` | Vertical arrangement strategy for items (e.g., spacing between items) | `Arrangement.Top` |
+| `horizontalAlignment` | `Alignment.Horizontal` | Horizontal alignment of items within the LazyColumn | `Alignment.Start` |
+| `flingBehavior` | `FlingBehavior?` | Custom fling behavior for scrolling animations, null uses default | `null` |
+| `userScrollEnabled` | `Boolean` | Whether user can scroll the LazyColumn | `true` |
+| `overscrollEffect` | `OverscrollEffect?` | Custom overscroll effect, null uses default | `null` |
+
+#### Usage Examples
+
+**Basic Configuration:**
+```kotlin
+val config = ParallaxToolbarDefaults.lazyColumnConfig(
+    contentPadding = PaddingValues(16.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp)
+)
+
+content = ParallaxContent.Lazy(
+    content = { /* your items */ },
+    config = config,
+    lazyListState = rememberLazyListState()
+)
+```
+
+**Advanced Configuration:**
+```kotlin
+val config = ParallaxToolbarDefaults.lazyColumnConfig(
+    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    verticalArrangement = Arrangement.spacedBy(12.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    userScrollEnabled = true
+)
+```
+
+**External LazyListState Control:**
+```kotlin
+// Control LazyColumn scrolling from outside the component
+val lazyListState = rememberLazyListState()
+
+// Programmatically scroll to specific items
+LaunchedEffect(someCondition) {
+    lazyListState.animateScrollToItem(index = 10)
+    // or
+    lazyListState.scrollToItem(index = 5)
+}
+
+// Monitor scroll position
+val isAtTop by remember {
+    derivedStateOf {
+        lazyListState.firstVisibleItemIndex == 0 && 
+        lazyListState.firstVisibleItemScrollOffset == 0
+    }
+}
+
+content = ParallaxContent.Lazy(
+    content = { /* your items */ },
+    config = config,
+    lazyListState = lazyListState // Use your controlled state
+)
+```
+
+**Custom Spacing Examples:**
+```kotlin
+// Evenly spaced items
+verticalArrangement = Arrangement.spacedBy(16.dp)
+
+// Space around items
+verticalArrangement = Arrangement.SpaceAround
+
+// Items at top with spacing
+verticalArrangement = Arrangement.Top
+```
+
 ## iOS Integration
 
 The library provides several ready-to-use UIViewController implementations for iOS integration.
@@ -249,11 +355,19 @@ The library provides several ready-to-use UIViewController implementations for i
 ```kotlin
 // In the IosParallaxToolbarSample.kt file
 
+// Basic Examples
 fun SimpleParallaxToolbarViewController(): UIViewController
-fun CustomParallaxToolbarViewController(): UIViewController
-fun MinimalParallaxToolbarViewController(): UIViewController
-fun InitiallyCollapsedToolbarViewController(): UIViewController
+fun LazyParallaxToolbarViewController(): UIViewController
 fun AllSamplesViewController(): UIViewController
+
+// LazyColumn Configuration Examples
+fun LazyWithPaddingViewController(): UIViewController
+fun LazyWithSpacingViewController(): UIViewController
+fun LazyWithScrollControlViewController(): UIViewController
+
+// iOS-Style Examples
+fun IOSSettingsStyleViewController(): UIViewController
+fun IOSPhotoGalleryViewController(): UIViewController
 ```
 
 These factory functions return UIViewControllers that can be directly used in iOS applications.
@@ -271,7 +385,7 @@ class MyViewController: UIViewController {
         super.viewDidLoad()
         
         // Create a Compose view controller with the toolbar
-        let composeVC = IosParallaxToolbarSampleKt.CustomParallaxToolbarViewController()
+        let composeVC = IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
         
         // Add it to your view hierarchy
         addChild(composeVC)
@@ -290,7 +404,7 @@ import compose_parallax_toolbar_kmp
 
 struct ComposeParallaxToolbarView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        return IosParallaxToolbarSampleKt.CustomParallaxToolbarViewController()
+        return IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
@@ -378,6 +492,9 @@ object ParallaxToolbarDefaults {
 
     @Composable
     fun bodyConfig(...): ParallaxBodyConfig
+
+    @Composable
+    fun lazyColumnConfig(...): LazyColumnConfig
 }
 ```
 
@@ -437,6 +554,30 @@ fun bodyConfig(
 ```
 
 Creates a configuration for the content body with default or custom values.
+
+#### lazyColumnConfig
+
+```kotlin
+@Composable
+fun lazyColumnConfig(
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingBehavior: FlingBehavior? = null,
+    userScrollEnabled: Boolean = true,
+    overscrollEffect: OverscrollEffect? = null
+): LazyColumnConfig
+```
+
+Creates a configuration for LazyColumn behavior with default or custom values. This method provides defaults for `@Composable` properties like `flingBehavior` and `overscrollEffect`.
+
+**Parameters:**
+- `contentPadding` - Padding around the entire LazyColumn content  
+- `verticalArrangement` - Vertical arrangement strategy for items
+- `horizontalAlignment` - Horizontal alignment of items within the LazyColumn
+- `flingBehavior` - Custom fling behavior, null uses `ScrollableDefaults.flingBehavior()`
+- `userScrollEnabled` - Whether user can scroll the LazyColumn
+- `overscrollEffect` - Custom overscroll effect, null uses `rememberOverscrollEffect()`
 
 ## Internal Components
 
