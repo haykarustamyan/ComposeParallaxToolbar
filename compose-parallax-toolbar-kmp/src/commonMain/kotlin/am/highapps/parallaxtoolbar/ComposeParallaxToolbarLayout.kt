@@ -3,11 +3,16 @@ package am.highapps.parallaxtoolbar
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -122,6 +128,23 @@ object ParallaxToolbarDefaults {
     ): ParallaxBodyConfig = ParallaxBodyConfig(
         minBottomSpacerHeight = minBottomSpacerHeight
     )
+
+    @Composable
+    fun lazyColumnConfig(
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+        horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+        flingBehavior: FlingBehavior? = null,
+        userScrollEnabled: Boolean = true,
+        overscrollEffect: OverscrollEffect? = null
+    ): LazyColumnConfig = LazyColumnConfig(
+        contentPadding = contentPadding,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        flingBehavior = flingBehavior ?: ScrollableDefaults.flingBehavior(),
+        userScrollEnabled = userScrollEnabled,
+        overscrollEffect = overscrollEffect ?: rememberOverscrollEffect()
+    )
 }
 
 /**
@@ -154,6 +177,15 @@ data class ParallaxBodyConfig(
     val minBottomSpacerHeight: Dp
 )
 
+data class LazyColumnConfig(
+    val contentPadding: PaddingValues = PaddingValues(0.dp),
+    val verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    val horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    val flingBehavior: FlingBehavior? = null,
+    val userScrollEnabled: Boolean = true,
+    val overscrollEffect: OverscrollEffect? = null
+)
+
 /**
  * Represents different types of content that can be used with the parallax toolbar
  */
@@ -165,12 +197,39 @@ sealed class ParallaxContent {
 
     /**
      * LazyColumn content for better performance with large lists
+     *
+     * @param content The content to display in the LazyColumn
+     * @param config Configuration for LazyColumn behavior (padding, arrangement, etc.)
+     * @param lazyListState State object to control and observe LazyColumn scrolling
      */
-    data class Lazy(val content: LazyListScope.(Boolean) -> Unit) : ParallaxContent()
+    data class Lazy(
+        val content: LazyListScope.(Boolean) -> Unit,
+        val config: LazyColumnConfig = LazyColumnConfig(),
+        val lazyListState: LazyListState? = null
+    ) : ParallaxContent()
 }
 
 /**
  * Unified ComposeParallaxToolbarLayout with a single content parameter
+ *
+ * @param content The content to display - can be either Regular (Column + verticalScroll) or Lazy (LazyColumn)
+ *                For LazyColumn content, use ParallaxContent.Lazy with LazyColumnConfig for customization
+ *
+ * Example usage with LazyColumn customization:
+ * ```
+ * ComposeParallaxToolbarLayout(
+ *     content = ParallaxContent.Lazy(
+ *         content = { isCollapsed ->
+ *             // Your lazy items here
+ *         },
+ *         config = ParallaxToolbarDefaults.lazyColumnConfig(
+ *             contentPadding = PaddingValues(16.dp),
+ *             reverseLayout = true,
+ *             verticalArrangement = Arrangement.spacedBy(8.dp)
+ *         )
+ *     )
+ * )
+ * ```
  */
 @Composable
 fun ComposeParallaxToolbarLayout(
@@ -185,8 +244,7 @@ fun ComposeParallaxToolbarLayout(
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
-    scrollState: ScrollState = rememberScrollState(),
-    lazyListState: LazyListState = rememberLazyListState()
+    scrollState: ScrollState = rememberScrollState()
 ) {
     // Delegate to the existing implementation based on content type
     when (content) {
@@ -205,7 +263,7 @@ fun ComposeParallaxToolbarLayout(
                 bodyConfig = bodyConfig,
                 scroll = scrollState,
                 lazyContent = null,
-                lazyListState = lazyListState
+                lazyListState = rememberLazyListState()
             )
         }
 
@@ -224,7 +282,8 @@ fun ComposeParallaxToolbarLayout(
                 bodyConfig = bodyConfig,
                 scroll = scrollState,
                 lazyContent = content.content,
-                lazyListState = lazyListState
+                lazyListState = content.lazyListState ?: rememberLazyListState(),
+                lazyColumnConfig = content.config
             )
         }
     }
@@ -249,7 +308,8 @@ fun ComposeParallaxToolbarLayout(
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
     scroll: ScrollState = rememberScrollState(),
     lazyContent: (LazyListScope.(Boolean) -> Unit)? = null,
-    lazyListState: LazyListState = rememberLazyListState()
+    lazyListState: LazyListState = rememberLazyListState(),
+    lazyColumnConfig: LazyColumnConfig = LazyColumnConfig()
 ) {
     val topInset = with(LocalDensity.current) {
         WindowInsets.statusBars.getTop(this).toDp()
@@ -319,7 +379,8 @@ fun ComposeParallaxToolbarLayout(
                     toolbarHeight = toolbarHeight,
                     lazyContent = { lazyContent(isCollapsed.value) },
                     modifier = Modifier.offset(y = topInset),
-                    minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight
+                    minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
+                    config = lazyColumnConfig
                 )
             } else {
                 Body(
@@ -487,7 +548,8 @@ private fun LazyBody(
     toolbarHeight: Dp,
     lazyContent: LazyListScope.() -> Unit,
     modifier: Modifier = Modifier,
-    minBottomSpacerHeight: Dp = 0.dp
+    minBottomSpacerHeight: Dp = 0.dp,
+    config: LazyColumnConfig = LazyColumnConfig()
 ) {
     val density = LocalDensity.current
     val headerHeightPx = with(density) { headerHeight.toPx() }
@@ -513,7 +575,13 @@ private fun LazyBody(
 
     LazyColumn(
         state = lazyListState,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        contentPadding = config.contentPadding,
+        verticalArrangement = config.verticalArrangement,
+        horizontalAlignment = config.horizontalAlignment,
+        flingBehavior = config.flingBehavior ?: ScrollableDefaults.flingBehavior(),
+        userScrollEnabled = config.userScrollEnabled,
+        overscrollEffect = config.overscrollEffect
     ) {
         item {
             Spacer(Modifier.height(headerHeight))
