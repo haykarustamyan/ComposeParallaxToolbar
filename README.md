@@ -386,6 +386,9 @@ ComposeParallaxToolbarLayout(
     headerContent = { /* ... */ },
     content = ParallaxContent.Regular { /* ... */ },
     
+    // Scaffold integration (important for bottom navigation)
+    contentPadding = paddingValues, // Pass from Scaffold for proper spacing
+    
     // Optional customizations
     headerConfig = headerConfig,
     toolbarConfig = toolbarConfig,
@@ -429,6 +432,10 @@ ComposeParallaxToolbarLayout(
         )
     },
     headerContent = { /* ... */ },
+    
+    // For Scaffold integration (merges with LazyColumn's own contentPadding)
+    contentPadding = paddingValues, // External padding (e.g., from Scaffold)
+    
     content = ParallaxContent.Lazy(
         content = { isCollapsed ->
             items(100) { index ->
@@ -444,7 +451,7 @@ ComposeParallaxToolbarLayout(
                 }
             }
         },
-        config = lazyConfig,
+        config = lazyConfig, // Internal LazyColumn padding (16dp) + External padding = Total padding
         lazyListState = lazyListState // Pass your controlled state
     )
 )

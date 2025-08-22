@@ -1,18 +1,24 @@
 # ComposeParallaxToolbar API Documentation
 
-This document provides detailed API documentation for the ComposeParallaxToolbar Compose Multiplatform library. It covers the main composable, configuration classes, and utilities.
+This document provides detailed API documentation for the ComposeParallaxToolbar Compose
+Multiplatform library. It covers the main composable, configuration classes, and utilities.
 
 ## Table of Contents
 
 - [Main Composable](#main-composable)
+    - [ComposeParallaxToolbarLayout](#composeparallaxtoolbarlayout)
+    - [ParallaxContent Types](#parallaxcontent-types)
+    - [Parameters](#parameters)
+    - [Quick Reference Examples](#quick-reference-examples)
 - [Configuration Classes](#configuration-classes)
-  - [ParallaxHeaderConfig](#parallaxheaderconfig)
-  - [ParallaxToolbarConfig](#parallaxtoolbarconfig)
-  - [ParallaxTitleConfig](#parallaxtitleconfig)
-  - [ParallaxBodyConfig](#parallaxbodyconfig)
-  - [LazyColumnConfig](#lazycolumnconfig)
-- [iOS Integration](#ios-integration)
+    - [ParallaxHeaderConfig](#parallaxheaderconfig)
+    - [ParallaxToolbarConfig](#parallaxtoolbarconfig)
+    - [ParallaxTitleConfig](#parallaxtitleconfig)
+    - [ParallaxBodyConfig](#parallaxbodyconfig)
+    - [LazyColumnConfig](#lazycolumnconfig)
 - [Default Values](#default-values)
+    - [ParallaxToolbarDefaults](#parallaxtoolbardefaults)
+- [iOS Integration](#ios-integration)
 - [Internal Components](#internal-components)
 
 ## Main Composable
@@ -42,9 +48,11 @@ fun ComposeParallaxToolbarLayout(
 
 ### ParallaxContent Types
 
-The `content` parameter accepts a `ParallaxContent` sealed class that represents different types of scrollable content:
+The `content` parameter accepts a `ParallaxContent` sealed class that represents different types of
+scrollable content:
 
 #### Regular Content
+
 For traditional scrollable content using Column with vertical scroll:
 
 ```kotlin
@@ -67,6 +75,7 @@ content = ParallaxContent.Regular { isCollapsed ->
 ```
 
 #### LazyColumn Content
+
 For high-performance lazy loading with large lists:
 
 ```kotlin
@@ -93,11 +102,14 @@ content = ParallaxContent.Lazy(
 )
 ```
 
-**Note**: For `ParallaxContent.Lazy`, the `lazyListState` parameter controls the LazyColumn's scroll behavior and can be used for external scroll control. The `scrollState` parameter in the main function only applies to `ParallaxContent.Regular` content.
+**Note**: For `ParallaxContent.Lazy`, the `lazyListState` parameter controls the LazyColumn's scroll
+behavior and can be used for external scroll control. The `scrollState` parameter in the main
+function only applies to `ParallaxContent.Regular` content.
 
 ### Simple Usage Examples
 
 #### Basic Example with Regular Content
+
 ```kotlin
 ComposeParallaxToolbarLayout(
     titleContent = { isCollapsed ->
@@ -121,6 +133,7 @@ ComposeParallaxToolbarLayout(
 ```
 
 #### LazyColumn Example
+
 ```kotlin
 ComposeParallaxToolbarLayout(
     titleContent = { isCollapsed ->
@@ -145,33 +158,37 @@ ComposeParallaxToolbarLayout(
 
 #### Parameters
 
-| Parameter | Type | Description | Default Value |
-|-----------|------|-------------|---------------|
-| `titleContent` | `@Composable (Boolean) -> Unit` | Composable lambda for the title that is provided with a boolean parameter indicating whether the toolbar is collapsed | (Required) |
-| `headerContent` | `@Composable () -> Unit` | Composable lambda for the header area (typically an image) | (Required) |
-| `content` | `ParallaxContent` | The main content area - either ParallaxContent.Regular or ParallaxContent.Lazy | (Required) |
-| `modifier` | `Modifier` | Modifier to be applied to the layout | `Modifier` |
-| `contentPadding` | `PaddingValues` | Padding applied to the content area, typically passed from Scaffold to prevent drawing behind bottom bars | `PaddingValues(0.dp)` |
-| `subtitleContent` | `(@Composable (Boolean) -> Unit)?` | Optional composable lambda for the subtitle that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
-| `navigationIcon` | `(@Composable (Boolean) -> Unit)?` | Optional composable lambda for the navigation icon that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
-| `actions` | `(@Composable RowScope.(Boolean) -> Unit)?` | Optional composable lambda for toolbar actions that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null` |
-| `headerConfig` | `ParallaxHeaderConfig` | Configuration for the header area behavior | `ParallaxToolbarDefaults.headerConfig()` |
-| `toolbarConfig` | `ParallaxToolbarConfig` | Configuration for the toolbar appearance and behavior | `ParallaxToolbarDefaults.toolbarConfig()` |
-| `titleConfig` | `ParallaxTitleConfig` | Configuration for the title and subtitle animations and behavior | `ParallaxToolbarDefaults.titleConfig()` |
-| `bodyConfig` | `ParallaxBodyConfig` | Configuration for the content body layout | `ParallaxToolbarDefaults.bodyConfig()` |
-| `scroll` | `ScrollState` | ScrollState to control the scrolling behavior (can be externally controlled) | `rememberScrollState()` |
-| `lazyListState` | `LazyListState` | LazyListState to control the LazyColumn scrolling behavior (can be externally controlled) | `rememberLazyListState()` |
+| Parameter         | Type                                        | Description                                                                                                                              | Default Value                             |
+|-------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| `titleContent`    | `@Composable (Boolean) -> Unit`             | Composable lambda for the title that is provided with a boolean parameter indicating whether the toolbar is collapsed                    | (Required)                                |
+| `headerContent`   | `@Composable () -> Unit`                    | Composable lambda for the header area (typically an image)                                                                               | (Required)                                |
+| `content`         | `ParallaxContent`                           | The main content area - either ParallaxContent.Regular or ParallaxContent.Lazy                                                           | (Required)                                |
+| `modifier`        | `Modifier`                                  | Modifier to be applied to the layout                                                                                                     | `Modifier`                                |
+| `contentPadding`  | `PaddingValues`                             | Padding applied to the content area, typically passed from Scaffold to prevent drawing behind bottom bars                                | `PaddingValues(0.dp)`                     |
+| `subtitleContent` | `(@Composable (Boolean) -> Unit)?`          | Optional composable lambda for the subtitle that is provided with a boolean parameter indicating whether the toolbar is collapsed        | `null`                                    |
+| `navigationIcon`  | `(@Composable (Boolean) -> Unit)?`          | Optional composable lambda for the navigation icon that is provided with a boolean parameter indicating whether the toolbar is collapsed | `null`                                    |
+| `actions`         | `(@Composable RowScope.(Boolean) -> Unit)?` | Optional composable lambda for toolbar actions that is provided with a boolean parameter indicating whether the toolbar is collapsed     | `null`                                    |
+| `headerConfig`    | `ParallaxHeaderConfig`                      | Configuration for the header area behavior                                                                                               | `ParallaxToolbarDefaults.headerConfig()`  |
+| `toolbarConfig`   | `ParallaxToolbarConfig`                     | Configuration for the toolbar appearance and behavior                                                                                    | `ParallaxToolbarDefaults.toolbarConfig()` |
+| `titleConfig`     | `ParallaxTitleConfig`                       | Configuration for the title and subtitle animations and behavior                                                                         | `ParallaxToolbarDefaults.titleConfig()`   |
+| `bodyConfig`      | `ParallaxBodyConfig`                        | Configuration for the content body layout                                                                                                | `ParallaxToolbarDefaults.bodyConfig()`    |
+| `scroll`          | `ScrollState`                               | ScrollState to control the scrolling behavior (can be externally controlled)                                                             | `rememberScrollState()`                   |
+| `lazyListState`   | `LazyListState`                             | LazyListState to control the LazyColumn scrolling behavior (can be externally controlled)                                                | `rememberLazyListState()`                 |
 
 #### Behavior
 
-- The `isCollapsed` boolean parameter passed to several content lambdas indicates whether the toolbar is in collapsed state
+- The `isCollapsed` boolean parameter passed to several content lambdas indicates whether the
+  toolbar is in collapsed state
 - The parallax effect automatically adjusts as the user scrolls
 - Title animation occurs along a curved path during collapse/expansion
-- The toolbar background color animates between `initialColor` and `targetColor` based on scroll position
+- The toolbar background color animates between `initialColor` and `targetColor` based on scroll
+  position
 
 ## Scaffold Integration
 
-When using `ComposeParallaxToolbarLayout` within a Scaffold (especially with bottom bars), you must pass the Scaffold's `paddingValues` to the `contentPadding` parameter to prevent content from drawing behind bottom navigation or other UI elements.
+When using `ComposeParallaxToolbarLayout` within a Scaffold (especially with bottom bars), you must
+pass the Scaffold's `paddingValues` to the `contentPadding` parameter to prevent content from
+drawing behind bottom navigation or other UI elements.
 
 ### Basic Scaffold Integration
 
@@ -286,7 +303,56 @@ ComposeParallaxToolbarLayout(
 )
 ```
 
-For more detailed information and examples, see the [Scaffold Integration Guide](SCAFFOLD_INTEGRATION.md).
+For more detailed information and examples, see
+the [Scaffold Integration Guide](SCAFFOLD_INTEGRATION.md).
+
+### Quick Reference Examples
+
+#### Minimal Setup
+
+```kotlin
+ComposeParallaxToolbarLayout(
+    titleContent = { isCollapsed -> Text("My App") },
+    headerContent = { Box(Modifier.background(Color.Blue).fillMaxSize()) },
+    content = ParallaxContent.Regular {
+        Column { /* Your content */ }
+    }
+)
+```
+
+#### With Scaffold (Recommended)
+
+```kotlin
+Scaffold(bottomBar = { BottomAppBar { /* ... */ } }) { paddingValues ->
+    ComposeParallaxToolbarLayout(
+        contentPadding = paddingValues, // Essential!
+        titleContent = { isCollapsed -> Text("My App") },
+        headerContent = { /* ... */ },
+        content = ParallaxContent.Regular { /* ... */ }
+    )
+}
+```
+
+#### Lazy Content with Custom Configuration
+
+```kotlin
+ComposeParallaxToolbarLayout(
+    contentPadding = paddingValues,
+    titleContent = { isCollapsed -> Text("My App") },
+    headerContent = { /* ... */ },
+    content = ParallaxContent.Lazy(
+        content = { isCollapsed ->
+            items(100) { index ->
+                Text("Item $index")
+            }
+        },
+        config = ParallaxToolbarDefaults.lazyColumnConfig(
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        )
+    )
+)
+```
 
 ## Configuration Classes
 
@@ -304,11 +370,11 @@ data class ParallaxHeaderConfig(
 
 #### Properties
 
-| Property | Type | Description | Default Value |
-|----------|------|-------------|---------------|
-| `height` | `Dp` | The height of the header area | 450.dp |
-| `gradient` | `Brush?` | Optional gradient brush to overlay on the header for better title visibility | `null` |
-| `isExpandedWhenFirstDisplayed` | `Boolean` | Whether the header should start in expanded state | `true` |
+| Property                       | Type      | Description                                                                  | Default Value |
+|--------------------------------|-----------|------------------------------------------------------------------------------|---------------|
+| `height`                       | `Dp`      | The height of the header area                                                | 450.dp        |
+| `gradient`                     | `Brush?`  | Optional gradient brush to overlay on the header for better title visibility | `null`        |
+| `isExpandedWhenFirstDisplayed` | `Boolean` | Whether the header should start in expanded state                            | `true`        |
 
 ### ParallaxToolbarConfig
 
@@ -327,14 +393,14 @@ data class ParallaxToolbarConfig(
 
 #### Properties
 
-| Property | Type | Description | Default Value |
-|----------|------|-------------|---------------|
-| `initialColor` | `Color` | The toolbar background color when expanded | `Color.Transparent` |
-| `targetColor` | `Color` | The toolbar background color when collapsed | `Color.Black` |
-| `elevation` | `Dp` | The elevation of the toolbar when visible | `0.dp` |
-| `iconSize` | `Dp` | The size of toolbar icons | `24.dp` |
-| `iconSpacing` | `Dp` | The spacing between toolbar actions | `8.dp` |
-| `animationSpec` | `AnimationSpec<Color>` | Animation specification for background color transition | `tween(300)` |
+| Property        | Type                   | Description                                             | Default Value       |
+|-----------------|------------------------|---------------------------------------------------------|---------------------|
+| `initialColor`  | `Color`                | The toolbar background color when expanded              | `Color.Transparent` |
+| `targetColor`   | `Color`                | The toolbar background color when collapsed             | `Color.Black`       |
+| `elevation`     | `Dp`                   | The elevation of the toolbar when visible               | `0.dp`              |
+| `iconSize`      | `Dp`                   | The size of toolbar icons                               | `24.dp`             |
+| `iconSpacing`   | `Dp`                   | The spacing between toolbar actions                     | `8.dp`              |
+| `animationSpec` | `AnimationSpec<Color>` | Animation specification for background color transition | `tween(300)`        |
 
 ### ParallaxTitleConfig
 
@@ -352,13 +418,13 @@ data class ParallaxTitleConfig(
 
 #### Properties
 
-| Property | Type | Description | Default Value |
-|----------|------|-------------|---------------|
-| `paddingBottom` | `Dp` | Padding from bottom of header to title when expanded | `-16.dp` |
-| `paddingStart` | `Dp` | Horizontal padding for title when expanded | `16.dp` |
-| `collapsedPaddingStart` | `Dp` | Horizontal padding for title when collapsed | `64.dp` |
-| `keepSubtitleAfterCollapse` | `Boolean` | Whether to keep subtitle visible after collapse | `false` |
-| `animateSubTitleHiding` | `Boolean` | Whether to animate subtitle hiding during collapse | `true` |
+| Property                    | Type      | Description                                          | Default Value |
+|-----------------------------|-----------|------------------------------------------------------|---------------|
+| `paddingBottom`             | `Dp`      | Padding from bottom of header to title when expanded | `-16.dp`      |
+| `paddingStart`              | `Dp`      | Horizontal padding for title when expanded           | `16.dp`       |
+| `collapsedPaddingStart`     | `Dp`      | Horizontal padding for title when collapsed          | `64.dp`       |
+| `keepSubtitleAfterCollapse` | `Boolean` | Whether to keep subtitle visible after collapse      | `false`       |
+| `animateSubTitleHiding`     | `Boolean` | Whether to animate subtitle hiding during collapse   | `true`        |
 
 ### ParallaxBodyConfig
 
@@ -372,9 +438,9 @@ data class ParallaxBodyConfig(
 
 #### Properties
 
-| Property | Type | Description | Default Value |
-|----------|------|-------------|---------------|
-| `minBottomSpacerHeight` | `Dp` | Minimum spacing after content | `0.dp` |
+| Property                | Type | Description                   | Default Value |
+|-------------------------|------|-------------------------------|---------------|
+| `minBottomSpacerHeight` | `Dp` | Minimum spacing after content | `0.dp`        |
 
 ### LazyColumnConfig
 
@@ -393,18 +459,19 @@ data class LazyColumnConfig(
 
 #### Properties
 
-| Property | Type | Description | Default Value |
-|----------|------|-------------|---------------|
-| `contentPadding` | `PaddingValues` | Padding around the entire LazyColumn content | `PaddingValues(0.dp)` |
-| `verticalArrangement` | `Arrangement.Vertical` | Vertical arrangement strategy for items (e.g., spacing between items) | `Arrangement.Top` |
-| `horizontalAlignment` | `Alignment.Horizontal` | Horizontal alignment of items within the LazyColumn | `Alignment.Start` |
-| `flingBehavior` | `FlingBehavior?` | Custom fling behavior for scrolling animations, null uses default | `null` |
-| `userScrollEnabled` | `Boolean` | Whether user can scroll the LazyColumn | `true` |
-| `overscrollEffect` | `OverscrollEffect?` | Custom overscroll effect, null uses default | `null` |
+| Property              | Type                   | Description                                                           | Default Value         |
+|-----------------------|------------------------|-----------------------------------------------------------------------|-----------------------|
+| `contentPadding`      | `PaddingValues`        | Padding around the entire LazyColumn content                          | `PaddingValues(0.dp)` |
+| `verticalArrangement` | `Arrangement.Vertical` | Vertical arrangement strategy for items (e.g., spacing between items) | `Arrangement.Top`     |
+| `horizontalAlignment` | `Alignment.Horizontal` | Horizontal alignment of items within the LazyColumn                   | `Alignment.Start`     |
+| `flingBehavior`       | `FlingBehavior?`       | Custom fling behavior for scrolling animations, null uses default     | `null`                |
+| `userScrollEnabled`   | `Boolean`              | Whether user can scroll the LazyColumn                                | `true`                |
+| `overscrollEffect`    | `OverscrollEffect?`    | Custom overscroll effect, null uses default                           | `null`                |
 
 #### Usage Examples
 
 **Basic Configuration:**
+
 ```kotlin
 val config = ParallaxToolbarDefaults.lazyColumnConfig(
     contentPadding = PaddingValues(16.dp),
@@ -419,6 +486,7 @@ content = ParallaxContent.Lazy(
 ```
 
 **Advanced Configuration:**
+
 ```kotlin
 val config = ParallaxToolbarDefaults.lazyColumnConfig(
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -429,6 +497,7 @@ val config = ParallaxToolbarDefaults.lazyColumnConfig(
 ```
 
 **External LazyListState Control:**
+
 ```kotlin
 // Control LazyColumn scrolling from outside the component
 val lazyListState = rememberLazyListState()
@@ -443,8 +512,8 @@ LaunchedEffect(someCondition) {
 // Monitor scroll position
 val isAtTop by remember {
     derivedStateOf {
-        lazyListState.firstVisibleItemIndex == 0 && 
-        lazyListState.firstVisibleItemScrollOffset == 0
+        lazyListState.firstVisibleItemIndex == 0 &&
+                lazyListState.firstVisibleItemScrollOffset == 0
     }
 }
 
@@ -456,6 +525,7 @@ content = ParallaxContent.Lazy(
 ```
 
 **Custom Spacing Examples:**
+
 ```kotlin
 // Evenly spaced items
 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -504,10 +574,10 @@ import compose_parallax_toolbar_kmp
 class MyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Create a Compose view controller with the toolbar
         let composeVC = IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
-        
+
         // Add it to your view hierarchy
         addChild(composeVC)
         view.addSubview(composeVC.view)
@@ -527,7 +597,7 @@ struct ComposeParallaxToolbarView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         return IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
     }
-    
+
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
         // Updates happen here if needed
     }
@@ -690,10 +760,12 @@ fun lazyColumnConfig(
 ): LazyColumnConfig
 ```
 
-Creates a configuration for LazyColumn behavior with default or custom values. This method provides defaults for `@Composable` properties like `flingBehavior` and `overscrollEffect`.
+Creates a configuration for LazyColumn behavior with default or custom values. This method provides
+defaults for `@Composable` properties like `flingBehavior` and `overscrollEffect`.
 
 **Parameters:**
-- `contentPadding` - Padding around the entire LazyColumn content  
+
+- `contentPadding` - Padding around the entire LazyColumn content
 - `verticalArrangement` - Vertical arrangement strategy for items
 - `horizontalAlignment` - Horizontal alignment of items within the LazyColumn
 - `flingBehavior` - Custom fling behavior, null uses `ScrollableDefaults.flingBehavior()`
@@ -722,7 +794,8 @@ Handles the animation and positioning of title and subtitle during collapse/expa
 
 ## Examples
 
-The library includes several sample usage examples to demonstrate different configurations and use cases:
+The library includes several sample usage examples to demonstrate different configurations and use
+cases:
 
 ### Fully Customized Example
 
@@ -917,7 +990,7 @@ fun InitiallyCollapsedToolbarScreen() {
         ),
         isExpandedWhenFirstDisplayed = false // Start in collapsed state
     )
-    
+
     ComposeParallaxToolbarLayout(
         titleContent = { isCollapsed ->
             Text(
@@ -934,4 +1007,5 @@ fun InitiallyCollapsedToolbarScreen() {
 }
 ```
 
-For more complete examples, see the full sample implementations in [SampleUsage.kt](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/compose-parallax-toolbar-kmp/src/commonMain/kotlin/am/highapps/parallaxtoolbar/SampleUsage.kt). 
+For more complete examples, see the full sample implementations
+in [SampleUsage.kt](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/compose-parallax-toolbar-kmp/src/commonMain/kotlin/am/highapps/parallaxtoolbar/SampleUsage.kt). 
