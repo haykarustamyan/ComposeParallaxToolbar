@@ -356,13 +356,53 @@ ComposeParallaxToolbarLayout(
 
 ## Configuration Classes
 
+### HeaderHeight
+
+Sealed class representing different ways to specify header height for responsive design.
+
+```kotlin
+sealed class HeaderHeight {
+    /**
+     * Fixed height in Dp
+     */
+    data class Fixed(val height: Dp) : HeaderHeight()
+
+    /**
+     * Height based on aspect ratio (width/height)
+     * For example: 16f/9f for a 16:9 aspect ratio
+     */
+    data class AspectRatio(val ratio: Float) : HeaderHeight()
+
+    /**
+     * Height as percentage of screen height
+     * Value should be between 0f and 1f (e.g., 0.4f for 40% of screen height)
+     */
+    data class Percentage(val percentage: Float) : HeaderHeight()
+}
+```
+
+#### Types
+
+| Type                        | Description                                                                    | Example Usage                                |
+|-----------------------------|--------------------------------------------------------------------------------|----------------------------------------------|
+| `HeaderHeight.Fixed`        | Traditional fixed height in Dp                                                | `HeaderHeight.Fixed(450.dp)`                |
+| `HeaderHeight.AspectRatio`  | Height calculated from screen width and aspect ratio (width/height)           | `HeaderHeight.AspectRatio(16f/9f)`           |
+| `HeaderHeight.Percentage`   | Height as percentage of screen height (0.0 to 1.0)                           | `HeaderHeight.Percentage(0.4f)` (40%)       |
+
+#### Benefits
+
+- **Responsive Design**: Adapts to different screen sizes automatically
+- **Consistent Visual Hierarchy**: Maintains proportions across devices
+- **No Overflow Issues**: Prevents headers from taking too much space on small screens
+- **Future-Proof**: Easy to adjust for new device form factors
+
 ### ParallaxHeaderConfig
 
 Configuration for the header area behavior.
 
 ```kotlin
 data class ParallaxHeaderConfig(
-    val height: Dp,
+    val height: HeaderHeight,
     val gradient: Brush?,
     val isExpandedWhenFirstDisplayed: Boolean = true
 )
@@ -370,11 +410,11 @@ data class ParallaxHeaderConfig(
 
 #### Properties
 
-| Property                       | Type      | Description                                                                  | Default Value |
-|--------------------------------|-----------|------------------------------------------------------------------------------|---------------|
-| `height`                       | `Dp`      | The height of the header area                                                | 450.dp        |
-| `gradient`                     | `Brush?`  | Optional gradient brush to overlay on the header for better title visibility | `null`        |
-| `isExpandedWhenFirstDisplayed` | `Boolean` | Whether the header should start in expanded state                            | `true`        |
+| Property                       | Type           | Description                                                                  | Default Value                              |
+|--------------------------------|----------------|------------------------------------------------------------------------------|--------------------------------------------|
+| `height`                       | `HeaderHeight` | The height specification for the header area (Fixed, AspectRatio, or Percentage) | `HeaderHeight.Fixed(450.dp)`               |
+| `gradient`                     | `Brush?`       | Optional gradient brush to overlay on the header for better title visibility | `null`                                     |
+| `isExpandedWhenFirstDisplayed` | `Boolean`      | Whether the header should start in expanded state                            | `true`                                     |
 
 ### ParallaxToolbarConfig
 
@@ -696,13 +736,62 @@ object ParallaxToolbarDefaults {
 ```kotlin
 @Composable
 fun headerConfig(
-    height: Dp = HeaderHeight,
+    height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
     gradient: Brush? = null,
     isExpandedWhenFirstDisplayed: Boolean = true
 ): ParallaxHeaderConfig
 ```
 
-Creates a configuration for the header area with default or custom values.
+Creates a configuration for the header area with default or custom values. Uses `HeaderHeight.Fixed` by default for backward compatibility.
+
+#### headerConfigWithAspectRatio
+
+```kotlin
+@Composable
+fun headerConfigWithAspectRatio(
+    aspectRatio: Float = 16f / 9f,
+    gradient: Brush? = null,
+    isExpandedWhenFirstDisplayed: Boolean = true
+): ParallaxHeaderConfig
+```
+
+Creates a header configuration with aspect ratio-based height. The header height will be calculated as `screenWidth / aspectRatio`.
+
+**Parameters:**
+- `aspectRatio` - The width/height ratio (e.g., 16f/9f for widescreen, 4f/3f for standard, 1f for square)
+- `gradient` - Optional gradient overlay
+- `isExpandedWhenFirstDisplayed` - Whether to start expanded
+
+**Common Aspect Ratios:**
+- `16f/9f` - Widescreen (default)
+- `4f/3f` - Standard/classic
+- `21f/9f` - Ultrawide
+- `1f/1f` - Square
+- `3f/2f` - Photography standard
+
+#### headerConfigWithPercentage
+
+```kotlin
+@Composable
+fun headerConfigWithPercentage(
+    heightPercentage: Float = 0.4f,
+    gradient: Brush? = null,
+    isExpandedWhenFirstDisplayed: Boolean = true
+): ParallaxHeaderConfig
+```
+
+Creates a header configuration with percentage-based height. The header height will be calculated as `screenHeight * heightPercentage`.
+
+**Parameters:**
+- `heightPercentage` - Percentage of screen height (0.0 to 1.0, e.g., 0.4f for 40%)
+- `gradient` - Optional gradient overlay
+- `isExpandedWhenFirstDisplayed` - Whether to start expanded
+
+**Recommended Percentages:**
+- `0.25f` (25%) - Minimal header
+- `0.4f` (40%) - Standard header (default)
+- `0.5f` (50%) - Large header
+- `0.6f` (60%) - Extra large header
 
 #### toolbarConfig
 
@@ -805,8 +894,9 @@ The `SampleParallaxToolbarScreen` shows how to use all customization options:
 @Composable
 fun SampleParallaxToolbarScreen() {
     // Create custom configurations using the defaults object
-    val headerConfig = ParallaxToolbarDefaults.headerConfig(
-        height = 400.dp,
+    // Example with aspect ratio for responsive design
+    val headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+        aspectRatio = 16f/9f,  // Widescreen ratio
         gradient = Brush.verticalGradient(
             colors = listOf(
                 Color.Transparent,
@@ -978,9 +1068,9 @@ The `InitiallyCollapsedToolbarScreen` demonstrates how to start with a collapsed
 ```kotlin
 @Composable
 fun InitiallyCollapsedToolbarScreen() {
-    // Create a header config that starts in collapsed state
-    val collapsedHeaderConfig = ParallaxToolbarDefaults.headerConfig(
-        height = 350.dp,
+    // Create a header config that starts in collapsed state using percentage
+    val collapsedHeaderConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
+        heightPercentage = 0.35f,  // 35% of screen height
         gradient = Brush.verticalGradient(
             colors = listOf(
                 Color.Transparent,
@@ -1005,6 +1095,152 @@ fun InitiallyCollapsedToolbarScreen() {
         headerConfig = collapsedHeaderConfig
     )
 }
+```
+
+### Responsive Header Height Examples
+
+#### Fixed Height (Traditional)
+
+```kotlin
+@Composable
+fun FixedHeaderExample() {
+    val headerConfig = ParallaxToolbarDefaults.headerConfig(
+        height = HeaderHeight.Fixed(400.dp)  // Traditional fixed height
+    )
+    
+    ComposeParallaxToolbarLayout(
+        titleContent = { isCollapsed ->
+            Text("Fixed Height", fontSize = if (isCollapsed) 18.sp else 24.sp)
+        },
+        headerContent = { /* Your header */ },
+        content = ParallaxContent.Regular { /* Your content */ },
+        headerConfig = headerConfig
+    )
+}
+```
+
+#### Aspect Ratio Height (Responsive)
+
+```kotlin
+@Composable
+fun AspectRatioHeaderExample() {
+    // Widescreen header - great for hero images
+    val widescreenConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+        aspectRatio = 16f/9f
+    )
+    
+    // Square header - perfect for profile screens
+    val squareConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+        aspectRatio = 1f/1f
+    )
+    
+    // Ultrawide header - for cinematic content
+    val ultrawideConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+        aspectRatio = 21f/9f
+    )
+    
+    ComposeParallaxToolbarLayout(
+        titleContent = { isCollapsed ->
+            Text("Aspect Ratio Header", fontSize = if (isCollapsed) 18.sp else 24.sp)
+        },
+        headerContent = {
+            Image(
+                painter = painterResource(id = R.drawable.hero_image),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        },
+        content = ParallaxContent.Regular { /* Your content */ },
+        headerConfig = widescreenConfig  // Choose based on your content
+    )
+}
+```
+
+#### Percentage Height (Screen-Based)
+
+```kotlin
+@Composable
+fun PercentageHeaderExample() {
+    // Large header taking 50% of screen
+    val largeHeaderConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
+        heightPercentage = 0.5f  // 50% of screen height
+    )
+    
+    // Compact header taking 30% of screen - great for mobile
+    val compactHeaderConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
+        heightPercentage = 0.3f  // 30% of screen height
+    )
+    
+    ComposeParallaxToolbarLayout(
+        titleContent = { isCollapsed ->
+            Text("Percentage Header", fontSize = if (isCollapsed) 18.sp else 24.sp)
+        },
+        headerContent = { /* Your header */ },
+        content = ParallaxContent.Regular { /* Your content */ },
+        headerConfig = largeHeaderConfig
+    )
+}
+```
+
+#### Responsive Design Best Practices
+
+```kotlin
+@Composable
+fun ResponsiveHeaderExample() {
+    // Different configurations for different screen types
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    
+    val headerConfig = when {
+        screenWidthDp < 600.dp -> {
+            // Phone: Use percentage to avoid taking too much space
+            ParallaxToolbarDefaults.headerConfigWithPercentage(0.35f)
+        }
+        screenWidthDp < 840.dp -> {
+            // Tablet portrait: Use moderate aspect ratio
+            ParallaxToolbarDefaults.headerConfigWithAspectRatio(4f/3f)
+        }
+        else -> {
+            // Tablet landscape/Desktop: Use widescreen ratio
+            ParallaxToolbarDefaults.headerConfigWithAspectRatio(16f/9f)
+        }
+    }
+    
+    ComposeParallaxToolbarLayout(
+        titleContent = { isCollapsed ->
+            Text("Responsive Design", fontSize = if (isCollapsed) 18.sp else 24.sp)
+        },
+        headerContent = { /* Your header */ },
+        content = ParallaxContent.Regular { /* Your content */ },
+        headerConfig = headerConfig
+    )
+}
+```
+
+### Migration from Fixed Height
+
+If you're upgrading from a previous version that used fixed heights:
+
+```kotlin
+// Old way (still works)
+val oldConfig = ParallaxToolbarDefaults.headerConfig(
+    height = 400.dp  // This automatically becomes HeaderHeight.Fixed(400.dp)
+)
+
+// New way - more responsive options
+val newConfigAspectRatio = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+    aspectRatio = 16f/9f  // Adapts to screen width
+)
+
+val newConfigPercentage = ParallaxToolbarDefaults.headerConfigWithPercentage(
+    heightPercentage = 0.4f  // 40% of screen height
+)
+
+// Direct usage with HeaderHeight sealed class
+val advancedConfig = ParallaxToolbarDefaults.headerConfig(
+    height = HeaderHeight.AspectRatio(21f/9f)  // Direct usage
+)
 ```
 
 For more complete examples, see the full sample implementations

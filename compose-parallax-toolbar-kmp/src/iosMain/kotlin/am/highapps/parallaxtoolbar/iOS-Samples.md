@@ -5,11 +5,18 @@ This guide provides detailed examples for implementing the Compose Parallax Tool
 ## Quick Reference
 
 Sample view controllers available in the library:
+
+### Basic Examples
 - `IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()`
 - `IosParallaxToolbarSampleKt.CustomParallaxToolbarViewController()`
 - `IosParallaxToolbarSampleKt.MinimalParallaxToolbarViewController()`
 - `IosParallaxToolbarSampleKt.InitiallyCollapsedToolbarViewController()`
 - `IosParallaxToolbarSampleKt.AllSamplesViewController()`
+
+### NEW: Responsive Header Examples
+- `IosParallaxToolbarSampleKt.MyResponsiveAspectRatioViewController()` - 16:9 aspect ratio header
+- `IosParallaxToolbarSampleKt.MyResponsivePercentageViewController()` - 40% screen height header
+- `IosParallaxToolbarSampleKt.MyConfiguredToolbarViewController()` - Traditional fixed height (backward compatible)
 
 ## UIKit Implementation Examples
 
@@ -50,6 +57,9 @@ class SampleListViewController: UITableViewController {
         case custom = "Custom Toolbar"
         case minimal = "Minimal Toolbar"
         case initiallyCollapsed = "Initially Collapsed"
+        case responsiveAspectRatio = "📱 NEW: Responsive Aspect Ratio"
+        case responsivePercentage = "📐 NEW: Responsive Percentage"
+        case fixedHeight = "🔧 Traditional Fixed Height"
         case all = "All Samples"
     }
     
@@ -91,6 +101,12 @@ class SampleListViewController: UITableViewController {
             viewController = IosParallaxToolbarSampleKt.MinimalParallaxToolbarViewController()
         case .initiallyCollapsed:
             viewController = IosParallaxToolbarSampleKt.InitiallyCollapsedToolbarViewController()
+        case .responsiveAspectRatio:
+            viewController = IosParallaxToolbarSampleKt.MyResponsiveAspectRatioViewController()
+        case .responsivePercentage:
+            viewController = IosParallaxToolbarSampleKt.MyResponsivePercentageViewController()
+        case .fixedHeight:
+            viewController = IosParallaxToolbarSampleKt.MyConfiguredToolbarViewController()
         case .all:
             viewController = IosParallaxToolbarSampleKt.AllSamplesViewController()
         }
@@ -166,6 +182,9 @@ struct ParallaxToolbarNavigation: View {
         case custom = "Custom Toolbar"
         case minimal = "Minimal Toolbar"
         case initiallyCollapsed = "Initially Collapsed"
+        case responsiveAspectRatio = "📱 NEW: Responsive Aspect Ratio"
+        case responsivePercentage = "📐 NEW: Responsive Percentage"
+        case fixedHeight = "🔧 Traditional Fixed Height"
         case all = "All Samples"
         
         var id: String { self.rawValue }
@@ -194,6 +213,12 @@ struct ParallaxToolbarNavigation: View {
             MinimalToolbarWrapper()
         case .initiallyCollapsed:
             InitiallyCollapsedToolbarWrapper()
+        case .responsiveAspectRatio:
+            ResponsiveAspectRatioWrapper()
+        case .responsivePercentage:
+            ResponsivePercentageWrapper()
+        case .fixedHeight:
+            FixedHeightWrapper()
         case .all:
             AllSamplesWrapper()
         }
@@ -236,6 +261,31 @@ struct InitiallyCollapsedToolbarWrapper: UIViewControllerRepresentable {
 struct AllSamplesWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         return IosParallaxToolbarSampleKt.AllSamplesViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+// NEW: Responsive Header Wrappers
+struct ResponsiveAspectRatioWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return IosParallaxToolbarSampleKt.MyResponsiveAspectRatioViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+struct ResponsivePercentageWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return IosParallaxToolbarSampleKt.MyResponsivePercentageViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+struct FixedHeightWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return IosParallaxToolbarSampleKt.MyConfiguredToolbarViewController()
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
@@ -401,13 +451,132 @@ fun MyAdvancedToolbarViewController() = ComposeUIViewController {
 }
 ```
 
-### Custom Configuration Example
+### Responsive Header Configuration Examples
 
 ```kotlin
+// Example 1: Aspect Ratio Header (NEW - Responsive)
+fun MyResponsiveAspectRatioViewController() = ComposeUIViewController {
+    MaterialTheme {
+        val responsiveHeaderConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+            aspectRatio = 16f/9f,  // Perfect widescreen ratio for any iOS device
+            gradient = Brush.verticalGradient(
+                colors = listOf(
+                    Color.Transparent,
+                    Color.Black.copy(alpha = 0.3f),
+                    Color.Black.copy(alpha = 0.7f)
+                )
+            )
+        )
+        
+        ComposeParallaxToolbarLayout(
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "Responsive Widescreen",
+                    fontSize = if (isCollapsed) 18.sp else 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color(0xFF2196F3), Color(0xFF1976D2))
+                            )
+                        )
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Regular { isCollapsed ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    repeat(20) { index ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Responsive Item ${index + 1}",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            headerConfig = responsiveHeaderConfig
+        )
+    }
+}
+
+// Example 2: Percentage Header (NEW - Responsive)
+fun MyResponsivePercentageViewController() = ComposeUIViewController {
+    MaterialTheme {
+        val percentageHeaderConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
+            heightPercentage = 0.4f,  // 40% of screen height
+            gradient = Brush.verticalGradient(
+                colors = listOf(
+                    Color.Transparent,
+                    Color.Black.copy(alpha = 0.3f),
+                    Color.Black.copy(alpha = 0.7f)
+                )
+            )
+        )
+        
+        ComposeParallaxToolbarLayout(
+            titleContent = { isCollapsed ->
+                Text(
+                    text = "40% Screen Height",
+                    fontSize = if (isCollapsed) 18.sp else 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCollapsed) 
+                        MaterialTheme.colorScheme.onSurface 
+                    else 
+                        Color.White
+                )
+            },
+            headerContent = {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))
+                            )
+                        )
+                        .fillMaxSize()
+                )
+            },
+            content = ParallaxContent.Lazy { isCollapsed ->
+                items(50) { index ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Percentage Item ${index + 1}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+            },
+            headerConfig = percentageHeaderConfig
+        )
+    }
+}
+
+// Example 3: Traditional Fixed Height (Backward Compatible)
 fun MyConfiguredToolbarViewController() = ComposeUIViewController {
     MaterialTheme {
         val headerConfig = ParallaxToolbarDefaults.headerConfig(
-            height = 400.dp,
+            height = HeaderHeight.Fixed(400.dp),  // Traditional fixed height
             gradient = Brush.verticalGradient(
                 colors = listOf(
                     Color.Transparent,
@@ -479,10 +648,14 @@ fun MyConfiguredToolbarViewController() = ComposeUIViewController {
 After adding your custom implementations to the Kotlin code, use them in Swift:
 
 ```swift
-// UIKit
+// UIKit - Basic Examples
 let myCustomVC = IosParallaxToolbarSampleKt.MyBasicToolbarViewController()
 let myAdvancedVC = IosParallaxToolbarSampleKt.MyAdvancedToolbarViewController()
 let myConfiguredVC = IosParallaxToolbarSampleKt.MyConfiguredToolbarViewController()
+
+// UIKit - NEW: Responsive Header Examples
+let responsiveAspectRatioVC = IosParallaxToolbarSampleKt.MyResponsiveAspectRatioViewController()
+let responsivePercentageVC = IosParallaxToolbarSampleKt.MyResponsivePercentageViewController()
 
 // SwiftUI
 struct MyCustomWrapper: UIViewControllerRepresentable {
@@ -492,6 +665,27 @@ struct MyCustomWrapper: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
+
+// SwiftUI - NEW: Responsive Examples
+struct ResponsiveWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return IosParallaxToolbarSampleKt.MyResponsiveAspectRatioViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+```
+
+### Migration Recommendation for iOS
+
+For the best iOS experience across all devices, consider migrating from fixed heights:
+
+```swift
+// ❌ Old way - may cause issues on different iOS devices
+let oldVC = IosParallaxToolbarSampleKt.MyConfiguredToolbarViewController() // Fixed 400.dp
+
+// ✅ New way - perfect scaling on iPhone SE to iPad Pro
+let newVC = IosParallaxToolbarSampleKt.MyResponsiveAspectRatioViewController() // 16:9 ratio
 ```
 
 ## Performance Considerations

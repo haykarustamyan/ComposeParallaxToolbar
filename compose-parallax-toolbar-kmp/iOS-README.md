@@ -267,9 +267,33 @@ ComposeParallaxToolbarLayout(
 ### Advanced Configuration
 
 ```kotlin
-// Custom configuration with styling
-val headerConfig = ParallaxToolbarDefaults.headerConfig(
-    height = 400.dp,
+// NEW: Responsive header heights for better cross-device support
+val responsiveHeaderConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+    aspectRatio = 16f/9f,  // Widescreen ratio adapts to any screen width
+    gradient = Brush.verticalGradient(
+        colors = listOf(
+            Color.Transparent,
+            Color.Black.copy(alpha = 0.3f),
+            Color.Black.copy(alpha = 0.7f)
+        )
+    )
+)
+
+// Alternative: Percentage-based height for consistent screen usage
+val percentageHeaderConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
+    heightPercentage = 0.4f,  // 40% of screen height
+    gradient = Brush.verticalGradient(
+        colors = listOf(
+            Color.Transparent,
+            Color.Black.copy(alpha = 0.3f),
+            Color.Black.copy(alpha = 0.7f)
+        )
+    )
+)
+
+// Traditional fixed height (still supported)
+val fixedHeaderConfig = ParallaxToolbarDefaults.headerConfig(
+    height = HeaderHeight.Fixed(400.dp),
     gradient = Brush.verticalGradient(
         colors = listOf(
             Color.Transparent,
@@ -306,7 +330,7 @@ ComposeParallaxToolbarLayout(
             // Your lazy items
         }
     },
-    headerConfig = headerConfig,
+    headerConfig = responsiveHeaderConfig,
     titleConfig = titleConfig
 )
 ```

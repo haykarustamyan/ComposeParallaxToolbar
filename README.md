@@ -13,6 +13,7 @@ A fully customizable Material 3 parallax toolbar layout built with **Compose Mul
 ## Features
 
 - **Material 3 Integration**: Built with Material 3 components, theming, and color system
+- **Responsive Header Heights**: Configure headers using fixed heights, aspect ratios, or screen percentages for perfect scaling across all devices
 - **Highly Customizable**: Full control over colors, dimensions, animations, and behaviors
 - **Parallax Effect**: Smooth transitions and animations while scrolling
 - **Title & Subtitle**: Animated title and subtitle with customizable transitions
@@ -350,8 +351,9 @@ import am.highapps.parallaxtoolbar.ParallaxContent
 import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
 
 // Create customized configurations using factory methods
-val headerConfig = ParallaxToolbarDefaults.headerConfig(
-    height = 400.dp,
+// NEW: Responsive header height with aspect ratio
+val headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
+    aspectRatio = 16f/9f,  // Responsive widescreen header
     gradient = Brush.verticalGradient(
         colors = listOf(
             Color.Transparent,
