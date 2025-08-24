@@ -61,7 +61,7 @@ import androidx.compose.ui.util.lerp
  */
 object ParallaxToolbarDefaults {
     // Header defaults
-    val HeaderHeight: Dp = 450.dp
+    val HeaderHeightDp: Dp = 450.dp
     internal const val HeaderParallaxMultiplier: Float = 0.5f
     internal const val HeaderAlphaHeightFraction: Float = 1f
 
@@ -83,11 +83,33 @@ object ParallaxToolbarDefaults {
 
     @Composable
     fun headerConfig(
-        height: Dp = HeaderHeight,
+        height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
+        gradient = gradient,
+        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
+    )
+
+    @Composable
+    fun headerConfigWithAspectRatio(
+        aspectRatio: Float = 16f / 9f,
+        gradient: Brush? = null,
+        isExpandedWhenFirstDisplayed: Boolean = true
+    ): ParallaxHeaderConfig = ParallaxHeaderConfig(
+        height = HeaderHeight.AspectRatio(aspectRatio),
+        gradient = gradient,
+        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
+    )
+
+    @Composable
+    fun headerConfigWithPercentage(
+        heightPercentage: Float = 0.4f,
+        gradient: Brush? = null,
+        isExpandedWhenFirstDisplayed: Boolean = true
+    ): ParallaxHeaderConfig = ParallaxHeaderConfig(
+        height = HeaderHeight.Percentage(heightPercentage),
         gradient = gradient,
         isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
     )
@@ -150,10 +172,32 @@ object ParallaxToolbarDefaults {
 }
 
 /**
+ * Represents different ways to specify header height
+ */
+sealed class HeaderHeight {
+    /**
+     * Fixed height in Dp
+     */
+    data class Fixed(val height: Dp) : HeaderHeight()
+
+    /**
+     * Height based on aspect ratio (width/height)
+     * For example: 16f/9f for a 16:9 aspect ratio
+     */
+    data class AspectRatio(val ratio: Float) : HeaderHeight()
+
+    /**
+     * Height as percentage of screen height
+     * Value should be between 0f and 1f (e.g., 0.4f for 40% of screen height)
+     */
+    data class Percentage(val percentage: Float) : HeaderHeight()
+}
+
+/**
  * Data classes for type-safe parameters
  */
 data class ParallaxHeaderConfig(
-    val height: Dp,
+    val height: HeaderHeight,
     val gradient: Brush?,
     val isExpandedWhenFirstDisplayed: Boolean = true
 )
@@ -209,6 +253,22 @@ sealed class ParallaxContent {
         val config: LazyColumnConfig = LazyColumnConfig(),
         val lazyListState: LazyListState? = null
     ) : ParallaxContent()
+}
+
+/**
+ * Helper function to calculate actual header height based on HeaderHeight type and screen dimensions
+ */
+@Composable
+private fun calculateHeaderHeight(
+    headerHeight: HeaderHeight,
+    screenWidth: Dp,
+    screenHeight: Dp
+): Dp {
+    return when (headerHeight) {
+        is HeaderHeight.Fixed -> headerHeight.height
+        is HeaderHeight.AspectRatio -> screenWidth / headerHeight.ratio
+        is HeaderHeight.Percentage -> screenHeight * headerHeight.percentage
+    }
 }
 
 /**
@@ -327,8 +387,16 @@ fun ComposeParallaxToolbarLayout(
 
     BoxWithConstraints {
         val screenHeight = this@BoxWithConstraints.maxHeight
+        val screenWidth = this@BoxWithConstraints.maxWidth
 
-        val headerHeightPx = with(LocalDensity.current) { headerConfig.height.toPx() }
+        // Calculate actual header height based on the header height type
+        val actualHeaderHeight = calculateHeaderHeight(
+            headerHeight = headerConfig.height,
+            screenWidth = screenWidth,
+            screenHeight = screenHeight
+        )
+
+        val headerHeightPx = with(LocalDensity.current) { actualHeaderHeight.toPx() }
         val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
 
         val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
@@ -371,7 +439,7 @@ fun ComposeParallaxToolbarLayout(
                 headerHeightPx = headerHeightPx,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(headerConfig.height),
+                    .height(actualHeaderHeight),
                 content = headerContent,
                 gradientBrush = headerConfig.gradient,
                 initialColor = toolbarConfig.initialColor,
@@ -381,7 +449,7 @@ fun ComposeParallaxToolbarLayout(
                 LazyBody(
                     lazyListState = lazyListState,
                     screenHeight = screenHeight,
-                    headerHeight = headerConfig.height,
+                    headerHeight = actualHeaderHeight,
                     toolbarHeight = toolbarHeight,
                     lazyContent = { lazyContent(isCollapsed.value) },
                     modifier = Modifier.offset(y = topInset),
@@ -393,7 +461,7 @@ fun ComposeParallaxToolbarLayout(
                 Body(
                     scroll = scroll,
                     screenHeight = screenHeight,
-                    headerHeight = headerConfig.height,
+                    headerHeight = actualHeaderHeight,
                     toolbarHeight = toolbarHeight,
                     content = { content(isCollapsed.value) },
                     modifier = Modifier.offset(y = topInset),
@@ -432,7 +500,7 @@ fun ComposeParallaxToolbarLayout(
                 elevation = toolbarConfig.elevation
             )
             TitleWithSubtitle(
-                headerHeight = headerConfig.height,
+                headerHeight = actualHeaderHeight,
                 toolbarHeight = toolbarHeight,
                 modifier = Modifier.offset(y = topInset)
                     .widthIn(
