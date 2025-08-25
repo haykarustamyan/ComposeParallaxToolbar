@@ -5,8 +5,8 @@ android-minSdk = "24"
 android-compileSdk = "35"
 compose-plugin = "1.8.1"
 maven = "0.29.0"
-uiToolingPreviewAndroid = "1.8.2"
-compose-ui = "1.8.2"
+uiToolingPreviewAndroid = "1.9.0"
+compose-ui = "1.9.0"
 
 [libraries]
 ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroid" }
