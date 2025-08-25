@@ -1,8 +1,8 @@
 # ComposeParallaxToolbar - Compose Multiplatform
 
 [![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://search.maven.org/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
-[![Kotlin](https://img.shields.io/badge/kotlin-v2.1.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-Compatible-blue)](https://github.com/JetBrains/compose-multiplatform)
+[![Kotlin](https://img.shields.io/badge/kotlin-v2.2.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-v1.8.2-blue)](https://github.com/JetBrains/compose-multiplatform)
 [![Platform](https://img.shields.io/badge/platform-Android%20|%20iOS-green.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -467,7 +467,7 @@ For detailed information on all components, parameters, and configuration option
 <details>
 <summary><b>Compatibility</b></summary>
 
-- **Kotlin**: 2.1.21
+- **Kotlin**: 2.2.10
 - **Compose Multiplatform**: 1.8.2
 - **Android**: API 24+ (Android 7.0+)
 - **iOS**: iOS 14+
