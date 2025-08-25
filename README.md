@@ -32,7 +32,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.2.0")
+                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.3.0")
             }
         }
     }
@@ -51,7 +51,7 @@ Add the dependency to your module's build.gradle.kts file:
 
 ```kotlin
 dependencies {
-    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.2.0")
+    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.3.0")
 }
 ```
 
@@ -59,7 +59,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.2.0'
+    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.3.0'
 }
 ```
 </details>
@@ -521,6 +521,21 @@ For detailed information on all components, parameters, and configuration option
 
 <details>
 <summary><b>Changelog</b></summary>
+
+### Version 1.3.0
+
+- **NEW**: Dynamic header height options with `HeaderHeight` sealed class:
+  - `HeaderHeight.Fixed`: Fixed height in Dp (previous default behavior)
+  - `HeaderHeight.AspectRatio`: Responsive height based on screen width and aspect ratio
+  - `HeaderHeight.Percentage`: Adaptive height as percentage of screen height
+- **NEW**: `contentPadding` parameter for seamless Scaffold integration
+  - Prevents content from drawing behind bottom navigation bars
+  - Automatically merges with LazyColumn's internal contentPadding
+  - Works with both Regular and Lazy content types
+- **ENHANCED**: Extended `ParallaxContent.Lazy` with comprehensive `LazyColumnConfig` customization
+  - Factory method `ParallaxToolbarDefaults.lazyColumnConfig()` for easy configuration
+- **UPDATED**: Kotlin 2.2.10, Compose Multiplatform 1.8.2, Compose UI 1.9.0
+- **UPGRADED**: Gradle 9.0.0, Android Gradle Plugin 8.12.1, Maven Publish Plugin 0.34.0
 
 ### Version 1.2.0
 
