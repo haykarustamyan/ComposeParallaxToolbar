@@ -1,5 +1,6 @@
 package am.highapps.parallaxtoolbar
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -161,6 +162,7 @@ fun ScaffoldIntegrationWithPaddingPreview() {
     device = "spec:width=411dp,height=891dp",
     showSystemUi = true
 )
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ScaffoldIntegrationWithoutPaddingPreview() {
     MaterialTheme {
