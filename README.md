@@ -115,6 +115,7 @@ fun MyScreen() {
         titleContent = { isCollapsed ->
             Text(
                 text = "My App",
+                color = if (isCollapsed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                 style = if (isCollapsed)
                     MaterialTheme.typography.titleMedium
                 else
@@ -123,10 +124,9 @@ fun MyScreen() {
         },
         headerContent = {
             // Your header image or content
-            Image(
-                painter = painterResource(id = R.drawable.header),
+            Icon(
+                imageVector = Icons.Default.Share,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
         },
