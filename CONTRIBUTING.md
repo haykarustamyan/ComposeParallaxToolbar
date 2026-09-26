@@ -57,6 +57,17 @@ unrecorded change. Configuration types are plain classes on purpose; when adding
 it with a default, extend `equals`, `hashCode`, `toString` and `copy`, and keep the previous
 `copy` overload.
 
+## Generated docs
+
+`docs/RECIPES.md`, `llms.txt` and `llms-full.txt` are generated. After changing a recipe in
+`sample/src/*/recipes/` or any guide under `docs/`, run:
+
+```bash
+python3 scripts/generate-docs.py
+```
+
+and commit the output; the Docs workflow fails when it is stale.
+
 ## Pull requests
 
 1. Branch from `main`.

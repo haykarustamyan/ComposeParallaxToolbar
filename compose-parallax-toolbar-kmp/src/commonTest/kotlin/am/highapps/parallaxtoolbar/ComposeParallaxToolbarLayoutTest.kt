@@ -1083,3 +1083,31 @@ class ComposeParallaxToolbarSemanticsTest : UiTestBase() {
         kotlin.test.assertEquals(listOf(0f, 1f, 4f), indices)
     }
 }
+
+class ParallaxValidationTest {
+
+    private inline fun failsWith(fragment: String, block: () -> Unit) {
+        val e = kotlin.test.assertFailsWith<IllegalArgumentException>(block = block)
+        kotlin.test.assertTrue(e.message!!.contains(fragment), "message '${e.message}' should mention '$fragment'")
+    }
+
+    @Test
+    fun invalidValues_failEarly_withActionableMessages() {
+        failsWith("Percentage must be in 0..1") { HeaderHeight.Percentage(1.4f) }
+        failsWith("Percentage must be in 0..1") { HeaderHeight.Percentage(0f) }
+        failsWith("AspectRatio ratio must be a positive") { HeaderHeight.AspectRatio(0f) }
+        failsWith("AspectRatio ratio must be a positive") { HeaderHeight.AspectRatio(Float.NaN) }
+        failsWith("maxHeight must be 0.dp or more") { HeaderHeight.Percentage(0.5f, maxHeight = (-1).dp) }
+        failsWith("Fixed height must be 0.dp or more") { HeaderHeight.Fixed((-10).dp) }
+        failsWith("parallaxMultiplier must be a finite") { ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, parallaxMultiplier = Float.NaN) }
+        failsWith("stretchTriggerDistance must be greater") { ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, stretchTriggerDistance = 0.dp) }
+        failsWith("height must be greater than 0.dp") { ParallaxToolbarConfig(Color.Black, Color.Black, 0.dp, androidx.compose.animation.core.snap(), height = 0.dp) }
+        failsWith("elevation must be 0.dp or more") { ParallaxToolbarConfig(Color.Black, Color.Black, (-1).dp, androidx.compose.animation.core.snap()) }
+        failsWith("collapsedScale must be a positive") { ParallaxTitleConfig(0.dp, 0.dp, 0.dp, false, true, collapsedScale = 0f) }
+        failsWith("minBottomSpacerHeight must be 0.dp or more") { ParallaxBodyConfig((-4).dp) }
+
+        // Valid edges still construct.
+        HeaderHeight.Percentage(1f); HeaderHeight.Fixed(0.dp); HeaderHeight.AspectRatio(0.1f, maxHeight = 0.dp)
+        ParallaxTitleConfig(0.dp, 0.dp, 0.dp, false, true, collapsedScale = 2f)
+    }
+}

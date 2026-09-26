@@ -1,0 +1,75 @@
+name: Docs
+
+# Publishes the API docs (Dokka), the markdown guides and llms.txt to GitHub Pages on every push
+# to main, so agents and doc indexers have a stable URL. Enable Pages with source "GitHub Actions".
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Generated docs are committed
+        run: |
+          python3 scripts/generate-docs.py
+          git diff --exit-code -- docs/RECIPES.md llms.txt llms-full.txt || {
+            echo "::error::docs/RECIPES.md, llms.txt or llms-full.txt is stale; run scripts/generate-docs.py and commit"; exit 1; }
+
+      - name: Dokka
+        run: ./gradlew :compose-parallax-toolbar-kmp:dokkaGeneratePublicationHtml
+
+      - name: Assemble site
+        run: |
+          mkdir -p site/api site/docs
+          cp -R compose-parallax-toolbar-kmp/build/dokka/html/. site/api/
+          cp docs/*.md site/docs/
+          mkdir -p site/docs/agents && cp docs/agents/SKILL.md site/docs/agents/
+          cp llms.txt llms-full.txt CHANGELOG.md README.md site/
+          touch site/.nojekyll
+          cat > site/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>ComposeParallaxToolbar</title>
+          <h1>ComposeParallaxToolbar</h1>
+          <ul>
+            <li><a href="api/">API docs (Dokka)</a></li>
+            <li><a href="docs/API.md">API reference (Markdown)</a></li>
+            <li><a href="docs/RECIPES.md">Recipes</a></li>
+            <li><a href="docs/PLATFORMS.md">Platform guide</a></li>
+            <li><a href="docs/MIGRATION.md">Migrating from 1.x</a></li>
+            <li><a href="docs/agents/SKILL.md">Agent skill</a></li>
+            <li><a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a></li>
+            <li><a href="CHANGELOG.md">Changelog</a></li>
+          </ul>
+          HTML
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

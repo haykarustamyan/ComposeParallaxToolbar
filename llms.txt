@@ -1,0 +1,19 @@
+# ComposeParallaxToolbar
+
+> Collapsing toolbar with a parallax header for Compose Multiplatform (Android, iOS, desktop, web). Version 2.0.0. Maven coordinate `am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0`. Depends only on Compose UI and Foundation; works with any design system.
+
+Mental model: one composable, `ComposeParallaxToolbarLayout`, with slots (`titleContent`, `headerContent`, `content`, optional `subtitleContent`, `navigationIcon`, `actions`, `overlayContent`, `bottomContent`). The body is a `ParallaxContent` (`Regular`, `Lazy`, or `Custom` for any scrollable). The header collapses through nested scrolling. Behavior is set through immutable configs built by `ParallaxToolbarDefaults`. State is hoisted in `rememberParallaxToolbarState()`; every slot runs in a `ParallaxToolbarScope` with `collapseFraction` and per-element modifiers.
+
+## Docs
+
+- [API reference](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/API.md): every parameter, config field, default, state member and modifier.
+- [Recipes](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/RECIPES.md): complete compiling screens for common tasks.
+- [Platform guide](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/PLATFORMS.md): Android edge-to-edge and Scaffold, iOS hosting and the required Info.plist key, desktop, web.
+- [Migration from 1.x](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/MIGRATION.md).
+- [Agent skill](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/agents/SKILL.md): condensed usage rules for coding assistants.
+- [Changelog](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/CHANGELOG.md).
+
+## Optional
+
+- [README](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/README.md)
+- [Full docs in one file](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/llms-full.txt)

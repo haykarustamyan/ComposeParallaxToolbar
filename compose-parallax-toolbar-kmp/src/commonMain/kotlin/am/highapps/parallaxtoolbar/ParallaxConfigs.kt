@@ -51,6 +51,11 @@ public class ParallaxHeaderConfig(
     public val stretchEnabled: Boolean = false,
     public val stretchTriggerDistance: Dp = ParallaxToolbarDefaults.StretchTriggerDistance
 ) {
+    init {
+        require(parallaxMultiplier.isFinite()) { "ParallaxHeaderConfig.parallaxMultiplier must be a finite number (0f pins the header, 0.5f is the classic parallax), was $parallaxMultiplier" }
+        require(stretchTriggerDistance > 0.dp) { "ParallaxHeaderConfig.stretchTriggerDistance must be greater than 0.dp, was $stretchTriggerDistance" }
+    }
+
     public fun copy(
         height: HeaderHeight = this.height,
         gradient: Brush? = this.gradient,
@@ -112,6 +117,11 @@ public class ParallaxToolbarConfig(
     public val height: Dp = ParallaxToolbarDefaults.ToolbarHeight,
     public val alwaysElevated: Boolean = false
 ) {
+    init {
+        require(height > 0.dp) { "ParallaxToolbarConfig.height must be greater than 0.dp, was $height" }
+        require(elevation >= 0.dp) { "ParallaxToolbarConfig.elevation must be 0.dp or more, was $elevation" }
+    }
+
     public fun copy(
         initialColor: Color = this.initialColor,
         targetColor: Color = this.targetColor,
@@ -164,6 +174,10 @@ public class ParallaxTitleConfig(
     public val collapsedScale: Float = ParallaxToolbarDefaults.TitleCollapsedScale,
     public val collapsedAlignment: Alignment.Horizontal = Alignment.Start
 ) {
+    init {
+        require(collapsedScale > 0f && collapsedScale.isFinite()) { "ParallaxTitleConfig.collapsedScale must be a positive scale such as 0.8f, was $collapsedScale" }
+    }
+
     public fun copy(
         paddingBottom: Dp = this.paddingBottom,
         paddingStart: Dp = this.paddingStart,
@@ -209,6 +223,10 @@ public class ParallaxTitleConfig(
 public class ParallaxBodyConfig(
     public val minBottomSpacerHeight: Dp
 ) {
+    init {
+        require(minBottomSpacerHeight >= 0.dp) { "ParallaxBodyConfig.minBottomSpacerHeight must be 0.dp or more, was $minBottomSpacerHeight" }
+    }
+
     public fun copy(minBottomSpacerHeight: Dp = this.minBottomSpacerHeight): ParallaxBodyConfig =
         ParallaxBodyConfig(minBottomSpacerHeight)
 

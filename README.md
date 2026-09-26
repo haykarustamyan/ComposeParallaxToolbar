@@ -149,9 +149,15 @@ overlayContent = {
 ## Documentation
 
 - [API reference](docs/API.md): every parameter, config, state member and modifier.
+- [Recipes](docs/RECIPES.md): complete screens for common tasks, compiled on every CI run.
 - [Platform guide](docs/PLATFORMS.md): Android edge-to-edge and `Scaffold`, iOS hosting, desktop, web.
 - [Migrating from 1.x](docs/MIGRATION.md).
 - [Changelog](CHANGELOG.md).
+
+**Using an AI coding assistant?** Point it at [llms.txt](llms.txt), or drop
+[docs/agents/SKILL.md](docs/agents/SKILL.md) into your project's agent instructions. It holds the
+current signatures, the rules that matter, and the 1.x habits to avoid. [llms-full.txt](llms-full.txt)
+is every guide in one file.
 
 ## Sample app
 

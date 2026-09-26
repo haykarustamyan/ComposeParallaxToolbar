@@ -1,0 +1,815 @@
+# ComposeParallaxToolbar
+
+> Collapsing toolbar with a parallax header for Compose Multiplatform (Android, iOS, desktop, web). Version 2.0.0. Maven coordinate `am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0`. Depends only on Compose UI and Foundation; works with any design system.
+
+Mental model: one composable, `ComposeParallaxToolbarLayout`, with slots (`titleContent`, `headerContent`, `content`, optional `subtitleContent`, `navigationIcon`, `actions`, `overlayContent`, `bottomContent`). The body is a `ParallaxContent` (`Regular`, `Lazy`, or `Custom` for any scrollable). The header collapses through nested scrolling. Behavior is set through immutable configs built by `ParallaxToolbarDefaults`. State is hoisted in `rememberParallaxToolbarState()`; every slot runs in a `ParallaxToolbarScope` with `collapseFraction` and per-element modifiers.
+
+## Docs
+
+- [API reference](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/API.md): every parameter, config field, default, state member and modifier.
+- [Recipes](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/RECIPES.md): complete compiling screens for common tasks.
+- [Platform guide](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/PLATFORMS.md): Android edge-to-edge and Scaffold, iOS hosting and the required Info.plist key, desktop, web.
+- [Migration from 1.x](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/MIGRATION.md).
+- [Agent skill](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/docs/agents/SKILL.md): condensed usage rules for coding assistants.
+- [Changelog](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/CHANGELOG.md).
+
+## Optional
+
+- [README](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/README.md)
+- [Full docs in one file](https://github.com/haykarustamyan/ComposeParallaxToolbar/blob/main/llms-full.txt)
+
+
+---
+
+<!-- docs/agents/SKILL.md -->
+---
+name: compose-parallax-toolbar
+description: Use when adding or changing a collapsing toolbar with a parallax header in a Compose Multiplatform or Jetpack Compose screen using the ComposeParallaxToolbar library (am.highapps.parallaxtoolbar).
+---
+
+# ComposeParallaxToolbar for coding agents
+
+Library: `am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp`. Package `am.highapps.parallaxtoolbar`.
+Current major: 2.x. Check the project's dependency line for the exact version; 1.x has a different API.
+
+## The one entry point
+
+```kotlin
+ComposeParallaxToolbarLayout(
+    titleContent = { collapsed -> Text("Title") },          // required
+    headerContent = { Image(...) },                           // required, fills the expanded header
+    content = ParallaxContent.Lazy(content = { _ -> items(n) { ... } }),  // required
+    // optional slots, all receive `collapsed`:
+    subtitleContent = { Text("Subtitle") },
+    navigationIcon = { IconButton(...) { ... } },
+    actions = { IconButton(...) { ... } },                  // RowScope
+    overlayContent = { /* elements that travel into the toolbar, see moveBetween */ },
+    bottomContent = { TabRow(...) },                        // pinned under the toolbar
+    onStretchTrigger = { refresh() },                       // with headerConfig(stretchEnabled = true)
+    contentPadding = scaffoldPadding,
+    headerConfig = ParallaxToolbarDefaults.headerConfig(...),
+    toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(...),
+    titleConfig = ParallaxToolbarDefaults.titleConfig(...),
+    bodyConfig = ParallaxToolbarDefaults.bodyConfig(...),
+    semanticsConfig = ParallaxToolbarDefaults.semanticsConfig(...),
+    state = rememberParallaxToolbarState()
+)
+```
+
+## Rules
+
+1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size.
+2. Configure through `ParallaxToolbarDefaults.headerConfig / toolbarConfig / titleConfig / bodyConfig / lazyColumnConfig / semanticsConfig`. Do not construct config classes by hand unless you need to.
+3. Header height: `HeaderHeight.Fixed(dp)`, `HeaderHeight.AspectRatio(ratio, maxHeight)`, `HeaderHeight.Percentage(fraction 0..1, maxHeight)`; or the `headerConfigWithAspectRatio` / `headerConfigWithPercentage` factories.
+4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true)`.
+5. Programmatic control: `val state = rememberParallaxToolbarState()`; `state.collapseFraction`, `state.isCollapsed`, `scope.launch { state.collapse() }`, `state.expand()`. The body keeps its own scroll position; use `state.scrollState` or `state.lazyListState` to scroll it.
+6. Inside any slot, `collapseFraction`, `isCollapsed`, `state` and `layoutInfo` are available from the scope. Read `collapseFraction` inside `graphicsLayer { }` for per-frame effects, not in composition.
+7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
+8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset.
+9. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
+10. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
+
+## Mistakes to avoid (1.x habits)
+
+- There is no `scrollState` parameter; use `state = rememberParallaxToolbarState(scrollState = ...)`.
+- There are no `iconSize` / `iconSpacing` options; size icons inside the slots.
+- Do not call `SimpleParallaxToolbarViewController` or other sample view controllers from Swift; they are not in the library.
+- The library has no Material dependency; import Material widgets from your own design system dependency.
+- `lazyContent` / `lazyColumnConfig` parameters belong to the deprecated overload; use `ParallaxContent.Lazy(content, config, lazyListState)`.
+
+## Where to look
+
+- `docs/API.md` for every parameter and default.
+- `docs/RECIPES.md` for complete screens: list, grid, profile with avatar, tabs, pull-to-refresh, Scaffold, centered title, programmatic control, iOS hosting.
+- `docs/PLATFORMS.md` for platform specifics. `docs/MIGRATION.md` for 1.x upgrades.
+
+
+---
+
+<!-- docs/API.md -->
+# API reference
+
+Package `am.highapps.parallaxtoolbar`. Everything below is public API and covered by the
+compatibility policy in the README.
+
+## ComposeParallaxToolbarLayout
+
+```kotlin
+@Composable
+fun ComposeParallaxToolbarLayout(
+    titleContent: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit,
+    headerContent: @Composable ParallaxToolbarScope.() -> Unit,
+    content: ParallaxContent,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    subtitleContent: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
+    navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
+    actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
+    overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
+    bottomContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
+    onStretchTrigger: (() -> Unit)? = null,
+    headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
+    toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
+    titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
+    bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
+    semanticsConfig: ParallaxSemanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
+    state: ParallaxToolbarState = rememberParallaxToolbarState()
+)
+```
+
+| Parameter | Description |
+|---|---|
+| `titleContent` | Title. Placed at the bottom of the header while expanded and glides into the toolbar. |
+| `headerContent` | Fills the expanded header, under the body. Typically an image. |
+| `content` | The scrolling body; see [ParallaxContent](#parallaxcontent). |
+| `modifier` | Applied to the whole layout. |
+| `contentPadding` | Padding for the body, typically the `Scaffold` padding. Applied to `Regular` and merged into the `LazyColumn` of `Lazy`; not applied to `Custom`. |
+| `subtitleContent` | Optional subtitle under the title. Fades out on collapse unless kept. |
+| `navigationIcon` | Optional leading toolbar slot. |
+| `actions` | Optional trailing toolbar slot. Its scope is also a `RowScope`. |
+| `overlayContent` | Optional layer the size of the layout, drawn above the body and toolbar. Hosts elements that use `moveBetween`. |
+| `bottomContent` | Optional row pinned under the toolbar: tabs, a search field. Rides the header's bottom edge while expanded; the body starts beneath it. Give it a background. |
+| `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance`. Needs `stretchEnabled`. |
+| `headerConfig`, `toolbarConfig`, `titleConfig`, `bodyConfig`, `semanticsConfig` | See [Configuration](#configuration). |
+| `state` | See [ParallaxToolbarState](#parallaxtoolbarstate). |
+
+Every slot lambda runs with a [ParallaxToolbarScope](#parallaxtoolbarscope) receiver and receives
+`collapsed`, which is `true` once the header is fully collapsed.
+
+A deprecated overload with the 1.x signature (`content` as a lambda, `scroll`, `lazyContent`,
+`lazyListState`, `lazyColumnConfig`) still compiles and delegates here. It is removed in 3.0; see
+[MIGRATION.md](MIGRATION.md).
+
+## ParallaxContent
+
+```kotlin
+sealed class ParallaxContent {
+    data class Regular(val content: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)
+    data class Lazy(
+        val content: LazyListScope.(collapsed: Boolean) -> Unit,
+        val config: LazyColumnConfig = LazyColumnConfig(),
+        val lazyListState: LazyListState? = null
+    )
+    data class Custom(val content: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)
+}
+```
+
+- `Regular` lays the content out in a `Column` with vertical scroll backed by `state.scrollState`.
+- `Lazy` uses a `LazyColumn` backed by `lazyListState`, or `state.lazyListState` when null.
+- `Custom` places your composable in the space below the collapsed toolbar. It must fill that size
+  and scroll vertically so nested scroll events reach the header. Grids, staggered grids and
+  pagers all work.
+
+The header collapses through nested scrolling: scrolling up collapses it before the body scrolls,
+and a drag that starts on the header collapses it directly. When it expands depends on the
+[ScrollMode](#scrollmode).
+
+## ParallaxToolbarState
+
+```kotlin
+@Composable
+fun rememberParallaxToolbarState(
+    scrollState: ScrollState = rememberScrollState(),
+    lazyListState: LazyListState = rememberLazyListState(),
+    initiallyCollapsed: Boolean = false
+): ParallaxToolbarState
+```
+
+| Member | Description |
+|---|---|
+| `collapseFraction: Float` | 0f while expanded, 1f once collapsed. |
+| `isCollapsed: Boolean` | `collapseFraction >= 1f`. |
+| `toolbarExitFraction: Float` | 0f on screen, 1f slid away. Moves only in `ScrollMode.EnterAlwaysCollapsed`. |
+| `stretchPx: Float` | Current stretch past the expanded height while pulled down, in px. |
+| `suspend fun collapse(animated = true)` | Collapses the header. The body keeps its scroll position. |
+| `suspend fun expand(animated = true)` | Expands the header and brings an exited toolbar back. |
+| `scrollState`, `lazyListState` | The scroll states backing `Regular` and `Lazy` content. |
+| `layoutInfo` | See [ParallaxToolbarLayoutInfo](#parallaxtoolbarlayoutinfo). |
+
+The collapse fraction is saved with `rememberSaveable`, so it survives configuration changes and
+process death. `initiallyCollapsed` applies the first time only; `headerConfig.isExpandedWhenFirstDisplayed`
+is the equivalent on the config side.
+
+## ParallaxToolbarScope
+
+Receiver of every slot.
+
+| Member | Description |
+|---|---|
+| `state` | The layout's state. |
+| `collapseFraction`, `isCollapsed` | Shortcuts to the state. |
+| `layoutInfo` | Measured geometry. |
+| `Modifier.parallax(ratio = 0.5f)` | Moves the element up by `ratio` of the collapse distance. |
+| `Modifier.fadeOnCollapse(expandedAlpha = 1f, collapsedAlpha = 0f)` | Interpolates alpha with the collapse. |
+| `Modifier.scaleOnCollapse(collapsedScale, origin = TransformOrigin.Center)` | Scales toward `collapsedScale`. |
+| `Modifier.moveBetween(expanded, collapsed, expandedPadding, collapsedPadding, collapsedScale = 1f)` | Glides the element from an alignment in the header area to an alignment in the toolbar area, scaling on the way. For `overlayContent`. Put it outside any `size` modifier. |
+
+Reading `collapseFraction` in composition recomposes that slot on every scroll frame. The modifiers,
+and reads inside `graphicsLayer { }` or `drawBehind { }`, stay on the draw path.
+
+`ParallaxActionsScope` is the receiver of `actions`: a `ParallaxToolbarScope` that is also a `RowScope`.
+
+## ParallaxToolbarLayoutInfo
+
+`state.layoutInfo`, in pixels, updated on every layout pass. All zero until `isMeasured`.
+
+| Property | Description |
+|---|---|
+| `widthPx`, `heightPx` | Size of the layout. |
+| `topInsetPx` | Status bar inset the toolbar and body are pushed down by. |
+| `headerHeightPx` | Expanded header height, excluding the inset. |
+| `toolbarHeightPx` | Toolbar height, excluding the inset. |
+| `bottomHeightPx` | Height of `bottomContent`, 0 when absent. |
+| `collapseRangePx` | `headerHeightPx - toolbarHeightPx`. |
+| `headerOffsetPx` | Current collapse distance. |
+| `toolbarExitOffsetPx` | Current toolbar exit distance. |
+| `stretchPx` | Current stretch. |
+| `currentHeaderBottomPx` | Current bottom edge of the header from the top of the layout. |
+
+## ScrollMode
+
+| Value | Scrolling up | Scrolling down |
+|---|---|---|
+| `ExitUntilCollapsed` (default) | collapses the header; toolbar stays | expands only once the body is at its top |
+| `EnterAlways` | collapses the header; toolbar stays | expands immediately, wherever the body is |
+| `EnterAlwaysCollapsed` | collapses the header, then the toolbar slides away | the toolbar returns immediately; the header expands at the top |
+
+## HeaderHeight
+
+```kotlin
+sealed class HeaderHeight {
+    data class Fixed(val height: Dp)
+    data class AspectRatio(val ratio: Float, val maxHeight: Dp = Dp.Unspecified)
+    data class Percentage(val percentage: Float, val maxHeight: Dp = Dp.Unspecified)
+}
+```
+
+`AspectRatio` divides the available width by `ratio` (`16f / 9f` for widescreen). `Percentage`
+takes a fraction of the available height. Both are capped at `maxHeight` when it is specified.
+
+## Configuration
+
+All config types are immutable classes with `copy`, `equals`, `hashCode` and `toString`. Build
+them with the `ParallaxToolbarDefaults` factories, which supply every default.
+
+### ParallaxHeaderConfig
+
+`headerConfig(...)`, `headerConfigWithAspectRatio(...)`, `headerConfigWithPercentage(...)`
+
+| Field | Default | Description |
+|---|---|---|
+| `height` | `Fixed(450.dp)` | See [HeaderHeight](#headerheight). |
+| `gradient` | `null` | Brush drawn over the header. When null, a vertical gradient from the toolbar's initial color to its target color covers the lower quarter. |
+| `isExpandedWhenFirstDisplayed` | `true` | Start collapsed when false. |
+| `parallaxMultiplier` | `0.5f` | How much of the collapse distance the header content moves by. 0f pins it. |
+| `snapOnRelease` | `false` | Settle a partly collapsed header to the nearer resting position when a drag or fling ends. |
+| `scrollMode` | `ExitUntilCollapsed` | See [ScrollMode](#scrollmode). |
+| `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
+| `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
+| `stretchTriggerDistance` | `100.dp` | Stretch required at release for `onStretchTrigger` to fire. |
+
+### ParallaxToolbarConfig
+
+`toolbarConfig(...)`
+
+| Field | Default | Description |
+|---|---|---|
+| `initialColor` | `Color.Transparent` | Toolbar background while expanded. |
+| `targetColor` | `Color.Black` | Toolbar background once collapsed. |
+| `elevation` | `0.dp` | Shadow once collapsed. |
+| `animationSpec` | `tween(300)` | Animation between the two colors. |
+| `height` | `64.dp` | Toolbar height, excluding the status bar inset. |
+| `alwaysElevated` | `false` | Draw the shadow while expanded too. |
+
+### ParallaxTitleConfig
+
+`titleConfig(...)`
+
+| Field | Default | Description |
+|---|---|---|
+| `paddingBottom` | `(-16).dp` | Distance from the header's bottom edge to the title block while expanded. Negative lets it straddle the edge. |
+| `paddingStart` | `16.dp` | Start padding while expanded. |
+| `collapsedPaddingStart` | `64.dp` | Start padding once collapsed, when a navigation icon is present and `collapsedAlignment` is `Start`. |
+| `keepSubtitleAfterCollapse` | `false` | Keep the subtitle in the toolbar instead of hiding it. |
+| `animateSubTitleHiding` | `true` | Fade the subtitle with the collapse; when false it disappears at the end. |
+| `collapsedScale` | `1f` | Scale of the title block once collapsed, about its start edge. |
+| `collapsedAlignment` | `Alignment.Start` | `Start` next to the navigation icon, `CenterHorizontally` centered between the slots, `End` before the actions. |
+
+### ParallaxBodyConfig
+
+`bodyConfig(minBottomSpacerHeight = 0.dp)`: extra space added after the content of `Regular` and `Lazy` bodies.
+
+### LazyColumnConfig
+
+`lazyColumnConfig(...)`, used by `ParallaxContent.Lazy`.
+
+| Field | Default |
+|---|---|
+| `contentPadding` | `PaddingValues(0.dp)`, merged with the layout's `contentPadding` |
+| `verticalArrangement` | `Arrangement.Top` |
+| `horizontalAlignment` | `Alignment.Start` |
+| `flingBehavior` | platform default |
+| `userScrollEnabled` | `true` |
+| `overscrollEffect` | platform default |
+
+### ParallaxSemanticsConfig
+
+`semanticsConfig(...)`: the strings announced to accessibility services. Defaults are English:
+`"Expanded"`, `"Collapsed"`, `"Expand header"`, `"Collapse header"`.
+
+## Accessibility
+
+The root node announces the state description and offers the standard expand and collapse
+semantic actions. Reading order is toolbar, header, bottom slot, overlay, body. The title is a
+heading. The faded header, and an exited toolbar, are hidden from accessibility.
+
+## ParallaxToolbarDefaults
+
+Constants: `HeaderHeightDp = 450.dp`, `HeaderParallaxMultiplier = 0.5f`, `ToolbarHeight = 64.dp`,
+`TitlePaddingBottom = (-16).dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
+`TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`.
+
+
+---
+
+<!-- docs/RECIPES.md -->
+# Recipes
+
+Complete screens for common tasks, version 2.0.0. Every Kotlin block is compiled as part of the
+`sample` module on each CI run, so it is known to build against the current API. Imports are in
+[Recipes.kt](../sample/src/commonMain/kotlin/am/highapps/parallaxtoolbar/sample/recipes/Recipes.kt);
+the examples use Material 3 for their own widgets, which the library does not require.
+
+## Basic list screen
+
+A title that changes style once collapsed, a subtitle, navigation and actions, and a lazy list.
+
+```kotlin
+@Composable
+fun BasicListScreen(items: List<String>, onBack: () -> Unit) {
+    ComposeParallaxToolbarLayout(
+        titleContent = { collapsed ->
+            Text(
+                text = "Playlist",
+                color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineMedium
+            )
+        },
+        subtitleContent = { collapsed -> if (!collapsed) Text("${items.size} tracks", color = Color.White) },
+        headerContent = { HeaderArtwork() },
+        navigationIcon = { collapsed ->
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = tint(collapsed))
+            }
+        },
+        actions = { collapsed ->
+            IconButton(onClick = {}) { Icon(Icons.Default.Share, contentDescription = "Share", tint = tint(collapsed)) }
+        },
+        toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 3.dp),
+        content = ParallaxContent.Lazy(
+            content = { _ -> items(items.size) { i -> ListItem(headlineContent = { Text(items[i]) }) } },
+            config = ParallaxToolbarDefaults.lazyColumnConfig(contentPadding = PaddingValues(vertical = 8.dp))
+        )
+    )
+}
+```
+
+## Photo grid
+
+Any scrollable can be the body. A two-column grid collapses the header through nested scroll.
+
+```kotlin
+@Composable
+fun PhotoGridScreen(photos: List<Int>) {
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Gallery", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
+        headerContent = { HeaderArtwork() },
+        headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(aspectRatio = 16f / 9f, maxHeight = 320.dp),
+        content = ParallaxContent.Custom { _ ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(photos) { seed -> Box(Modifier.aspectRatio(1f).background(swatch(seed))) }
+            }
+        }
+    )
+}
+```
+
+## Profile with avatar into the toolbar
+
+The avatar lives in overlayContent, above the body, and glides into the toolbar. Header-wide effects are turned off so the cover image keeps its own parallax and fade.
+
+```kotlin
+@Composable
+fun ProfileScreen(name: String, posts: List<String>) {
+    ComposeParallaxToolbarLayout(
+        titleContent = { collapsed ->
+            Text(name, color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = MaterialTheme.typography.headlineSmall)
+        },
+        headerContent = {
+            Box(Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse().background(swatch(7)))
+        },
+        overlayContent = {
+            Box(
+                Modifier
+                    .size(80.dp)
+                    .moveBetween(
+                        expanded = Alignment.BottomStart,
+                        collapsed = Alignment.CenterEnd,
+                        expandedPadding = PaddingValues(start = 16.dp, bottom = 56.dp),
+                        collapsedPadding = PaddingValues(end = 16.dp),
+                        collapsedScale = 0.5f
+                    )
+                    .background(Color(0xFFFFC107), CircleShape)
+            )
+        },
+        headerConfig = ParallaxToolbarDefaults.headerConfig(
+            height = HeaderHeight.Fixed(280.dp), parallaxMultiplier = 0f, fadeOnCollapse = false
+        ),
+        toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface),
+        content = ParallaxContent.Lazy(content = { _ -> items(posts.size) { i -> ListItem(headlineContent = { Text(posts[i]) }) } })
+    )
+}
+```
+
+## Tabs under the toolbar
+
+bottomContent stays pinned below the toolbar; the body starts beneath it.
+
+```kotlin
+@Composable
+fun TabbedScreen(sections: List<String>) {
+    var selected by remember { mutableIntStateOf(0) }
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Store", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
+        headerContent = { HeaderArtwork() },
+        bottomContent = {
+            TabRow(selectedTabIndex = selected, modifier = Modifier.fillMaxWidth()) {
+                sections.forEachIndexed { i, s -> Tab(selected = i == selected, onClick = { selected = i }, text = { Text(s) }) }
+            }
+        },
+        headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(220.dp)),
+        toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface),
+        content = ParallaxContent.Lazy(content = { _ ->
+            items(40) { i -> ListItem(headlineContent = { Text("${sections[selected]} item ${i + 1}") }) }
+        })
+    )
+}
+```
+
+## Pull to refresh
+
+stretchEnabled lets a pull past the top stretch the header; onStretchTrigger fires on release.
+
+```kotlin
+@Composable
+fun RefreshableFeedScreen(feed: List<String>, onRefresh: () -> Unit) {
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Feed", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
+        headerContent = { HeaderArtwork() },
+        headerConfig = ParallaxToolbarDefaults.headerConfig(
+            height = HeaderHeight.Percentage(0.35f, maxHeight = 300.dp),
+            stretchEnabled = true,
+            stretchTriggerDistance = 96.dp
+        ),
+        onStretchTrigger = onRefresh,
+        content = ParallaxContent.Lazy(content = { _ -> items(feed.size) { i -> ListItem(headlineContent = { Text(feed[i]) }) } })
+    )
+}
+```
+
+## Scaffold with a bottom bar
+
+Pass the Scaffold padding as contentPadding so the last row clears the navigation bar.
+
+```kotlin
+@Composable
+fun ScaffoldScreen(rows: List<String>) {
+    var tab by remember { mutableIntStateOf(0) }
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                listOf("Home", "Search").forEachIndexed { i, label ->
+                    NavigationBarItem(selected = tab == i, onClick = { tab = i }, icon = {}, label = { Text(label) })
+                }
+            }
+        }
+    ) { padding ->
+        ComposeParallaxToolbarLayout(
+            titleContent = { Text("Home", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
+            headerContent = { HeaderArtwork() },
+            contentPadding = padding,
+            content = ParallaxContent.Regular { _ ->
+                rows.forEach { Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) { Text(it, Modifier.padding(16.dp)) } }
+            }
+        )
+    }
+}
+```
+
+## iOS-style centered title with enter-always header
+
+The collapsed title is centered and the header returns on any downward scroll.
+
+```kotlin
+@Composable
+fun SettingsStyleScreen(rows: List<String>) {
+    ComposeParallaxToolbarLayout(
+        titleContent = { collapsed ->
+            Text("Settings", color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineLarge)
+        },
+        headerContent = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) },
+        headerConfig = ParallaxToolbarDefaults.headerConfig(
+            height = HeaderHeight.Fixed(160.dp), scrollMode = ScrollMode.EnterAlways, snapOnRelease = true
+        ),
+        toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 2.dp),
+        titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = Alignment.CenterHorizontally, collapsedScale = 0.85f),
+        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } })
+    )
+}
+```
+
+## Programmatic control and reading the fraction
+
+Hoist the state to drive the header from outside and to react to the collapse fraction.
+
+```kotlin
+@Composable
+fun ControlledScreen(rows: List<String>) {
+    val state = rememberParallaxToolbarState()
+    val scope = rememberCoroutineScope()
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Controlled", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
+        headerContent = {
+            // Read the fraction on the draw path: this never recomposes while scrolling.
+            Box(Modifier.fillMaxSize().graphicsLayer { alpha = 1f - collapseFraction / 2f }.background(swatch(3)))
+        },
+        actions = { collapsed ->
+            Button(onClick = { scope.launch { if (collapsed) state.expand() else state.collapse() } }) {
+                Text(if (collapsed) "Expand" else "Collapse")
+            }
+        },
+        state = state,
+        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } })
+    )
+}
+```
+
+## iOS hosting
+
+Expose a screen to Swift from your shared module's iosMain. Swift wraps it in UIViewControllerRepresentable and applies ignoresSafeArea() so the header reaches the top edge.
+
+```kotlin
+fun PlaylistViewController(items: List<String>): UIViewController = ComposeUIViewController {
+    MaterialTheme { BasicListScreen(items = items, onBack = {}) }
+}
+```
+
+Swift side:
+
+```swift
+struct PlaylistView: UIViewControllerRepresentable {
+    let items: [String]
+    func makeUIViewController(context: Context) -> UIViewController {
+        IosHostingKt.PlaylistViewController(items: items)
+    }
+    func updateUIViewController(_ vc: UIViewController, context: Context) {}
+}
+
+// Somewhere in your SwiftUI hierarchy:
+PlaylistView(items: tracks).ignoresSafeArea()
+```
+
+Add `CADisableMinimumFrameDurationOnPhone = true` to the app's `Info.plist`; Compose refuses to
+start on high refresh rate iPhones without it.
+
+
+---
+
+<!-- docs/PLATFORMS.md -->
+# Platform guide
+
+The library is pure common Compose code. This page covers what differs per host.
+
+## Android
+
+**Edge-to-edge.** The layout reads the status bar inset itself: the header covers the inset, the
+toolbar and body are pushed below it. Call `enableEdgeToEdge()` in your activity and do not add a
+status bar padding of your own around the layout. Status bar icon color is your app's concern;
+switch it when `collapsed` flips if the toolbar colors need it.
+
+**Scaffold.** Pass the padding `Scaffold` gives you as `contentPadding` so the body clears a bottom
+bar or a floating action button. The horizontal and bottom padding is applied to `Regular` and
+merged into the `LazyColumn` for `Lazy`. For `Custom` content apply it inside your scrollable.
+
+```kotlin
+Scaffold(bottomBar = { NavigationBar { /* ... */ } }) { padding ->
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Feed") },
+        headerContent = { HeaderImage() },
+        contentPadding = padding,
+        content = ParallaxContent.Lazy(content = { items(posts) { PostRow(it) } })
+    )
+}
+```
+
+**Previews.** The layout renders in `@Preview`. The sample module keeps a set of previews under
+`sample/src/androidMain`.
+
+## iOS
+
+Add the dependency to your shared module's `commonMain` and build screens there. Expose them to
+Swift through a `ComposeUIViewController`, as with any Compose Multiplatform screen:
+
+```kotlin
+// shared module, iosMain
+fun AlbumViewController(album: Album): UIViewController = ComposeUIViewController { AlbumScreen(album) }
+```
+
+```swift
+struct AlbumView: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController { AlbumViewControllerKt.AlbumViewController(album: album) }
+    func updateUIViewController(_ vc: UIViewController, context: Context) {}
+}
+
+AlbumView().ignoresSafeArea()
+```
+
+Use `ignoresSafeArea()` so the header can extend under the status bar; the layout places the
+toolbar and body below the inset on its own.
+
+**Info.plist.** Compose for iOS refuses to start on high refresh rate iPhones without this key,
+and the failure is a crash on launch:
+
+```xml
+<key>CADisableMinimumFrameDurationOnPhone</key>
+<true/>
+```
+
+**Minimum version.** Kotlin 2.4 targets iOS 15.0. Only arm64 devices and Apple Silicon simulators
+are supported; Compose Multiplatform no longer publishes the Intel simulator target.
+
+## Desktop
+
+Add the dependency to the `jvm` source set or `commonMain`. Mouse wheel scrolling drives the
+header through nested scroll, including expansion when scrolling back up. Dragging the header
+with the mouse works as on touch.
+
+## Web
+
+Add the dependency to the `wasmJs` source set or `commonMain` and mount your screen with
+`ComposeViewport`. Wheel and touch input behave as on desktop and mobile. Resizing the browser
+window restarts the Compose viewport, which is standard Compose for Web behavior.
+
+## Insets and the toolbar height
+
+The status bar inset is read from `WindowInsets.statusBars` on every platform and is zero on
+desktop and web. `toolbarConfig(height = ...)` sets the toolbar height excluding that inset;
+`state.layoutInfo` exposes the resolved values in pixels if you need them.
+
+
+---
+
+<!-- docs/MIGRATION.md -->
+# Migrating from 1.x to 2.0
+
+2.0.0 is a breaking release. Most screens need one or two edits; many need none.
+
+## What changed
+
+| 1.x | 2.0 |
+|---|---|
+| `scrollState` parameter | `state = rememberParallaxToolbarState(scrollState = ...)` |
+| `ParallaxContent.Lazy(lazyListState = ...)` | still accepted; `state.lazyListState` is the default |
+| Sample view controllers such as `SimpleParallaxToolbarViewController` in the framework | moved to the `sample` module; write your own `ComposeUIViewController` in your shared module |
+| `ParallaxToolbarConfig.iconSize`, `iconSpacing`; `ParallaxToolbarDefaults.ToolbarMinWidth`, `ToolbarIconSize`, `ToolbarIconSpacing` | removed; nothing read them. Size icons inside the slots |
+| Material 3 dependency | removed; bring your own design system |
+| `iosX64` target | removed; Compose Multiplatform no longer publishes it |
+| Config data classes | plain classes with `copy`, `equals`, `hashCode`, `toString`; `componentN` destructuring no longer compiles |
+| Slot lambdas `(Boolean) -> Unit` | `ParallaxToolbarScope.(Boolean) -> Unit`; existing `{ collapsed -> }` lambdas compile unchanged |
+| Toolbar shadow drawn while expanded | drawn once collapsed, or always with `toolbarConfig(alwaysElevated = true)` |
+| Header faded over its full height | faded over the collapse range, so it is fully hidden once covered |
+
+## Behavior changes you may notice
+
+- The header now collapses through nested scrolling. Scrolling feels the same, and any scrollable
+  can be the body. Dragging on the header itself now collapses it too.
+- `collapse()` and `expand()` move only the header; the body keeps its scroll position. To also
+  scroll to the top, use `state.scrollState` or `state.lazyListState`.
+- The collapse fraction is saved across configuration changes and process death.
+- Short content no longer leaves extra blank space below it, and the last part of long content
+  is reachable under the status bar inset on every platform.
+
+## Step by step
+
+1. Bump the dependency to `2.0.0`.
+2. If you passed `scrollState`, wrap it: `state = rememberParallaxToolbarState(scrollState = yourState)`.
+3. If a Swift file called a sample view controller from the framework, create the equivalent
+   `ComposeUIViewController` in your shared module. The [platform guide](PLATFORMS.md#ios) shows the pattern.
+4. Delete any `iconSize` or `iconSpacing` arguments.
+5. If you relied on the Material 3 dependency transitively, add it to your own module.
+6. Build. The deprecated 1.x overload still compiles with a warning and a quick-fix; it is removed in 3.0.
+
+## New in 2.0 worth adopting
+
+`ParallaxContent.Custom` for grids, `ScrollMode`, `snapOnRelease`, per-element modifiers with the
+`overlayContent` slot, `bottomContent` for tabs, `stretchEnabled` with `onStretchTrigger`,
+`collapsedAlignment`, `maxHeight` on relative header heights, and `semanticsConfig` for
+localized accessibility strings. All are described in the [API reference](API.md).
+
+
+---
+
+<!-- CHANGELOG.md -->
+# Changelog
+
+All notable changes to this project are documented here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
+[Semantic Versioning](https://semver.org/): breaking changes only ship in a major version.
+
+## 2.0.0
+
+Breaking release. See [docs/MIGRATION.md](docs/MIGRATION.md) for the upgrade steps; most screens
+need one edit or none.
+
+- **NEW**: the header collapses through nested scrolling. Any vertically scrollable composable can be the body via `ParallaxContent.Custom`, including `LazyVerticalGrid`, `LazyVerticalStaggeredGrid` and pagers. Dragging on the header itself collapses it.
+- **NEW**: every slot runs in a `ParallaxToolbarScope` exposing `collapseFraction`, `isCollapsed` and `state`; the `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
+- **NEW**: invalid configuration values throw at construction with a message naming the field and the valid range.
+- **NEW**: compiled recipes in `docs/RECIPES.md`, an agent skill file, `llms.txt`, and a docs site published to GitHub Pages.
+- **NEW**: accessibility semantics: state description with expand and collapse actions, explicit reading order with the toolbar first, the title as a heading, and the faded header or exited toolbar hidden from screen readers. Strings are configurable through `semanticsConfig`.
+- **NEW**: `bottomContent` slot pinned under the toolbar for tabs or search; overscroll stretch with `stretchEnabled`, `stretchTriggerDistance` and an `onStretchTrigger` callback for pull-to-refresh; `collapsedAlignment` for a centered or end-aligned collapsed title; `maxHeight` on `HeaderHeight.Percentage` and `AspectRatio`; `alwaysElevated` on the toolbar config.
+- **NEW**: per-element behaviors on the slot scope: `Modifier.parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`; an `overlayContent` slot above the body and toolbar for elements that travel into the toolbar; `fadeOnCollapse` on the header config; and `state.layoutInfo` with the measured geometry.
+- **NEW**: `ScrollMode` on the header config: `ExitUntilCollapsed` (default), `EnterAlways`, and `EnterAlwaysCollapsed`, which also slides the toolbar off screen. `state.toolbarExitFraction` reports the exit.
+- **NEW**: `snapOnRelease` on the header config settles a half-collapsed header to the nearer end.
+- **NEW**: desktop (JVM) and web (Kotlin/Wasm) targets, plus desktop and web sample apps.
+- **NEW**: the collapse fraction is saved and restored across configuration changes and process death.
+- **CHANGED**: `collapse()` and `expand()` move only the header; the body keeps its scroll position. `rememberParallaxToolbarState(initiallyCollapsed = true)` is the state-side equivalent of `isExpandedWhenFirstDisplayed = false`.
+- **NEW**: explicit API mode, a checked-in ABI dump verified on every pull request, and generated API docs in the javadoc jar
+- **NEW**: `ParallaxToolbarState` and `rememberParallaxToolbarState()`: observe `collapseFraction` and `isCollapsed`, and call `collapse()` / `expand()` (animated or not). The `scrollState` parameter is replaced by `state`; the deprecated overload still accepts a `ScrollState`.
+- **NEW**: `parallaxMultiplier` on the header config, `height` on the toolbar config, and `collapsedScale` on the title config.
+- **REMOVED**: `iconSize` and `iconSpacing` from `ParallaxToolbarConfig` and `ToolbarMinWidth`, `ToolbarIconSize`, `ToolbarIconSpacing` from `ParallaxToolbarDefaults`. Nothing ever read them; size icons inside the slots.
+- **REMOVED**: the Material 3 dependency. The library now depends only on Compose UI and Foundation, so it works with any design system
+- **CHANGED**: the header fades out over the collapse range instead of its full height, so it is fully hidden once the toolbar covers it
+- **CHANGED**: the toolbar and title are measured in one pass by a custom layout instead of position callbacks, removing the one-frame jump on first display and rotation. The toolbar no longer uses Material's `TopAppBar` internally; its look is unchanged.
+- **UPDATED**: Kotlin 2.4.20, Compose Multiplatform 1.12.1
+- **UPGRADED**: Gradle 9.7.0, Android Gradle Plugin 9.3.3, Maven Publish Plugin 0.37.0
+- **CHANGED**: Migrated to the `com.android.kotlin.multiplatform.library` plugin required by AGP 9
+- **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
+- **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
+- **REMOVED**: sample screens, previews and iOS sample view controllers from the published artifact; they now live in the `sample` module. The library no longer depends on `material-icons-extended`.
+- **CHANGED**: configuration classes are plain classes with `copy`, `equals`, `hashCode` and `toString` instead of data classes, so fields can be added later without breaking compiled consumers
+- **CHANGED**: configuration classes are annotated `@Immutable` so the layout skips recomposition when its inputs are unchanged
+- **CHANGED**: the legacy overload taking `lazyContent` is now marked `@Deprecated` with a replacement; it delegates to the `ParallaxContent` overload
+- **FIXED**: `isExpandedWhenFirstDisplayed = false` now works for `ParallaxContent.Lazy`
+- **FIXED**: the last status-bar-inset height of the body could never be scrolled into view; the body is now padded by the inset instead of offset
+- **FIXED**: right-to-left layouts: content padding and the title's horizontal motion now follow the layout direction
+- **FIXED**: horizontal `contentPadding` is applied to `ParallaxContent.Regular`
+- **CHANGED**: the toolbar shadow (`elevation`) now appears only once the toolbar is collapsed, so it no longer draws a band across the expanded header
+- **CHANGED**: the bottom filler for short regular content is computed exactly, removing extra blank space
+- **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
+- **FIXED**: A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title
+- **NEW**: Compose Multiplatform sample playground with Android and iOS host apps
+- **TESTS**: Compose UI tests now run on Android (Robolectric) and the iOS simulator, with a Kover line-coverage gate
+
+## 1.3.0
+
+- **NEW**: Dynamic header height options with `HeaderHeight` sealed class:
+  - `HeaderHeight.Fixed`: Fixed height in Dp (previous default behavior)
+  - `HeaderHeight.AspectRatio`: Responsive height based on screen width and aspect ratio
+  - `HeaderHeight.Percentage`: Adaptive height as percentage of screen height
+- **NEW**: `contentPadding` parameter for seamless Scaffold integration
+  - Prevents content from drawing behind bottom navigation bars
+  - Automatically merges with LazyColumn's internal contentPadding
+  - Works with both Regular and Lazy content types
+- **ENHANCED**: Extended `ParallaxContent.Lazy` with comprehensive `LazyColumnConfig` customization
+  - Factory method `ParallaxToolbarDefaults.lazyColumnConfig()` for easy configuration
+- **UPDATED**: Kotlin 2.2.10, Compose Multiplatform 1.8.2, Compose UI 1.9.0
+- **UPGRADED**: Gradle 9.0.0, Android Gradle Plugin 8.12.1, Maven Publish Plugin 0.34.0
+
+## 1.2.0
+
+- **NEW**: Introduced unified `ParallaxContent` sealed class system for content types:
+  - `ParallaxContent.Regular` - Regular scrollable content using Column with vertical scroll
+  - `ParallaxContent.Lazy` - LazyColumn content for better performance with large lists
+- **API Enhancement**: New unified `ComposeParallaxToolbarLayout` with single `content: ParallaxContent` parameter
+- **Backward Compatibility**: Legacy API maintained but marked as deprecated
+- **Developer Experience**: Clearer API with explicit content type declarations
+
+## 1.1.0
+
+- Updated to Kotlin 2.1.20
+- Updated to Compose Multiplatform 1.8.1
+- Ios integration details update
+
+## 1.0.0
+
+- Initial release
+- Basic parallax toolbar functionality
+- Material 3 support
