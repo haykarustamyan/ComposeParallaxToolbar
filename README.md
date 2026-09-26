@@ -562,6 +562,8 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 - **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
 - **REMOVED**: sample screens, previews and iOS sample view controllers from the published artifact; they now live in the `sample` module. The library no longer depends on `material-icons-extended`.
 - **CHANGED**: configuration classes are annotated `@Immutable` so the layout skips recomposition when its inputs are unchanged
+- **CHANGED**: the legacy overload taking `lazyContent` is now marked `@Deprecated` with a replacement; it delegates to the `ParallaxContent` overload
+- **FIXED**: `isExpandedWhenFirstDisplayed = false` now works for `ParallaxContent.Lazy`
 - **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
 - **FIXED**: A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title
 - **NEW**: Compose Multiplatform sample playground with Android and iOS host apps

@@ -355,3 +355,24 @@ class ComposeParallaxToolbarRecompositionTest : UiTestBase() {
         onNodeWithText("legacy").assertIsDisplayed()
     }
 }
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarLazyStartTest : UiTestBase() {
+
+    /** isExpandedWhenFirstDisplayed = false must also work for lazy content. */
+    @Test
+    fun lazyContent_startsCollapsed_whenIsExpandedWhenFirstDisplayedIsFalse() = runComposeUiTest {
+        setContent {
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(isExpandedWhenFirstDisplayed = false),
+                content = ParallaxContent.Lazy(content = { _ ->
+                    items(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
+                })
+            )
+        }
+        waitForIdle()
+        onNodeWithText("collapsed").assertIsDisplayed()
+    }
+}

@@ -1,300 +1,61 @@
 package am.highapps.parallaxtoolbar
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.ScrollableDefaults
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.util.lerp
 
 /**
- * Default values and factory methods for ComposeParallaxToolbar
- */
-object ParallaxToolbarDefaults {
-    // Header defaults
-    val HeaderHeightDp: Dp = 450.dp
-    internal const val HeaderParallaxMultiplier: Float = 0.5f
-    internal const val HeaderAlphaHeightFraction: Float = 1f
-
-    // Toolbar defaults
-    internal val ToolbarHeight: Dp = 64.dp
-    val ToolbarMinWidth: Dp = 56.dp
-    val ToolbarIconSize: Dp = 24.dp
-    val ToolbarIconSpacing: Dp = 8.dp
-
-    // Title and subtitle defaults
-    val TitlePaddingBottom: Dp = (-16).dp
-    val TitlePaddingStart: Dp = 16.dp
-    val TitleCollapsedPaddingStart: Dp = 64.dp
-    internal const val TitleFontScaleStart: Float = 1f
-    internal const val TitleFontScaleEnd: Float = 1f
-
-    // Body defaults
-    val BodyMinBottomSpacing: Dp = 0.dp
-
-    @Composable
-    fun headerConfig(
-        height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
-        gradient: Brush? = null,
-        isExpandedWhenFirstDisplayed: Boolean = true
-    ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height = height,
-        gradient = gradient,
-        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
-    )
-
-    @Composable
-    fun headerConfigWithAspectRatio(
-        aspectRatio: Float = 16f / 9f,
-        gradient: Brush? = null,
-        isExpandedWhenFirstDisplayed: Boolean = true
-    ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height = HeaderHeight.AspectRatio(aspectRatio),
-        gradient = gradient,
-        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
-    )
-
-    @Composable
-    fun headerConfigWithPercentage(
-        heightPercentage: Float = 0.4f,
-        gradient: Brush? = null,
-        isExpandedWhenFirstDisplayed: Boolean = true
-    ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height = HeaderHeight.Percentage(heightPercentage),
-        gradient = gradient,
-        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
-    )
-
-    @Composable
-    fun toolbarConfig(
-        initialColor: Color = Color.Transparent,
-        targetColor: Color = Color.Black,
-        elevation: Dp = 0.dp,
-        iconSize: Dp = ToolbarIconSize,
-        iconSpacing: Dp = ToolbarIconSpacing,
-        animationSpec: AnimationSpec<Color> = tween(durationMillis = 300)
-    ): ParallaxToolbarConfig = ParallaxToolbarConfig(
-        initialColor = initialColor,
-        targetColor = targetColor,
-        elevation = elevation,
-        iconSize = iconSize,
-        iconSpacing = iconSpacing,
-        animationSpec = animationSpec
-    )
-
-    @Composable
-    fun titleConfig(
-        paddingBottom: Dp = TitlePaddingBottom,
-        paddingStart: Dp = TitlePaddingStart,
-        collapsedPaddingStart: Dp = TitleCollapsedPaddingStart,
-        keepSubtitleAfterCollapse: Boolean = false,
-        animateSubTitleHiding: Boolean = true
-    ): ParallaxTitleConfig = ParallaxTitleConfig(
-        paddingBottom = paddingBottom,
-        paddingStart = paddingStart,
-        collapsedPaddingStart = collapsedPaddingStart,
-        keepSubtitleAfterCollapse = keepSubtitleAfterCollapse,
-        animateSubTitleHiding = animateSubTitleHiding
-    )
-
-    @Composable
-    fun bodyConfig(
-        minBottomSpacerHeight: Dp = BodyMinBottomSpacing
-    ): ParallaxBodyConfig = ParallaxBodyConfig(
-        minBottomSpacerHeight = minBottomSpacerHeight
-    )
-
-    @Composable
-    fun lazyColumnConfig(
-        contentPadding: PaddingValues = PaddingValues(0.dp),
-        verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-        horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-        flingBehavior: FlingBehavior? = null,
-        userScrollEnabled: Boolean = true,
-        overscrollEffect: OverscrollEffect? = null
-    ): LazyColumnConfig = LazyColumnConfig(
-        contentPadding = contentPadding,
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        flingBehavior = flingBehavior ?: ScrollableDefaults.flingBehavior(),
-        userScrollEnabled = userScrollEnabled,
-        overscrollEffect = overscrollEffect ?: rememberOverscrollEffect()
-    )
-}
-
-/**
- * Represents different ways to specify header height
- */
-@Immutable
-sealed class HeaderHeight {
-    /**
-     * Fixed height in Dp
-     */
-    data class Fixed(val height: Dp) : HeaderHeight()
-
-    /**
-     * Height based on aspect ratio (width/height)
-     * For example: 16f/9f for a 16:9 aspect ratio
-     */
-    data class AspectRatio(val ratio: Float) : HeaderHeight()
-
-    /**
-     * Height as percentage of screen height
-     * Value should be between 0f and 1f (e.g., 0.4f for 40% of screen height)
-     */
-    data class Percentage(val percentage: Float) : HeaderHeight()
-}
-
-/**
- * Configuration holders. They are immutable so the layout can skip recomposition when the parent
- * recomposes with the same values.
- */
-@Immutable
-data class ParallaxHeaderConfig(
-    val height: HeaderHeight,
-    val gradient: Brush?,
-    val isExpandedWhenFirstDisplayed: Boolean = true
-)
-
-@Immutable
-data class ParallaxToolbarConfig(
-    val initialColor: Color,
-    val targetColor: Color,
-    val elevation: Dp,
-    val iconSize: Dp,
-    val iconSpacing: Dp,
-    val animationSpec: AnimationSpec<Color>
-)
-
-@Immutable
-data class ParallaxTitleConfig(
-    val paddingBottom: Dp,
-    val paddingStart: Dp,
-    val collapsedPaddingStart: Dp,
-    val keepSubtitleAfterCollapse: Boolean,
-    val animateSubTitleHiding: Boolean
-)
-
-@Immutable
-data class ParallaxBodyConfig(
-    val minBottomSpacerHeight: Dp
-)
-
-@Immutable
-data class LazyColumnConfig(
-    val contentPadding: PaddingValues = PaddingValues(0.dp),
-    val verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    val horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    val flingBehavior: FlingBehavior? = null,
-    val userScrollEnabled: Boolean = true,
-    val overscrollEffect: OverscrollEffect? = null
-)
-
-/**
- * Represents different types of content that can be used with the parallax toolbar
- */
-sealed class ParallaxContent {
-    /**
-     * Regular scrollable content using Column with vertical scroll
-     */
-    data class Regular(val content: @Composable (Boolean) -> Unit) : ParallaxContent()
-
-    /**
-     * LazyColumn content for better performance with large lists
-     *
-     * @param content The content to display in the LazyColumn
-     * @param config Configuration for LazyColumn behavior (padding, arrangement, etc.)
-     * @param lazyListState State object to control and observe LazyColumn scrolling
-     */
-    data class Lazy(
-        val content: LazyListScope.(Boolean) -> Unit,
-        val config: LazyColumnConfig = LazyColumnConfig(),
-        val lazyListState: LazyListState? = null
-    ) : ParallaxContent()
-}
-
-/**
- * Helper function to calculate actual header height based on HeaderHeight type and screen dimensions
- */
-@Composable
-private fun calculateHeaderHeight(
-    headerHeight: HeaderHeight,
-    screenWidth: Dp,
-    screenHeight: Dp
-): Dp {
-    return when (headerHeight) {
-        is HeaderHeight.Fixed -> headerHeight.height
-        is HeaderHeight.AspectRatio -> screenWidth / headerHeight.ratio
-        is HeaderHeight.Percentage -> screenHeight * headerHeight.percentage
-    }
-}
-
-/**
- * Unified ComposeParallaxToolbarLayout with a single content parameter
+ * A collapsing toolbar with a parallax header for Compose Multiplatform.
  *
- * @param content The content to display - can be either Regular (Column + verticalScroll) or Lazy (LazyColumn)
- *                For LazyColumn content, use ParallaxContent.Lazy with LazyColumnConfig for customization
+ * The header collapses as [content] scrolls; the title glides into the toolbar and the toolbar
+ * background animates to its target color. Every slot receives `true` once collapsed so it can
+ * adapt colors or content.
  *
- * Example usage with LazyColumn customization:
+ * @param titleContent Title, positioned by the layout.
+ * @param headerContent Content shown in the expanded header, e.g. an image.
+ * @param content The scrollable body: [ParallaxContent.Regular] or [ParallaxContent.Lazy].
+ * @param contentPadding Padding applied to the body, typically the `Scaffold` padding.
+ * @param subtitleContent Optional subtitle under the title.
+ * @param navigationIcon Optional leading toolbar slot.
+ * @param actions Optional trailing toolbar slot.
+ * @param scrollState Scroll state used by [ParallaxContent.Regular]. Lazy content uses the
+ *   state carried by [ParallaxContent.Lazy].
+ *
+ * Example with a customized LazyColumn:
  * ```
  * ComposeParallaxToolbarLayout(
+ *     titleContent = { collapsed -> Text("Title") },
+ *     headerContent = { Image(...) },
  *     content = ParallaxContent.Lazy(
- *         content = { isCollapsed ->
- *             // Your lazy items here
- *         },
+ *         content = { collapsed -> items(100) { Text("Row $it") } },
  *         config = ParallaxToolbarDefaults.lazyColumnConfig(
  *             contentPadding = PaddingValues(16.dp),
- *             reverseLayout = true,
  *             verticalArrangement = Arrangement.spacedBy(8.dp)
  *         )
  *     )
@@ -317,55 +78,54 @@ fun ComposeParallaxToolbarLayout(
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
     scrollState: ScrollState = rememberScrollState()
 ) {
-    // Delegate to the existing implementation based on content type
     when (content) {
-        is ParallaxContent.Regular -> {
-            ComposeParallaxToolbarLayout(
-                titleContent = titleContent,
-                headerContent = headerContent,
-                content = content.content,
-                modifier = modifier,
-                contentPadding = contentPadding,
-                subtitleContent = subtitleContent,
-                navigationIcon = navigationIcon,
-                actions = actions,
-                headerConfig = headerConfig,
-                toolbarConfig = toolbarConfig,
-                titleConfig = titleConfig,
-                bodyConfig = bodyConfig,
-                scroll = scrollState,
-                lazyContent = null,
-                lazyListState = rememberLazyListState()
-            )
-        }
+        is ParallaxContent.Regular -> ParallaxToolbarLayoutImpl(
+            titleContent = titleContent,
+            headerContent = headerContent,
+            modifier = modifier,
+            contentPadding = contentPadding,
+            subtitleContent = subtitleContent,
+            navigationIcon = navigationIcon,
+            actions = actions,
+            headerConfig = headerConfig,
+            toolbarConfig = toolbarConfig,
+            titleConfig = titleConfig,
+            bodyConfig = bodyConfig,
+            body = ParallaxBodySpec.Regular(scrollState, content.content)
+        )
 
-        is ParallaxContent.Lazy -> {
-            ComposeParallaxToolbarLayout(
-                titleContent = titleContent,
-                headerContent = headerContent,
-                content = { _ -> /* Empty since we're using lazy content */ },
-                modifier = modifier,
-                contentPadding = contentPadding,
-                subtitleContent = subtitleContent,
-                navigationIcon = navigationIcon,
-                actions = actions,
-                headerConfig = headerConfig,
-                toolbarConfig = toolbarConfig,
-                titleConfig = titleConfig,
-                bodyConfig = bodyConfig,
-                scroll = scrollState,
-                lazyContent = content.content,
+        is ParallaxContent.Lazy -> ParallaxToolbarLayoutImpl(
+            titleContent = titleContent,
+            headerContent = headerContent,
+            modifier = modifier,
+            contentPadding = contentPadding,
+            subtitleContent = subtitleContent,
+            navigationIcon = navigationIcon,
+            actions = actions,
+            headerConfig = headerConfig,
+            toolbarConfig = toolbarConfig,
+            titleConfig = titleConfig,
+            bodyConfig = bodyConfig,
+            body = ParallaxBodySpec.Lazy(
                 lazyListState = content.lazyListState ?: rememberLazyListState(),
-                lazyColumnConfig = content.config
+                config = content.config,
+                content = content.content
             )
-        }
+        )
     }
 }
 
 /**
- * Legacy ComposeParallaxToolbarLayout - kept for backward compatibility
- * @deprecated Use the new unified API with ParallaxContent instead
+ * Previous entry point. Prefer the overload taking [ParallaxContent].
  */
+@Deprecated(
+    message = "Use the overload that takes ParallaxContent.",
+    replaceWith = ReplaceWith(
+        "ComposeParallaxToolbarLayout(titleContent, headerContent, ParallaxContent.Regular(content), " +
+                "modifier, contentPadding, subtitleContent, navigationIcon, actions, headerConfig, " +
+                "toolbarConfig, titleConfig, bodyConfig, scroll)"
+    )
+)
 @Composable
 fun ComposeParallaxToolbarLayout(
     titleContent: @Composable (Boolean) -> Unit,
@@ -385,483 +145,159 @@ fun ComposeParallaxToolbarLayout(
     lazyListState: LazyListState = rememberLazyListState(),
     lazyColumnConfig: LazyColumnConfig = LazyColumnConfig()
 ) {
-    val topInset = with(LocalDensity.current) {
-        WindowInsets.statusBars.getTop(this).toDp()
-    }
+    ComposeParallaxToolbarLayout(
+        titleContent = titleContent,
+        headerContent = headerContent,
+        content = if (lazyContent != null) {
+            ParallaxContent.Lazy(lazyContent, lazyColumnConfig, lazyListState)
+        } else {
+            ParallaxContent.Regular(content)
+        },
+        modifier = modifier,
+        contentPadding = contentPadding,
+        subtitleContent = subtitleContent,
+        navigationIcon = navigationIcon,
+        actions = actions,
+        headerConfig = headerConfig,
+        toolbarConfig = toolbarConfig,
+        titleConfig = titleConfig,
+        bodyConfig = bodyConfig,
+        scrollState = scroll
+    )
+}
 
+/** Resolved body: which scroll source drives the collapse and how to render the content. */
+private sealed class ParallaxBodySpec {
+    class Regular(
+        val scrollState: ScrollState,
+        val content: @Composable (Boolean) -> Unit
+    ) : ParallaxBodySpec()
+
+    class Lazy(
+        val lazyListState: LazyListState,
+        val config: LazyColumnConfig,
+        val content: LazyListScope.(Boolean) -> Unit
+    ) : ParallaxBodySpec()
+}
+
+@Composable
+private fun ParallaxToolbarLayoutImpl(
+    titleContent: @Composable (Boolean) -> Unit,
+    headerContent: @Composable () -> Unit,
+    modifier: Modifier,
+    contentPadding: PaddingValues,
+    subtitleContent: (@Composable (Boolean) -> Unit)?,
+    navigationIcon: (@Composable (Boolean) -> Unit)?,
+    actions: (@Composable RowScope.(Boolean) -> Unit)?,
+    headerConfig: ParallaxHeaderConfig,
+    toolbarConfig: ParallaxToolbarConfig,
+    titleConfig: ParallaxTitleConfig,
+    bodyConfig: ParallaxBodyConfig,
+    body: ParallaxBodySpec
+) {
+    val density = LocalDensity.current
+    val topInset = with(density) { WindowInsets.statusBars.getTop(this).toDp() }
     val toolbarHeight = ParallaxToolbarDefaults.ToolbarHeight
-    val titleFontScaleStart = ParallaxToolbarDefaults.TitleFontScaleStart
-    val titleFontScaleEnd = ParallaxToolbarDefaults.TitleFontScaleEnd
 
-    BoxWithConstraints {
-        val screenHeight = this@BoxWithConstraints.maxHeight
-        val screenWidth = this@BoxWithConstraints.maxWidth
-
-        // Calculate actual header height based on the header height type
-        val actualHeaderHeight = calculateHeaderHeight(
-            headerHeight = headerConfig.height,
-            screenWidth = screenWidth,
-            screenHeight = screenHeight
+    BoxWithConstraints(modifier = modifier) {
+        val headerHeight = headerConfig.height.resolve(
+            availableWidth = maxWidth,
+            availableHeight = maxHeight
         )
+        val headerHeightPx = with(density) { headerHeight.toPx() }
+        val toolbarHeightPx = with(density) { toolbarHeight.toPx() }
+        val maxWidthPx = with(density) { maxWidth.toPx() }
+        val collapseRangePx = headerHeightPx - toolbarHeightPx
 
-        val headerHeightPx = with(LocalDensity.current) { actualHeaderHeight.toPx() }
-        val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
+        val collapseState = rememberCollapseState(
+            scrollState = (body as? ParallaxBodySpec.Regular)?.scrollState ?: rememberScrollState(),
+            lazyListState = (body as? ParallaxBodySpec.Lazy)?.lazyListState,
+            collapseRangePx = collapseRangePx
+        )
+        val isCollapsed by remember(collapseState) { derivedStateOf { collapseState.isCollapsed } }
 
-        val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
+        LaunchedEffect(collapseState, headerConfig.isExpandedWhenFirstDisplayed) {
+            if (!headerConfig.isExpandedWhenFirstDisplayed) collapseState.collapse()
+        }
 
         var navIconWidthPx by remember { mutableStateOf(0f) }
         var actionsWidthPx by remember { mutableStateOf(0f) }
 
-        val collapseRange =
-            remember(headerHeightPx, toolbarHeightPx) { headerHeightPx - toolbarHeightPx }
+        // The body and title are pushed down by the status bar inset so the collapsed toolbar
+        // clears it. The header covers that inset too, or a gap would appear under it.
+        ParallaxHeader(
+            collapseState = collapseState,
+            headerHeightPx = headerHeightPx,
+            gradientBrush = headerConfig.gradient,
+            initialColor = toolbarConfig.initialColor,
+            targetColor = toolbarConfig.targetColor,
+            modifier = Modifier.fillMaxWidth().height(headerHeight + topInset),
+            content = headerContent
+        )
 
-        LaunchedEffect(collapseRange, headerConfig.isExpandedWhenFirstDisplayed) {
-            if (!headerConfig.isExpandedWhenFirstDisplayed) {
-                scroll.scrollTo(collapseRange.toInt() + 1)
-            }
-        }
-
-        val isCollapsed =
-            remember(scroll.value, lazyListState.firstVisibleItemIndex, lazyListState.firstVisibleItemScrollOffset, collapseRange) {
-                derivedStateOf {
-                    if (lazyContent != null) {
-                        val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-                        val firstVisibleItemScrollOffset =
-                            lazyListState.firstVisibleItemScrollOffset
-                        val totalScrollOffset = if (firstVisibleItemIndex == 0) {
-                            firstVisibleItemScrollOffset
-                        } else {
-                            collapseRange.toInt() + firstVisibleItemScrollOffset
-                        }
-                        totalScrollOffset >= collapseRange
-                    } else {
-                        scroll.value > collapseRange
-                    }
-                }
-            }
-
-        Box(modifier = modifier) {
-            // The body and title are pushed down by the status bar inset so the collapsed toolbar
-            // clears it. The header must cover that inset too, or a gap appears under it.
-            Header(
-                scroll = scroll,
-                lazyListState = if (lazyContent != null) lazyListState else null,
-                headerHeightPx = headerHeightPx,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(actualHeaderHeight + topInset),
-                content = headerContent,
-                gradientBrush = headerConfig.gradient,
-                initialColor = toolbarConfig.initialColor,
-                targetColor = toolbarConfig.targetColor
-            )
-            if (lazyContent != null) {
-                LazyBody(
-                    lazyListState = lazyListState,
-                    headerHeight = actualHeaderHeight,
-                    lazyContent = { lazyContent(isCollapsed.value) },
-                    modifier = Modifier.offset(y = topInset),
-                    minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
-                    config = lazyColumnConfig,
-                    contentPadding = contentPadding
-                )
-            } else {
-                Body(
-                    scroll = scroll,
-                    screenHeight = screenHeight,
-                    headerHeight = actualHeaderHeight,
-                    toolbarHeight = toolbarHeight,
-                    content = { content(isCollapsed.value) },
-                    modifier = Modifier.offset(y = topInset),
-                    minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
-                    contentPadding = contentPadding
-                )
-            }
-            Toolbar(
-                scroll = scroll,
-                lazyListState = if (lazyContent != null) lazyListState else null,
-                headerHeightPx = headerHeightPx,
-                toolbarHeightPx = toolbarHeightPx,
-                navigationIcon = {
-                    Box(
-                        modifier = Modifier
-                            .onGloballyPositioned {
-                                navIconWidthPx = it.size.width.toFloat()
-                            }
-                            .size(if (navigationIcon != null) Dp.Unspecified else 0.dp)
-                    ) {
-                        navigationIcon?.invoke(isCollapsed.value)
-                    }
-                },
-                actions = {
-                    Row(
-                        modifier = Modifier.onGloballyPositioned {
-                            actionsWidthPx = it.size.width.toFloat()
-                        }
-                    ) {
-                        actions?.invoke(this, isCollapsed.value)
-                    }
-                },
-                initialColor = toolbarConfig.initialColor,
-                targetColor = toolbarConfig.targetColor,
-                colorAnimationSpec = toolbarConfig.animationSpec,
-                elevation = toolbarConfig.elevation
-            )
-            TitleWithSubtitle(
-                headerHeight = actualHeaderHeight,
+        when (body) {
+            is ParallaxBodySpec.Regular -> ParallaxBody(
+                scroll = body.scrollState,
+                screenHeight = maxHeight,
+                headerHeight = headerHeight,
                 toolbarHeight = toolbarHeight,
-                modifier = Modifier.offset(y = topInset)
-                    .widthIn(
-                        min = 0.dp,
-                        max = with(LocalDensity.current) {
-                            (maxWidthPx - navIconWidthPx - actionsWidthPx).toDp()
-                        }
-                    ),
-                titleContent = titleContent,
-                subtitleContent = subtitleContent,
-                scroll = scroll,
-                lazyListState = if (lazyContent != null) lazyListState else null,
-                hasNavigationIcon = navigationIcon != null,
-                keepSubtitleAfterCollapse = titleConfig.keepSubtitleAfterCollapse,
-                titleWithSubTitlePaddingBottom = titleConfig.paddingBottom,
-                titleWithSubTitlePaddingStart = titleConfig.paddingStart,
-                titleWithSubTitleCollapsedPaddingStart = titleConfig.collapsedPaddingStart,
-                titleFontScaleStart = titleFontScaleStart,
-                titleFontScaleEnd = titleFontScaleEnd,
-                animateSubTitleHiding = titleConfig.animateSubTitleHiding
+                minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
+                contentPadding = contentPadding,
+                modifier = Modifier.offset(y = topInset),
+                content = { body.content(isCollapsed) }
+            )
+
+            is ParallaxBodySpec.Lazy -> ParallaxLazyBody(
+                lazyListState = body.lazyListState,
+                headerHeight = headerHeight,
+                minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
+                config = body.config,
+                contentPadding = contentPadding,
+                modifier = Modifier.offset(y = topInset),
+                lazyContent = { body.content(this, isCollapsed) }
             )
         }
-    }
-}
 
-@Composable
-private fun Header(
-    scroll: ScrollState,
-    lazyListState: LazyListState?,
-    headerHeightPx: Float,
-    modifier: Modifier,
-    gradientBrush: Brush?,
-    content: @Composable () -> Unit,
-    initialColor: Color,
-    targetColor: Color
-) {
-    val parallaxMultiplier = ParallaxToolbarDefaults.HeaderParallaxMultiplier
-    val alphaHeightFraction = ParallaxToolbarDefaults.HeaderAlphaHeightFraction
-
-    Box(
-        modifier = modifier
-            .graphicsLayer {
-                val scrollOffset = if (lazyListState != null) {
-                    val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-                    val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
-                    if (firstVisibleItemIndex == 0) {
-                        firstVisibleItemScrollOffset.toFloat()
-                    } else {
-                        headerHeightPx + firstVisibleItemScrollOffset.toFloat()
-                    }
-                } else {
-                    scroll.value.toFloat()
+        ParallaxToolbar(
+            collapseState = collapseState,
+            initialColor = toolbarConfig.initialColor,
+            targetColor = toolbarConfig.targetColor,
+            colorAnimationSpec = toolbarConfig.animationSpec,
+            elevation = toolbarConfig.elevation,
+            navigationIcon = {
+                Box(
+                    modifier = Modifier
+                        .onGloballyPositioned { navIconWidthPx = it.size.width.toFloat() }
+                        .size(if (navigationIcon != null) Dp.Unspecified else 0.dp)
+                ) {
+                    navigationIcon?.invoke(isCollapsed)
                 }
-
-                translationY = -scrollOffset * parallaxMultiplier
-                alpha = (-1f / (headerHeightPx * alphaHeightFraction)) * scrollOffset + 1
+            },
+            actions = {
+                Row(
+                    modifier = Modifier.onGloballyPositioned { actionsWidthPx = it.size.width.toFloat() }
+                ) {
+                    actions?.invoke(this, isCollapsed)
+                }
             }
-    ) {
-        content()
-
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(
-                    brush = gradientBrush ?: Brush.verticalGradient(
-                        colors = listOf(initialColor, targetColor),
-                        startY = 3 * headerHeightPx / 4
-                    )
-                )
         )
-    }
-}
 
-@Composable
-private fun Body(
-    scroll: ScrollState,
-    screenHeight: Dp,
-    headerHeight: Dp,
-    toolbarHeight: Dp,
-    content: @Composable (Boolean) -> Unit,
-    modifier: Modifier,
-    minBottomSpacerHeight: Dp,
-    contentPadding: PaddingValues
-) {
-    var contentHeight by remember { mutableStateOf(0) }
-
-    val density = LocalDensity.current
-    val headerHeightPx = with(density) { headerHeight.toPx() }
-    val toolbarHeightPx = with(density) { toolbarHeight.toPx() }
-
-    val collapseRange = headerHeightPx - toolbarHeightPx
-    val isCollapsed = scroll.value > collapseRange
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize().verticalScroll(scroll)
-    ) {
-        Spacer(Modifier.height(headerHeight))
-
-        Box(
-            modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
-                contentHeight = layoutCoordinates.size.height
-            }
-        ) {
-            content(isCollapsed)
-        }
-
-        val contentHeightDp = with(LocalDensity.current) { contentHeight.toDp() }
-        val bottomPadding = contentPadding.calculateBottomPadding()
-        val minimumSpacerHeight = (screenHeight - contentHeightDp + toolbarHeight - bottomPadding)
-            .coerceAtLeast(minBottomSpacerHeight)
-
-        Spacer(Modifier.height(minimumSpacerHeight.coerceAtLeast(0.dp)))
-
-        // Add bottom padding as additional spacer to respect Scaffold padding
-        if (bottomPadding > 0.dp) {
-            Spacer(Modifier.height(bottomPadding))
-        }
-    }
-}
-
-@Composable
-private fun LazyBody(
-    lazyListState: LazyListState,
-    headerHeight: Dp,
-    lazyContent: LazyListScope.() -> Unit,
-    modifier: Modifier,
-    minBottomSpacerHeight: Dp,
-    config: LazyColumnConfig,
-    contentPadding: PaddingValues
-) {
-    // Merge external contentPadding with LazyColumn's own contentPadding
-    val mergedContentPadding = PaddingValues(
-        start = config.contentPadding.calculateStartPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) +
-                contentPadding.calculateStartPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
-        top = config.contentPadding.calculateTopPadding() +
-                contentPadding.calculateTopPadding(),
-        end = config.contentPadding.calculateEndPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) +
-                contentPadding.calculateEndPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
-        bottom = config.contentPadding.calculateBottomPadding() +
-                contentPadding.calculateBottomPadding()
-    )
-
-    LazyColumn(
-        state = lazyListState,
-        modifier = modifier.fillMaxSize(),
-        contentPadding = mergedContentPadding,
-        verticalArrangement = config.verticalArrangement,
-        horizontalAlignment = config.horizontalAlignment,
-        flingBehavior = config.flingBehavior ?: ScrollableDefaults.flingBehavior(),
-        userScrollEnabled = config.userScrollEnabled,
-        overscrollEffect = config.overscrollEffect
-    ) {
-        item {
-            Spacer(Modifier.height(headerHeight))
-        }
-
-        lazyContent()
-
-        item {
-            Spacer(Modifier.height(minBottomSpacerHeight.coerceAtLeast(0.dp)))
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun Toolbar(
-    scroll: ScrollState,
-    lazyListState: LazyListState?,
-    headerHeightPx: Float,
-    toolbarHeightPx: Float,
-    navigationIcon: @Composable () -> Unit,
-    actions: @Composable RowScope.() -> Unit,
-    initialColor: Color,
-    targetColor: Color,
-    colorAnimationSpec: AnimationSpec<Color>,
-    elevation: Dp
-) {
-    val toolbarBottom = remember(headerHeightPx, toolbarHeightPx) {
-        headerHeightPx - toolbarHeightPx
-    }
-
-    val isToolbarVisible by remember(
-        scroll.value,
-        lazyListState?.firstVisibleItemIndex,
-        lazyListState?.firstVisibleItemScrollOffset,
-        toolbarBottom
-    ) {
-        derivedStateOf {
-            if (lazyListState != null) {
-                val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-                val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
-                val totalScrollOffset = if (firstVisibleItemIndex == 0) {
-                    firstVisibleItemScrollOffset
-                } else {
-                    toolbarBottom.toInt() + firstVisibleItemScrollOffset
-                }
-                totalScrollOffset >= toolbarBottom
-            } else {
-                scroll.value >= toolbarBottom
-            }
-        }
-    }
-
-    val backgroundColor by animateColorAsState(
-        targetValue = if (isToolbarVisible) targetColor else initialColor,
-        animationSpec = colorAnimationSpec
-    )
-
-    TopAppBar(
-        modifier = Modifier.shadow(elevation = elevation),
-        title = {},
-        navigationIcon = navigationIcon,
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = backgroundColor
+        ParallaxTitle(
+            collapseState = collapseState,
+            headerHeightPx = headerHeightPx,
+            toolbarHeightPx = toolbarHeightPx,
+            hasNavigationIcon = navigationIcon != null,
+            config = titleConfig,
+            titleFontScaleStart = ParallaxToolbarDefaults.TitleFontScaleStart,
+            titleFontScaleEnd = ParallaxToolbarDefaults.TitleFontScaleEnd,
+            modifier = Modifier
+                .offset(y = topInset)
+                .widthIn(
+                    min = 0.dp,
+                    max = with(density) { (maxWidthPx - navIconWidthPx - actionsWidthPx).toDp() }
+                ),
+            titleContent = titleContent,
+            subtitleContent = subtitleContent
         )
-    )
-}
-
-@Composable
-private fun TitleWithSubtitle(
-    scroll: ScrollState,
-    lazyListState: LazyListState?,
-    headerHeight: Dp,
-    toolbarHeight: Dp,
-    hasNavigationIcon: Boolean,
-    titleContent: @Composable (Boolean) -> Unit,
-    modifier: Modifier,
-    subtitleContent: (@Composable (Boolean) -> Unit)?,
-    keepSubtitleAfterCollapse: Boolean,
-    titleWithSubTitlePaddingBottom: Dp,
-    titleWithSubTitlePaddingStart: Dp,
-    titleWithSubTitleCollapsedPaddingStart: Dp,
-    titleFontScaleStart: Float,
-    titleFontScaleEnd: Float,
-    animateSubTitleHiding: Boolean
-) {
-    var combinedHeightPx by remember { mutableStateOf(0f) }
-    var combinedWidthPx by remember { mutableStateOf(0f) }
-    var subtitleHeightPx by remember { mutableStateOf(0f) }
-
-    val density = LocalDensity.current
-    val headerHeightPx = remember(density, headerHeight) { with(density) { headerHeight.toPx() } }
-    val toolbarHeightPx = remember(density) { with(density) { toolbarHeight.toPx() } }
-
-    val collapseRange =
-        remember(headerHeightPx, toolbarHeightPx) { headerHeightPx - toolbarHeightPx }
-
-    val collapseFraction =
-        remember(scroll.value, lazyListState?.firstVisibleItemIndex, lazyListState?.firstVisibleItemScrollOffset, collapseRange) {
-            if (lazyListState != null) {
-                val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-                val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
-                val totalScrollOffset = if (firstVisibleItemIndex == 0) {
-                    firstVisibleItemScrollOffset
-                } else {
-                    collapseRange.toInt() + firstVisibleItemScrollOffset
-                }
-                (totalScrollOffset / collapseRange).coerceIn(0f, 1f)
-            } else {
-                (scroll.value / collapseRange).coerceIn(0f, 1f)
-            }
-        }
-
-    val isCollapsed =
-        remember(scroll.value, lazyListState?.firstVisibleItemIndex, lazyListState?.firstVisibleItemScrollOffset, collapseRange) {
-            if (lazyListState != null) {
-                val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-                val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
-                val totalScrollOffset = if (firstVisibleItemIndex == 0) {
-                    firstVisibleItemScrollOffset
-                } else {
-                    collapseRange.toInt() + firstVisibleItemScrollOffset
-                }
-                totalScrollOffset >= collapseRange
-            } else {
-                scroll.value > collapseRange
-            }
-        }
-
-    Column(
-        modifier = modifier
-            .graphicsLayer {
-                if (keepSubtitleAfterCollapse) {
-                    val scaleXY = lerp(
-                        titleFontScaleStart.dp,
-                        titleFontScaleEnd.dp,
-                        collapseFraction
-                    ).value
-                    val extraStartPadding = combinedWidthPx.toDp() * (1 - scaleXY) / 2f
-
-                    translationY = lerp(
-                        headerHeightPx.toDp() - combinedHeightPx.toDp() - subtitleHeightPx.toDp() - titleWithSubTitlePaddingBottom,
-                        toolbarHeightPx.toDp() / 2 - combinedHeightPx.toDp() / 2,
-                        collapseFraction
-                    ).toPx()
-
-                    translationX = if (hasNavigationIcon) {
-                        lerp(
-                            titleWithSubTitlePaddingStart,
-                            titleWithSubTitleCollapsedPaddingStart - extraStartPadding,
-                            collapseFraction
-                        ).toPx()
-                    } else {
-                        titleWithSubTitlePaddingStart.toPx()
-                    }
-
-                    scaleX = scaleXY
-                    scaleY = scaleXY
-                } else {
-                    translationY = lerp(
-                        headerHeightPx.toDp() - combinedHeightPx.toDp() - subtitleHeightPx.toDp() - titleWithSubTitlePaddingBottom,
-                        toolbarHeightPx.toDp() / 2 - (combinedHeightPx - subtitleHeightPx).toDp() / 2,
-                        collapseFraction
-                    ).toPx()
-
-                    translationX = if (hasNavigationIcon) {
-                        lerp(
-                            titleWithSubTitlePaddingStart,
-                            titleWithSubTitleCollapsedPaddingStart,
-                            collapseFraction
-                        ).toPx()
-                    } else {
-                        titleWithSubTitlePaddingStart.toPx()
-                    }
-                }
-            }
-            .onGloballyPositioned {
-                combinedHeightPx = it.size.height.toFloat()
-                combinedWidthPx = it.size.width.toFloat()
-            }
-    ) {
-        titleContent(isCollapsed)
-
-        subtitleContent?.let { content ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .onGloballyPositioned {
-                        subtitleHeightPx = it.size.height.toFloat()
-                    }
-                    .graphicsLayer {
-                        if (!keepSubtitleAfterCollapse && animateSubTitleHiding) {
-                            alpha = lerp(1f, 0f, collapseFraction)
-                        } else if (!keepSubtitleAfterCollapse && !animateSubTitleHiding) {
-                            alpha = if (isCollapsed) 0f else 1f
-                        }
-                    }
-            ) {
-                content(isCollapsed)
-            }
-        }
     }
 }

@@ -44,6 +44,11 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
+    compilerOptions {
+        // The test base class uses expect/actual; the warning is noise here.
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Pin the Compose runtime stack to the plugin version; Material 3 alone would pull an older one.
