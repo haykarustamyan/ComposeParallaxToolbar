@@ -24,6 +24,9 @@ public class ParallaxToolbarState internal constructor(
     public val lazyListState: LazyListState,
     internal val headerState: HeaderScrollState
 ) {
+    /** Measured geometry, updated on every layout pass. */
+    public val layoutInfo: ParallaxToolbarLayoutInfo = ParallaxToolbarLayoutInfo(headerState)
+
     /** 0f while fully expanded, 1f once fully collapsed. */
     public val collapseFraction: Float
         get() = headerState.fraction

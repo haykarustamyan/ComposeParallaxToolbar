@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -82,6 +83,8 @@ data class PlaygroundConfig(
     val startExpanded: Boolean = true,
     val snapOnRelease: Boolean = false,
     val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
+    val fadeHeader: Boolean = true,
+    val overlayAvatar: Boolean = false,
     val toolbarColor: ToolbarColor = ToolbarColor.Black,
     val elevation: Float = 0f,
     val subtitle: Boolean = true,
@@ -226,8 +229,26 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
             isExpandedWhenFirstDisplayed = config.startExpanded,
             parallaxMultiplier = config.parallaxMultiplier,
             snapOnRelease = config.snapOnRelease,
-            scrollMode = config.scrollMode
+            scrollMode = config.scrollMode,
+            fadeOnCollapse = config.fadeHeader
         ),
+        overlayContent = if (config.overlayAvatar) {
+            {
+                // Travels from the header's bottom-start into the toolbar's end, shrinking on the way.
+                Box(
+                    Modifier
+                        .size(72.dp)
+                        .moveBetween(
+                            expanded = Alignment.BottomStart,
+                            collapsed = Alignment.CenterEnd,
+                            expandedPadding = PaddingValues(start = 16.dp, bottom = 72.dp),
+                            collapsedPadding = PaddingValues(end = 104.dp),
+                            collapsedScale = 0.5f
+                        )
+                        .background(Color(0xFFFFC107), androidx.compose.foundation.shape.CircleShape)
+                )
+            }
+        } else null,
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
             targetColor = config.toolbarColor.color,
             elevation = config.elevation.dp,
@@ -336,6 +357,8 @@ private fun ConfigSheet(
             onChange(config.copy(parallaxMultiplier = it))
         }
         SwitchRow("Gradient overlay", config.gradient) { onChange(config.copy(gradient = it)) }
+        SwitchRow("Fade header on collapse", config.fadeHeader) { onChange(config.copy(fadeHeader = it)) }
+        SwitchRow("Overlay avatar (moveBetween)", config.overlayAvatar) { onChange(config.copy(overlayAvatar = it)) }
         SwitchRow("Start expanded", config.startExpanded) { onChange(config.copy(startExpanded = it)) }
         SwitchRow("Snap on release", config.snapOnRelease) { onChange(config.copy(snapOnRelease = it)) }
 

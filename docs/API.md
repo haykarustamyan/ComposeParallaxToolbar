@@ -15,6 +15,19 @@ Receiver of every content slot (`titleContent`, `subtitleContent`, `headerConten
 
 `actions` receives a `ParallaxActionsScope`, which is also a `RowScope`.
 
+Modifiers available on the scope:
+
+| Modifier | Effect |
+|---|---|
+| `parallax(ratio)` | Moves the element up by `ratio` of the collapse distance |
+| `fadeOnCollapse(expandedAlpha, collapsedAlpha)` | Interpolates alpha with the collapse |
+| `scaleOnCollapse(collapsedScale, origin)` | Scales toward `collapsedScale` |
+| `moveBetween(expanded, collapsed, expandedPadding, collapsedPadding, collapsedScale)` | Glides from a header alignment to a toolbar alignment; for `overlayContent` |
+
+## ParallaxToolbarLayoutInfo
+
+`state.layoutInfo`, measured geometry in pixels: `isMeasured`, `widthPx`, `heightPx`, `topInsetPx`, `headerHeightPx`, `toolbarHeightPx`, `collapseRangePx`, `headerOffsetPx`, `toolbarExitOffsetPx`, `currentHeaderBottomPx`.
+
 ## ParallaxToolbarState
 
 Hoisted state returned by `rememberParallaxToolbarState()` and passed to the `state` parameter.

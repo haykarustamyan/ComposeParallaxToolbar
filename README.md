@@ -498,6 +498,43 @@ a half-collapsed header to the nearer resting position when a drag or fling ends
 </details>
 
 <details>
+<summary><b>Per-element behaviors and the overlay slot</b></summary>
+
+Elements inside `headerContent` can declare their own collapse behavior with modifiers from the
+slot scope. Turn off the header-wide effects first so they do not stack:
+
+```kotlin
+headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
+headerContent = {
+    Image(cover, null, Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse())
+    Text("Est. 1998", Modifier.align(Alignment.BottomEnd).scaleOnCollapse(0.6f).fadeOnCollapse())
+}
+```
+
+`headerContent` is drawn under the body, so an element that must stay visible after collapsing,
+such as an avatar that ends up in the toolbar, goes in `overlayContent`, a layer above the body
+and the toolbar. `moveBetween` glides it from an alignment in the header to one in the toolbar:
+
+```kotlin
+overlayContent = {
+    Avatar(
+        Modifier.size(72.dp).moveBetween(
+            expanded = Alignment.BottomStart,
+            collapsed = Alignment.CenterEnd,
+            expandedPadding = PaddingValues(start = 16.dp, bottom = 72.dp),
+            collapsedPadding = PaddingValues(end = 104.dp),
+            collapsedScale = 0.5f
+        )
+    )
+}
+```
+
+`state.layoutInfo` exposes the measured geometry in pixels (width, header and toolbar heights,
+inset, current header offset and bottom edge) for custom overlays.
+
+</details>
+
+<details>
 <summary><b>Programmatic control</b></summary>
 
 ```kotlin

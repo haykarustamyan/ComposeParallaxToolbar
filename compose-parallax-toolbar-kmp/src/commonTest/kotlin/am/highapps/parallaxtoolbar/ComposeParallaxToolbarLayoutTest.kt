@@ -824,3 +824,63 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
         kotlin.test.assertTrue(state.toolbarExitFraction == 0f || state.toolbarExitFraction == 1f, "exit=${state.toolbarExitFraction}")
     }
 }
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarOverlayTest : UiTestBase() {
+
+    @Test
+    fun overlayElement_movesBetweenHeaderAndToolbar_andLayoutInfoIsPublished() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = {
+                    Box(Modifier.fillMaxSize().background(Color.Blue))
+                    Box(Modifier.size(20.dp).parallax(0.3f).fadeOnCollapse().scaleOnCollapse(0.5f).testTag("decor"))
+                },
+                overlayContent = {
+                    Box(
+                        Modifier
+                            .size(40.dp)
+                            .moveBetween(
+                                expanded = androidx.compose.ui.Alignment.BottomCenter,
+                                collapsed = androidx.compose.ui.Alignment.CenterEnd,
+                                collapsedPadding = androidx.compose.foundation.layout.PaddingValues(end = 8.dp),
+                                collapsedScale = 0.5f
+                            )
+                            .background(Color.Red)
+                            .testTag("avatar")
+                    )
+                },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp), parallaxMultiplier = 0f, fadeOnCollapse = false
+                ),
+                content = ParallaxContent.Regular { Column { repeat(60) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+                state = state
+            )
+        }
+        waitForIdle()
+        val info = state.layoutInfo
+        kotlin.test.assertTrue(info.isMeasured)
+        kotlin.test.assertTrue(info.widthPx > 0f && info.headerHeightPx > 0f && info.toolbarHeightPx > 0f)
+        kotlin.test.assertEquals(info.headerHeightPx - info.toolbarHeightPx, info.collapseRangePx)
+        kotlin.test.assertEquals(0f, info.headerOffsetPx)
+
+        val expandedBounds = onNodeWithTag("avatar").fetchSemanticsNode().boundsInRoot
+        onNodeWithTag("decor").assertIsDisplayed()
+
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        kotlin.test.assertEquals(info.collapseRangePx, info.headerOffsetPx)
+        kotlin.test.assertEquals(info.topInsetPx + info.toolbarHeightPx, info.currentHeaderBottomPx)
+
+        val collapsedBounds = onNodeWithTag("avatar").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertTrue(collapsedBounds.top < expandedBounds.top, "moved up: $expandedBounds -> $collapsedBounds")
+        kotlin.test.assertTrue(collapsedBounds.left > expandedBounds.left, "moved to the end: $expandedBounds -> $collapsedBounds")
+        kotlin.test.assertTrue(collapsedBounds.height < expandedBounds.height, "scaled down")
+        // Still within the toolbar band once collapsed.
+        kotlin.test.assertTrue(collapsedBounds.bottom <= info.topInsetPx + info.toolbarHeightPx + 1f)
+        onNodeWithText("collapsed").assertIsDisplayed()
+    }
+}

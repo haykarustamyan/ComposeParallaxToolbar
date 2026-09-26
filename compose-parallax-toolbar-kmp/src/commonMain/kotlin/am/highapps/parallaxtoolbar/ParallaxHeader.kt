@@ -15,6 +15,7 @@ internal fun ParallaxHeader(
     headerState: HeaderScrollState,
     headerHeightPx: Float,
     parallaxMultiplier: Float,
+    fadeOnCollapse: Boolean,
     gradientBrush: Brush?,
     initialColor: Color,
     targetColor: Color,
@@ -25,7 +26,7 @@ internal fun ParallaxHeader(
         modifier = modifier.graphicsLayer {
             translationY = -headerState.offsetPx * parallaxMultiplier
             // Fully faded exactly when the toolbar covers it, so nothing shows through the body.
-            alpha = 1f - headerState.fraction
+            if (fadeOnCollapse) alpha = 1f - headerState.fraction
         }
     ) {
         content()

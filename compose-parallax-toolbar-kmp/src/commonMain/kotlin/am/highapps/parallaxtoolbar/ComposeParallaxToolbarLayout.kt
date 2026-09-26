@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.dp
  * @param subtitleContent Optional subtitle under the title.
  * @param navigationIcon Optional leading toolbar slot.
  * @param actions Optional trailing toolbar slot.
+ * @param overlayContent Optional layer drawn above the body and the toolbar, the size of the
+ *   whole layout. Use it with [ParallaxToolbarScope.moveBetween] for elements that travel from
+ *   the header into the toolbar, such as an avatar.
  * @param state Hoisted state to observe the collapse fraction or expand and collapse
  *   programmatically. It also owns the scroll states of both content kinds, unless
  *   [ParallaxContent.Lazy] carries its own list state.
@@ -83,6 +86,7 @@ public fun ComposeParallaxToolbarLayout(
     subtitleContent: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
     navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
     actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
+    overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
     headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
@@ -98,6 +102,7 @@ public fun ComposeParallaxToolbarLayout(
             subtitleContent = subtitleContent,
             navigationIcon = navigationIcon,
             actions = actions,
+            overlayContent = overlayContent,
             headerConfig = headerConfig,
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
@@ -114,6 +119,7 @@ public fun ComposeParallaxToolbarLayout(
             subtitleContent = subtitleContent,
             navigationIcon = navigationIcon,
             actions = actions,
+            overlayContent = overlayContent,
             headerConfig = headerConfig,
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
@@ -134,6 +140,7 @@ public fun ComposeParallaxToolbarLayout(
             subtitleContent = subtitleContent,
             navigationIcon = navigationIcon,
             actions = actions,
+            overlayContent = overlayContent,
             headerConfig = headerConfig,
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
@@ -167,6 +174,7 @@ public fun ComposeParallaxToolbarLayout(
     subtitleContent: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
     navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
     actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
+    overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
     headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
@@ -189,6 +197,7 @@ public fun ComposeParallaxToolbarLayout(
         subtitleContent = subtitleContent,
         navigationIcon = navigationIcon,
         actions = actions,
+        overlayContent = null,
         headerConfig = headerConfig,
         toolbarConfig = toolbarConfig,
         titleConfig = titleConfig,
@@ -223,6 +232,7 @@ private fun ParallaxToolbarLayoutImpl(
     subtitleContent: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
     navigationIcon: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
     actions: (@Composable ParallaxActionsScope.(Boolean) -> Unit)?,
+    overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)?,
     headerConfig: ParallaxHeaderConfig,
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
@@ -284,6 +294,7 @@ private fun ParallaxToolbarLayoutImpl(
                     headerState = headerState,
                     headerHeightPx = headerHeightPx,
                     parallaxMultiplier = headerConfig.parallaxMultiplier,
+                    fadeOnCollapse = headerConfig.fadeOnCollapse,
                     gradientBrush = headerConfig.gradient,
                     initialColor = toolbarConfig.initialColor,
                     targetColor = toolbarConfig.targetColor,
@@ -335,6 +346,10 @@ private fun ParallaxToolbarLayoutImpl(
                     subtitleContent = subtitleContent,
                     modifier = Modifier.layoutId(TopBarSlot)
                 )
+
+                if (overlayContent != null) {
+                    Box(Modifier.layoutId(OverlaySlot)) { scope.overlayContent() }
+                }
             }
         ) { measurables, constraints ->
             val width = constraints.maxWidth
@@ -347,6 +362,17 @@ private fun ParallaxToolbarLayoutImpl(
                 .measure(Constraints.fixedWidth(width))
             val topBar = measurables.first { it.layoutId == TopBarSlot }
                 .measure(Constraints.fixedWidth(width))
+            val overlay = measurables.firstOrNull { it.layoutId == OverlaySlot }
+                ?.measure(Constraints.fixed(width, height))
+
+            // Publish the geometry before placement so overlay elements can position themselves.
+            val info = state.layoutInfo
+            info.widthPx = width.toFloat()
+            info.heightPx = height.toFloat()
+            info.topInsetPx = insetPx.toFloat()
+            info.headerHeightPx = headerPx.toFloat()
+            info.toolbarHeightPx = toolbarPx.toFloat()
+            info.isMeasured = true
             // The body gets the space below the collapsed toolbar, plus whatever the toolbar can
             // vacate by exiting. While the header is expanded it is pushed down and its tail is off
             // screen; it slides up as the header collapses and the toolbar exits.
@@ -365,6 +391,7 @@ private fun ParallaxToolbarLayoutImpl(
                 topBar.placeRelativeWithLayer(0, 0) {
                     translationY = -headerState.exitOffsetPx
                 }
+                overlay?.placeRelative(0, 0)
             }
         }
     }
@@ -373,6 +400,7 @@ private fun ParallaxToolbarLayoutImpl(
 private const val HeaderSlot = "header"
 private const val BodySlot = "body"
 private const val TopBarSlot = "topBar"
+private const val OverlaySlot = "overlay"
 
 private fun PaddingValues.withExtraBottom(extra: Dp): PaddingValues =
     if (extra <= 0.dp) this else PaddingValues(
