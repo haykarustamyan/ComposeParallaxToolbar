@@ -448,9 +448,7 @@ fun ComposeParallaxToolbarLayout(
             if (lazyContent != null) {
                 LazyBody(
                     lazyListState = lazyListState,
-                    screenHeight = screenHeight,
                     headerHeight = actualHeaderHeight,
-                    toolbarHeight = toolbarHeight,
                     lazyContent = { lazyContent(isCollapsed.value) },
                     modifier = Modifier.offset(y = topInset),
                     minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
@@ -531,8 +529,8 @@ private fun Header(
     scroll: ScrollState,
     lazyListState: LazyListState?,
     headerHeightPx: Float,
-    modifier: Modifier = Modifier,
-    gradientBrush: Brush? = null,
+    modifier: Modifier,
+    gradientBrush: Brush?,
     content: @Composable () -> Unit,
     initialColor: Color,
     targetColor: Color
@@ -581,9 +579,9 @@ private fun Body(
     headerHeight: Dp,
     toolbarHeight: Dp,
     content: @Composable (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    minBottomSpacerHeight: Dp = 0.dp,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    modifier: Modifier,
+    minBottomSpacerHeight: Dp,
+    contentPadding: PaddingValues
 ) {
     var contentHeight by remember { mutableStateOf(0) }
 
@@ -609,7 +607,6 @@ private fun Body(
         }
 
         val contentHeightDp = with(LocalDensity.current) { contentHeight.toDp() }
-        val availableHeight = screenHeight - headerHeight + toolbarHeight
         val bottomPadding = contentPadding.calculateBottomPadding()
         val minimumSpacerHeight = (screenHeight - contentHeightDp + toolbarHeight - bottomPadding)
             .coerceAtLeast(minBottomSpacerHeight)
@@ -626,37 +623,13 @@ private fun Body(
 @Composable
 private fun LazyBody(
     lazyListState: LazyListState,
-    screenHeight: Dp,
     headerHeight: Dp,
-    toolbarHeight: Dp,
     lazyContent: LazyListScope.() -> Unit,
-    modifier: Modifier = Modifier,
-    minBottomSpacerHeight: Dp = 0.dp,
-    config: LazyColumnConfig = LazyColumnConfig(),
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    modifier: Modifier,
+    minBottomSpacerHeight: Dp,
+    config: LazyColumnConfig,
+    contentPadding: PaddingValues
 ) {
-    val density = LocalDensity.current
-    val headerHeightPx = with(density) { headerHeight.toPx() }
-    val toolbarHeightPx = with(density) { toolbarHeight.toPx() }
-
-    val collapseRange = headerHeightPx - toolbarHeightPx
-    val isCollapsed = remember(
-        lazyListState.firstVisibleItemIndex,
-        lazyListState.firstVisibleItemScrollOffset,
-        collapseRange
-    ) {
-        derivedStateOf {
-            val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-            val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
-            val totalScrollOffset = if (firstVisibleItemIndex == 0) {
-                firstVisibleItemScrollOffset
-            } else {
-                collapseRange.toInt() + firstVisibleItemScrollOffset
-            }
-            totalScrollOffset >= collapseRange
-        }
-    }
-
     // Merge external contentPadding with LazyColumn's own contentPadding
     val mergedContentPadding = PaddingValues(
         start = config.contentPadding.calculateStartPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) +
@@ -686,9 +659,7 @@ private fun LazyBody(
         lazyContent()
 
         item {
-            val availableHeight = screenHeight - headerHeight + toolbarHeight
-            val minimumSpacerHeight = minBottomSpacerHeight.coerceAtLeast(0.dp)
-            Spacer(Modifier.height(minimumSpacerHeight))
+            Spacer(Modifier.height(minBottomSpacerHeight.coerceAtLeast(0.dp)))
         }
     }
 }
@@ -702,11 +673,10 @@ private fun Toolbar(
     toolbarHeightPx: Float,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
-    modifier: Modifier = Modifier,
     initialColor: Color,
     targetColor: Color,
-    colorAnimationSpec: AnimationSpec<Color> = tween(durationMillis = 300),
-    elevation: Dp = 0.dp
+    colorAnimationSpec: AnimationSpec<Color>,
+    elevation: Dp
 ) {
     val toolbarBottom = remember(headerHeightPx, toolbarHeightPx) {
         headerHeightPx - toolbarHeightPx
@@ -740,7 +710,7 @@ private fun Toolbar(
     )
 
     TopAppBar(
-        modifier = modifier.shadow(elevation = elevation),
+        modifier = Modifier.shadow(elevation = elevation),
         title = {},
         navigationIcon = navigationIcon,
         actions = actions,
@@ -758,15 +728,15 @@ private fun TitleWithSubtitle(
     toolbarHeight: Dp,
     hasNavigationIcon: Boolean,
     titleContent: @Composable (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    subtitleContent: (@Composable (Boolean) -> Unit)? = null,
-    keepSubtitleAfterCollapse: Boolean = false,
-    titleWithSubTitlePaddingBottom: Dp = ParallaxToolbarDefaults.TitlePaddingBottom,
-    titleWithSubTitlePaddingStart: Dp = ParallaxToolbarDefaults.TitlePaddingStart,
-    titleWithSubTitleCollapsedPaddingStart: Dp = ParallaxToolbarDefaults.TitleCollapsedPaddingStart,
+    modifier: Modifier,
+    subtitleContent: (@Composable (Boolean) -> Unit)?,
+    keepSubtitleAfterCollapse: Boolean,
+    titleWithSubTitlePaddingBottom: Dp,
+    titleWithSubTitlePaddingStart: Dp,
+    titleWithSubTitleCollapsedPaddingStart: Dp,
     titleFontScaleStart: Float,
     titleFontScaleEnd: Float,
-    animateSubTitleHiding: Boolean = true
+    animateSubTitleHiding: Boolean
 ) {
     var combinedHeightPx by remember { mutableStateOf(0f) }
     var combinedWidthPx by remember { mutableStateOf(0f) }

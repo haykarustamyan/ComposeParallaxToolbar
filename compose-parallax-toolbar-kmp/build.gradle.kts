@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.kover)
 }
 
 kotlin {
@@ -14,7 +15,9 @@ kotlin {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
-        withHostTestBuilder {}
+        withHostTestBuilder {}.configure {
+            isIncludeAndroidResources = true
+        }
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -43,18 +46,26 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            // Pin the Compose runtime stack to the plugin version; Material 3 alone would pull an older one.
+            api(libs.compose.ui)
+            api(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.extended)
-            implementation(libs.compose.components.resources)
-            implementation(libs.compose.components.ui.tooling.preview)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling)
         }
-        // Compose UI tests run on the iOS simulator; the Android host test has no UI runtime.
-        iosTest.dependencies {
+        commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.compose.ui.test)
+        }
+        // Android host tests render Compose through Robolectric.
+        getByName("androidHostTest").dependencies {
+            implementation(libs.junit)
+            implementation(libs.androidx.test.junit)
+            implementation(libs.robolectric)
+            implementation(libs.androidx.compose.ui.test.junit4)
+            implementation(libs.androidx.compose.ui.test.manifest)
         }
     }
 }
@@ -75,6 +86,28 @@ tasks.register("buildIosFramework") {
         println("You can find the frameworks at:")
         println("- build/bin/iosArm64/releaseFramework/compose-parallax-toolbar-kmp.framework")
         println("- build/bin/iosSimulatorArm64/releaseFramework/compose-parallax-toolbar-kmp.framework")
+    }
+}
+
+compose.resources {
+    // The library ships no Compose resources, so skip generating the Res accessor class.
+    generateResClass = never
+}
+
+kover {
+    reports {
+        verify {
+            rule("line coverage of the library code") {
+                minBound(95)
+            }
+        }
+        filters {
+            excludes {
+                // Sample and preview code is documentation, not library behavior.
+                classes("am.highapps.parallaxtoolbar.*Sample*", "am.highapps.parallaxtoolbar.*Preview*", "am.highapps.parallaxtoolbar.*Screen*", "am.highapps.parallaxtoolbar.*ViewController*")
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
+        }
     }
 }
 

@@ -528,6 +528,9 @@ For detailed information on all components, parameters, and configuration option
 - **UPGRADED**: Gradle 9.7.0, Android Gradle Plugin 9.3.3, Maven Publish Plugin 0.37.0
 - **CHANGED**: Migrated to the `com.android.kotlin.multiplatform.library` plugin required by AGP 9
 - **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
+- **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
+- **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
+- **TESTS**: Compose UI tests now run on Android (Robolectric) and the iOS simulator, with a Kover line-coverage gate
 
 ### Version 1.3.0
 
