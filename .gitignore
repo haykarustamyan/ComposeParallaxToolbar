@@ -18,3 +18,6 @@ gradle.properties
 *.xcframework.zip
 # Xcode host app
 iosApp/build
+# Local tooling
+.claude/
+kotlin-js-store/

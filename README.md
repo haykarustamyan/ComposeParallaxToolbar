@@ -540,6 +540,7 @@ actions, padding); the other names show the fixed sample screens from the librar
 - `sample` holds the shared playground UI and the fixed sample screens.
 - `sample-android` is the Android host app.
 - `sample-desktop` is the desktop host app.
+- `sample-web` is the browser host (Kotlin/Wasm).
 - `iosApp` is the Xcode host project; it builds the shared framework through Gradle.
 
 Android:
@@ -553,6 +554,15 @@ Desktop:
 ```bash
 ./gradlew :sample-desktop:run
 ```
+
+Web: build the bundle and serve it from any static server:
+
+```bash
+./gradlew :sample-web:wasmJsBrowserDistribution
+python3 -m http.server 8080 --directory sample-web/build/dist/wasmJs/productionExecutable
+```
+
+Open `http://localhost:8080`; add `?screen=lazyPadding` to open a fixed sample.
 
 iOS: open `iosApp/iosApp.xcodeproj` in Xcode and run, or from the terminal:
 

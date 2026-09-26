@@ -35,7 +35,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
 
       - name: Unit tests, coverage report, ABI check, sample apps
-        run: ./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest :compose-parallax-toolbar-kmp:desktopTest :compose-parallax-toolbar-kmp:compileKotlinWasmJs :compose-parallax-toolbar-kmp:koverXmlReport :compose-parallax-toolbar-kmp:checkKotlinAbi :sample-android:assembleDebug :sample-desktop:build
+        run: ./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest :compose-parallax-toolbar-kmp:desktopTest :compose-parallax-toolbar-kmp:compileKotlinWasmJs :compose-parallax-toolbar-kmp:koverXmlReport :compose-parallax-toolbar-kmp:checkKotlinAbi :sample-android:assembleDebug :sample-desktop:build :sample-web:wasmJsBrowserDistribution
 
       # The numbers land in the run summary even when the gate below fails.
       - name: Coverage summary
