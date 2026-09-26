@@ -1,8 +1,8 @@
 # ComposeParallaxToolbar - Compose Multiplatform
 
 [![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://search.maven.org/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
-[![Kotlin](https://img.shields.io/badge/kotlin-v2.2.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-v1.8.2-blue)](https://github.com/JetBrains/compose-multiplatform)
+[![Kotlin](https://img.shields.io/badge/kotlin-v2.4.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-v1.12.1-blue)](https://github.com/JetBrains/compose-multiplatform)
 [![Platform](https://img.shields.io/badge/platform-Android%20|%20iOS-green.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -32,7 +32,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.3.0")
+                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.4.0")
             }
         }
     }
@@ -51,7 +51,7 @@ Add the dependency to your module's build.gradle.kts file:
 
 ```kotlin
 dependencies {
-    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.3.0")
+    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.4.0")
 }
 ```
 
@@ -59,7 +59,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.3.0'
+    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.4.0'
 }
 ```
 </details>
@@ -467,10 +467,10 @@ For detailed information on all components, parameters, and configuration option
 <details>
 <summary><b>Compatibility</b></summary>
 
-- **Kotlin**: 2.2.10
-- **Compose Multiplatform**: 1.8.2
+- **Kotlin**: 2.4.20
+- **Compose Multiplatform**: 1.12.1 (Material 3 1.9.0)
 - **Android**: API 24+ (Android 7.0+)
-- **iOS**: iOS 14+
+- **iOS**: arm64 devices and Apple Silicon simulators (the Intel `iosX64` simulator target was dropped by Compose Multiplatform 1.11 and is no longer published)
 
 </details>
 
@@ -521,6 +521,13 @@ For detailed information on all components, parameters, and configuration option
 
 <details>
 <summary><b>Changelog</b></summary>
+
+### Version 1.4.0
+
+- **UPDATED**: Kotlin 2.4.20, Compose Multiplatform 1.12.1, Material 3 1.9.0
+- **UPGRADED**: Gradle 9.8.0, Android Gradle Plugin 9.4.1, Maven Publish Plugin 0.37.0
+- **CHANGED**: Migrated to the `com.android.kotlin.multiplatform.library` plugin required by AGP 9
+- **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
 
 ### Version 1.3.0
 

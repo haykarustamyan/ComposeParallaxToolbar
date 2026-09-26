@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.androidKmpLibrary) apply false
     alias(libs.plugins.kotlinMultiplatform) apply  false
     alias(libs.plugins.jetbrainsCompose) apply  false
     alias(libs.plugins.compose.compiler) apply false
@@ -14,8 +14,7 @@ tasks.register("buildIosFramework") {
     // Create XCFrameworkTask for each platform
     dependsOn(
         ":compose-parallax-toolbar-kmp:linkReleaseFrameworkIosArm64",
-        ":compose-parallax-toolbar-kmp:linkReleaseFrameworkIosSimulatorArm64",
-        ":compose-parallax-toolbar-kmp:linkReleaseFrameworkIosX64"
+        ":compose-parallax-toolbar-kmp:linkReleaseFrameworkIosSimulatorArm64"
     )
     
     doLast {
