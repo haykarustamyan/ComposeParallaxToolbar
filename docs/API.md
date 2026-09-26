@@ -414,7 +414,7 @@ sealed class HeaderHeight {
 Configuration for the header area behavior.
 
 ```kotlin
-data class ParallaxHeaderConfig(
+class ParallaxHeaderConfig(
     val height: HeaderHeight,
     val gradient: Brush?,
     val isExpandedWhenFirstDisplayed: Boolean = true
@@ -434,7 +434,7 @@ data class ParallaxHeaderConfig(
 Configuration for the toolbar appearance and behavior.
 
 ```kotlin
-data class ParallaxToolbarConfig(
+class ParallaxToolbarConfig(
     val initialColor: Color,
     val targetColor: Color,
     val elevation: Dp,
@@ -456,7 +456,7 @@ data class ParallaxToolbarConfig(
 Configuration for the title and subtitle animations and behavior.
 
 ```kotlin
-data class ParallaxTitleConfig(
+class ParallaxTitleConfig(
     val paddingBottom: Dp,
     val paddingStart: Dp,
     val collapsedPaddingStart: Dp,
@@ -480,7 +480,7 @@ data class ParallaxTitleConfig(
 Configuration for the content body layout.
 
 ```kotlin
-data class ParallaxBodyConfig(
+class ParallaxBodyConfig(
     val minBottomSpacerHeight: Dp
 )
 ```
@@ -496,7 +496,7 @@ data class ParallaxBodyConfig(
 Configuration for LazyColumn behavior when using `ParallaxContent.Lazy`.
 
 ```kotlin
-data class LazyColumnConfig(
+class LazyColumnConfig(
     val contentPadding: PaddingValues,
     val verticalArrangement: Arrangement.Vertical,
     val horizontalAlignment: Alignment.Horizontal,

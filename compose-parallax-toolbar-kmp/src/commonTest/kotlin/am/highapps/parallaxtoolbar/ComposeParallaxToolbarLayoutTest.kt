@@ -518,3 +518,40 @@ class ComposeParallaxToolbarStateTest : UiTestBase() {
         kotlin.test.assertEquals(ParallaxToolbarDefaults.TitleCollapsedScale, title.collapsedScale)
     }
 }
+
+class ParallaxConfigEqualityTest {
+
+    @Test
+    fun configs_compareByValue_andCopyOverridesSelectively() {
+        val header = ParallaxHeaderConfig(HeaderHeight.Fixed(300.dp), gradient = null)
+        kotlin.test.assertEquals(header, header.copy())
+        kotlin.test.assertEquals(header.hashCode(), header.copy().hashCode())
+        kotlin.test.assertNotEquals(header, header.copy(parallaxMultiplier = 0.1f))
+        kotlin.test.assertTrue(header.toString().contains("Fixed"))
+
+        val toolbar = ParallaxToolbarConfig(Color.Transparent, Color.Black, 0.dp, androidx.compose.animation.core.snap())
+        kotlin.test.assertEquals(toolbar, toolbar.copy())
+        kotlin.test.assertNotEquals(toolbar, toolbar.copy(height = 56.dp))
+        kotlin.test.assertEquals(toolbar.hashCode(), toolbar.copy().hashCode())
+        kotlin.test.assertTrue(toolbar.toString().startsWith("ParallaxToolbarConfig("))
+
+        val title = ParallaxTitleConfig(0.dp, 16.dp, 64.dp, keepSubtitleAfterCollapse = false, animateSubTitleHiding = true)
+        kotlin.test.assertEquals(title, title.copy())
+        kotlin.test.assertNotEquals(title, title.copy(collapsedScale = 0.5f))
+        kotlin.test.assertEquals(title.hashCode(), title.copy().hashCode())
+        kotlin.test.assertTrue(title.toString().startsWith("ParallaxTitleConfig("))
+
+        val body = ParallaxBodyConfig(8.dp)
+        kotlin.test.assertEquals(body, body.copy())
+        kotlin.test.assertNotEquals(body, body.copy(minBottomSpacerHeight = 9.dp))
+        kotlin.test.assertEquals(body.hashCode(), body.copy().hashCode())
+        kotlin.test.assertTrue(body.toString().startsWith("ParallaxBodyConfig("))
+
+        val lazy = LazyColumnConfig()
+        kotlin.test.assertEquals(lazy, lazy.copy())
+        kotlin.test.assertNotEquals(lazy, lazy.copy(userScrollEnabled = false))
+        kotlin.test.assertEquals(lazy.hashCode(), lazy.copy().hashCode())
+        kotlin.test.assertTrue(lazy.toString().startsWith("LazyColumnConfig("))
+        kotlin.test.assertNotEquals<Any>(lazy, "not a config")
+    }
+}

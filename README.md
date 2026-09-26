@@ -593,6 +593,7 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 - **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
 - **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
 - **REMOVED**: sample screens, previews and iOS sample view controllers from the published artifact; they now live in the `sample` module. The library no longer depends on `material-icons-extended`.
+- **CHANGED**: configuration classes are plain classes with `copy`, `equals`, `hashCode` and `toString` instead of data classes, so fields can be added later without breaking compiled consumers
 - **CHANGED**: configuration classes are annotated `@Immutable` so the layout skips recomposition when its inputs are unchanged
 - **CHANGED**: the legacy overload taking `lazyContent` is now marked `@Deprecated` with a replacement; it delegates to the `ParallaxContent` overload
 - **FIXED**: `isExpandedWhenFirstDisplayed = false` now works for `ParallaxContent.Lazy`
