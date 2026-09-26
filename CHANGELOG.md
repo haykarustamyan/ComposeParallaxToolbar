@@ -7,7 +7,6 @@ All notable changes to this project are documented here. The format follows
 ## 2.0.0
 
 - **NEW**: explicit API mode, a checked-in ABI dump verified on every pull request, and generated API docs in the javadoc jar
-
 - **NEW**: `ParallaxToolbarState` and `rememberParallaxToolbarState()`: observe `collapseFraction` and `isCollapsed`, and call `collapse()` / `expand()` (animated or not). The `scrollState` parameter is replaced by `state`; the deprecated overload still accepts a `ScrollState`.
 - **NEW**: `parallaxMultiplier` on the header config, `height` on the toolbar config, and `collapsedScale` on the title config.
 - **REMOVED**: `iconSize` and `iconSpacing` from `ParallaxToolbarConfig` and `ToolbarMinWidth`, `ToolbarIconSize`, `ToolbarIconSpacing` from `ParallaxToolbarDefaults`. Nothing ever read them; size icons inside the slots.

@@ -545,6 +545,9 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
   not tested.
 - **Reporting.** Bugs and requests go through GitHub issues; security concerns through
   [SECURITY.md](SECURITY.md).
+- **Releasing.** Bump the version in `compose-parallax-toolbar-kmp/build.gradle.kts`, add the
+  matching `## x.y.z` section to `CHANGELOG.md`, and push a `vx.y.z` tag. CI verifies, publishes
+  to Maven Central, then creates the GitHub release with that changelog section as its notes.
 
 </details>
 

@@ -1,45 +1,90 @@
-# This workflow builds the library with Gradle and runs the test tasks
-# for the targets the module actually declares (Android + iOS).
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: CI
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_call:
 
 permissions:
   contents: read
 
-jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: iosSimulatorArm64Test :sample:compileKotlinIosSimulatorArm64
-            os: macos-latest
-          - target: testAndroidHostTest koverVerify checkKotlinAbi :sample-android:assembleDebug
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+# A new push to the same branch or PR cancels the run in progress.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  android:
+    name: Android tests, coverage, ABI, sample
+    # Drafts skip the gate; marking a PR ready for review starts the real run.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    - name: Set up Gradle
-      uses: gradle/actions/setup-gradle@v4
-    - name: Cache Kotlin/Native
-      if: runner.os == 'macOS'
-      uses: actions/cache@v4
-      with:
-        path: ~/.konan
-        key: ${{ runner.os }}-konan-${{ hashFiles('gradle/libs.versions.toml') }}
-    - name: Build with Gradle
-      run: ./gradlew ${{ matrix.target }}
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Also validates the Gradle wrapper checksum.
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Unit tests, coverage report, ABI check, sample app
+        run: ./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest :compose-parallax-toolbar-kmp:koverXmlReport :compose-parallax-toolbar-kmp:checkKotlinAbi :sample-android:assembleDebug
+
+      # The numbers land in the run summary even when the gate below fails.
+      - name: Coverage summary
+        if: always()
+        run: |
+          set +e
+          xml=compose-parallax-toolbar-kmp/build/reports/kover/report.xml
+          {
+            echo "### Library coverage (Kover, Android host tests)"
+            echo ""
+            echo "| Metric | Covered | Total | % |"
+            echo "|---|--:|--:|--:|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "$xml" ]; then
+            for type in LINE BRANCH METHOD; do
+              c=$(grep -oE "<counter type=\"$type\"[^>]*/>" "$xml" | tail -1)
+              cov=$(printf '%s' "$c" | grep -oE 'covered="[0-9]+"' | grep -oE '[0-9]+')
+              mis=$(printf '%s' "$c" | grep -oE 'missed="[0-9]+"' | grep -oE '[0-9]+')
+              tot=$((cov + mis))
+              pct=$(awk "BEGIN{ if ($tot>0) printf \"%.1f\", 100*$cov/$tot; else print \"0.0\" }")
+              echo "| $type | $cov | $tot | $pct% |" >> "$GITHUB_STEP_SUMMARY"
+            done
+          else
+            echo "| no report | | | |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Coverage gate
+        run: ./gradlew :compose-parallax-toolbar-kmp:koverVerify
+
+  ios:
+    name: iOS simulator tests, sample framework
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('gradle/libs.versions.toml') }}
+
+      - name: Simulator tests and shared sample compile
+        run: ./gradlew :compose-parallax-toolbar-kmp:iosSimulatorArm64Test :sample:compileKotlinIosSimulatorArm64

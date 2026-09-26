@@ -50,3 +50,14 @@ The library uses explicit API mode and a checked-in ABI dump under
 
 and commit the updated dump together with a CHANGELOG entry. CI runs `checkKotlinAbi` and fails on
 any unrecorded change.
+
+## Releasing
+
+1. Set the new version in `compose-parallax-toolbar-kmp/build.gradle.kts` and in the README
+   install snippets.
+2. Add a `## x.y.z` section at the top of `CHANGELOG.md`.
+3. Commit, then push a tag: `git tag vx.y.z && git push origin vx.y.z`.
+
+The Release workflow refuses a tag whose version does not match the build file or has no
+changelog section, publishes to Maven Central, and creates the GitHub release with the changelog
+section as notes. A tag with a suffix, such as `v2.1.0-rc1`, is marked as a pre-release.
