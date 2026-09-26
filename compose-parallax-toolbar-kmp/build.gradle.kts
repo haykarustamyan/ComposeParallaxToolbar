@@ -54,7 +54,6 @@ kotlin {
             // Pin the Compose runtime stack to the plugin version; Material 3 alone would pull an older one.
             api(libs.compose.ui)
             api(libs.compose.foundation)
-            implementation(libs.compose.material3)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
