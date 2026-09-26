@@ -15,6 +15,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -77,7 +79,7 @@ internal fun ParallaxTopBar(
                     ParallaxActionsScopeImpl(scope, this).actions(isCollapsed)
                 }
             }
-            Box(Modifier.layoutId(TitleSlot)) { scope.titleContent(isCollapsed) }
+            Box(Modifier.layoutId(TitleSlot).semantics { heading() }) { scope.titleContent(isCollapsed) }
             if (subtitleContent != null) {
                 Box(Modifier.layoutId(SubtitleSlot)) { scope.subtitleContent(isCollapsed) }
             }

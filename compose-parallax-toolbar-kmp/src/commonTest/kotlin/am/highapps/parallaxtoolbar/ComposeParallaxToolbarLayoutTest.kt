@@ -19,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
@@ -1013,5 +1015,71 @@ class ComposeParallaxToolbarExtrasTest : UiTestBase() {
         kotlin.test.assertEquals(HeaderHeight.AspectRatio(1f, maxHeight = 10.dp).resolve(1000.dp, 1000.dp), 10.dp)
         kotlin.test.assertEquals(HeaderHeight.AspectRatio(2f).resolve(100.dp, 1000.dp), 50.dp)
         onNodeWithText("body").assertIsDisplayed()
+    }
+}
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarSemanticsTest : UiTestBase() {
+
+    @Test
+    fun layout_exposesStateAndActions_orderAndHeading_andHidesInvisibleParts() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("headerBox")) },
+                navigationIcon = { Text("<") },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp), scrollMode = ScrollMode.EnterAlwaysCollapsed
+                ),
+                semanticsConfig = ParallaxToolbarDefaults.semanticsConfig(
+                    expandedStateDescription = "Open", collapsedStateDescription = "Closed",
+                    expandActionLabel = "Open it", collapseActionLabel = "Close it"
+                ),
+                content = ParallaxContent.Lazy(content = { _ -> items(300) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } }),
+                modifier = Modifier.testTag("layout"),
+                state = state
+            )
+        }
+        val root = onNodeWithTag("layout")
+        root.assert(androidx.compose.ui.test.hasStateDescription("Open"))
+        root.assert(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsActions.Collapse))
+        root.assert(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.IsTraversalGroup))
+
+        // The title is a heading; the header is announced while visible.
+        onNodeWithText("expanded", useUnmergedTree = true).assertExists()
+        kotlin.test.assertTrue(
+            onAllNodes(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.Heading), useUnmergedTree = true)
+                .fetchSemanticsNodes().isNotEmpty(), "title is a heading"
+        )
+        val headerHidden = androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility)
+        kotlin.test.assertTrue(onAllNodes(headerHidden, useUnmergedTree = true).fetchSemanticsNodes().isEmpty(), "nothing hidden while expanded")
+
+        // The collapse action works and flips the state; the faded header is then hidden.
+        root.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.Collapse)
+        waitForIdle()
+        kotlin.test.assertTrue(state.isCollapsed)
+        root.assert(androidx.compose.ui.test.hasStateDescription("Closed"))
+        root.assert(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsActions.Expand))
+        kotlin.test.assertEquals(1, onAllNodes(headerHidden, useUnmergedTree = true).fetchSemanticsNodes().size, "faded header hidden")
+
+        // Scrolling far in EnterAlwaysCollapsed exits the toolbar, which is then hidden too.
+        repeat(4) { root.performTouchInput { swipeUp() } }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.toolbarExitFraction)
+        kotlin.test.assertEquals(2, onAllNodes(headerHidden, useUnmergedTree = true).fetchSemanticsNodes().size, "exited toolbar hidden")
+
+        root.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.Expand)
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+        kotlin.test.assertEquals(0f, state.toolbarExitFraction)
+        root.assert(androidx.compose.ui.test.hasStateDescription("Open"))
+
+        // Traversal order: toolbar before header before body.
+        val index = androidx.compose.ui.semantics.SemanticsProperties.TraversalIndex
+        val indices = onAllNodes(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(index), useUnmergedTree = true)
+            .fetchSemanticsNodes().map { it.config[index] }.sorted()
+        kotlin.test.assertEquals(listOf(0f, 1f, 4f), indices)
     }
 }

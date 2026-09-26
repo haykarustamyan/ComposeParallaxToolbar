@@ -553,6 +553,23 @@ inset, current header offset and bottom edge) for custom overlays.
 </details>
 
 <details>
+<summary><b>Accessibility</b></summary>
+
+Screen readers get a usable component without extra work:
+
+- The layout announces its state and offers the standard expand and collapse actions, so a
+  TalkBack or VoiceOver user can open or close the header without scrolling.
+- Reading order is toolbar, header, bottom slot, overlay, then body, regardless of draw order.
+- The title is marked as a heading.
+- The faded header, and an exited toolbar in `ScrollMode.EnterAlwaysCollapsed`, are hidden from
+  accessibility so nothing invisible is announced.
+
+The announced strings default to English; pass `semanticsConfig = ParallaxToolbarDefaults.semanticsConfig(...)`
+with translated values.
+
+</details>
+
+<details>
 <summary><b>Programmatic control</b></summary>
 
 ```kotlin

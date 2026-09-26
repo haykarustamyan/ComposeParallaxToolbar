@@ -124,6 +124,19 @@ public object ParallaxToolbarDefaults {
     )
 
     @Composable
+    public fun semanticsConfig(
+        expandedStateDescription: String = "Expanded",
+        collapsedStateDescription: String = "Collapsed",
+        expandActionLabel: String = "Expand header",
+        collapseActionLabel: String = "Collapse header"
+    ): ParallaxSemanticsConfig = ParallaxSemanticsConfig(
+        expandedStateDescription = expandedStateDescription,
+        collapsedStateDescription = collapsedStateDescription,
+        expandActionLabel = expandActionLabel,
+        collapseActionLabel = collapseActionLabel
+    )
+
+    @Composable
     public fun bodyConfig(
         minBottomSpacerHeight: Dp = BodyMinBottomSpacing
     ): ParallaxBodyConfig = ParallaxBodyConfig(

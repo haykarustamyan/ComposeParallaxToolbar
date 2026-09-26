@@ -265,3 +265,46 @@ public class LazyColumnConfig(
             "flingBehavior=$flingBehavior, userScrollEnabled=$userScrollEnabled, " +
             "overscrollEffect=$overscrollEffect)"
 }
+
+/**
+ * Strings the layout exposes to accessibility services. Provide translated values.
+ *
+ * @param expandedStateDescription Announced state while the header is expanded.
+ * @param collapsedStateDescription Announced state once the header is collapsed.
+ * @param expandActionLabel Label of the expand action offered while collapsed.
+ * @param collapseActionLabel Label of the collapse action offered while expanded.
+ */
+@Immutable
+public class ParallaxSemanticsConfig(
+    public val expandedStateDescription: String = "Expanded",
+    public val collapsedStateDescription: String = "Collapsed",
+    public val expandActionLabel: String = "Expand header",
+    public val collapseActionLabel: String = "Collapse header"
+) {
+    public fun copy(
+        expandedStateDescription: String = this.expandedStateDescription,
+        collapsedStateDescription: String = this.collapsedStateDescription,
+        expandActionLabel: String = this.expandActionLabel,
+        collapseActionLabel: String = this.collapseActionLabel
+    ): ParallaxSemanticsConfig = ParallaxSemanticsConfig(
+        expandedStateDescription, collapsedStateDescription, expandActionLabel, collapseActionLabel
+    )
+
+    override fun equals(other: Any?): Boolean = other is ParallaxSemanticsConfig &&
+            expandedStateDescription == other.expandedStateDescription &&
+            collapsedStateDescription == other.collapsedStateDescription &&
+            expandActionLabel == other.expandActionLabel &&
+            collapseActionLabel == other.collapseActionLabel
+
+    override fun hashCode(): Int {
+        var result = expandedStateDescription.hashCode()
+        result = 31 * result + collapsedStateDescription.hashCode()
+        result = 31 * result + expandActionLabel.hashCode()
+        result = 31 * result + collapseActionLabel.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "ParallaxSemanticsConfig(expandedStateDescription=$expandedStateDescription, " +
+            "collapsedStateDescription=$collapsedStateDescription, expandActionLabel=$expandActionLabel, " +
+            "collapseActionLabel=$collapseActionLabel)"
+}

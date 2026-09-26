@@ -35,6 +35,7 @@ Modifiers available on the scope:
 | `overlayContent` | Layer above the body and toolbar, the size of the layout; use with `moveBetween` |
 | `bottomContent` | Row pinned under the toolbar; rides the header edge while expanded |
 | `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance` |
+| `semanticsConfig` | `ParallaxSemanticsConfig`: state descriptions and action labels announced to accessibility services |
 
 ## ParallaxToolbarState
 

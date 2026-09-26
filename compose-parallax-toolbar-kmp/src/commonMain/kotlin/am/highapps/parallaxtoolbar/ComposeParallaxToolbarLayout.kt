@@ -33,6 +33,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.traversalIndex
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -63,6 +72,10 @@ import androidx.compose.ui.unit.dp
  * @param onStretchTrigger Called when a stretch is released past
  *   [ParallaxHeaderConfig.stretchTriggerDistance]; requires `stretchEnabled`. Typical use is
  *   pull-to-refresh.
+ * @param semanticsConfig Strings announced to accessibility services; see
+ *   [ParallaxSemanticsConfig]. The layout exposes its state and expand/collapse actions, reads
+ *   the toolbar before the header and body, marks the title as a heading, and hides the faded
+ *   header or an exited toolbar from screen readers.
  * @param state Hoisted state to observe the collapse fraction or expand and collapse
  *   programmatically. It also owns the scroll states of both content kinds, unless
  *   [ParallaxContent.Lazy] carries its own list state.
@@ -99,6 +112,7 @@ public fun ComposeParallaxToolbarLayout(
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
+    semanticsConfig: ParallaxSemanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
     state: ParallaxToolbarState = rememberParallaxToolbarState()
 ) {
     when (content) {
@@ -117,6 +131,7 @@ public fun ComposeParallaxToolbarLayout(
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
             bodyConfig = bodyConfig,
+            semanticsConfig = semanticsConfig,
             state = state,
             body = ParallaxBodySpec.Regular(content.content)
         )
@@ -136,6 +151,7 @@ public fun ComposeParallaxToolbarLayout(
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
             bodyConfig = bodyConfig,
+            semanticsConfig = semanticsConfig,
             state = state,
             body = ParallaxBodySpec.Lazy(
                 lazyListState = content.lazyListState ?: state.lazyListState,
@@ -159,6 +175,7 @@ public fun ComposeParallaxToolbarLayout(
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
             bodyConfig = bodyConfig,
+            semanticsConfig = semanticsConfig,
             state = state,
             body = ParallaxBodySpec.Custom(content.content)
         )
@@ -220,6 +237,7 @@ public fun ComposeParallaxToolbarLayout(
         toolbarConfig = toolbarConfig,
         titleConfig = titleConfig,
         bodyConfig = bodyConfig,
+        semanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
         state = rememberParallaxToolbarState(scrollState = scroll, lazyListState = lazyListState)
     )
 }
@@ -257,14 +275,17 @@ private fun ParallaxToolbarLayoutImpl(
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
     bodyConfig: ParallaxBodyConfig,
+    semanticsConfig: ParallaxSemanticsConfig,
     state: ParallaxToolbarState,
     body: ParallaxBodySpec
 ) {
+    val semanticsScope = rememberCoroutineScope()
     val density = LocalDensity.current
     val topInset = with(density) { WindowInsets.statusBars.getTop(this).toDp() }
     val toolbarHeight = toolbarConfig.height
     val headerState = state.headerState
     val isCollapsed by remember(headerState) { derivedStateOf { headerState.isCollapsed } }
+    val isToolbarExited by remember(headerState) { derivedStateOf { headerState.exitFraction >= 1f } }
     val scope = remember(state) { ParallaxToolbarScopeImpl(state) }
 
     // The first composition honors the config; later ones keep the saved fraction.
@@ -283,7 +304,27 @@ private fun ParallaxToolbarLayoutImpl(
         HeaderFlingBehavior(headerState, headerConfig.snapOnRelease)
     }
 
-    BoxWithConstraints(modifier = modifier) {
+    BoxWithConstraints(
+        modifier = modifier
+            // Screen readers get the state and a way to toggle it on the root node; the slots
+            // declare their reading order so the toolbar comes first.
+            .semantics {
+                isTraversalGroup = true
+                stateDescription = if (isCollapsed) semanticsConfig.collapsedStateDescription
+                else semanticsConfig.expandedStateDescription
+                if (isCollapsed) {
+                    expand(semanticsConfig.expandActionLabel) {
+                        semanticsScope.launch { state.expand() }
+                        true
+                    }
+                } else {
+                    collapse(semanticsConfig.collapseActionLabel) {
+                        semanticsScope.launch { state.collapse() }
+                        true
+                    }
+                }
+            }
+    ) {
         val headerHeight = headerConfig.height.resolve(
             availableWidth = maxWidth,
             availableHeight = maxHeight
@@ -326,6 +367,11 @@ private fun ParallaxToolbarLayoutImpl(
                         .layoutId(HeaderSlot)
                         .fillMaxWidth()
                         .height(headerHeight + topInset)
+                        .semantics {
+                            traversalIndex = 1f
+                            // Faded out under the body: nothing there should be announced.
+                            if (isCollapsed && headerConfig.fadeOnCollapse) hideFromAccessibility()
+                        }
                         // Drags that start on the header collapse it directly.
                         .scrollable(
                             state = headerState,
@@ -336,7 +382,7 @@ private fun ParallaxToolbarLayoutImpl(
                     content = { scope.headerContent() }
                 )
 
-                val bodyModifier = Modifier.layoutId(BodySlot)
+                val bodyModifier = Modifier.layoutId(BodySlot).semantics { traversalIndex = 4f }
                 when (body) {
                     is ParallaxBodySpec.Regular -> ParallaxBody(
                         scroll = state.scrollState,
@@ -368,14 +414,19 @@ private fun ParallaxToolbarLayoutImpl(
                     actions = actions,
                     titleContent = titleContent,
                     subtitleContent = subtitleContent,
-                    modifier = Modifier.layoutId(TopBarSlot)
+                    modifier = Modifier
+                        .layoutId(TopBarSlot)
+                        .semantics {
+                            traversalIndex = 0f
+                            if (isToolbarExited) hideFromAccessibility()
+                        }
                 )
 
                 if (bottomContent != null) {
-                    Box(Modifier.layoutId(BottomSlot)) { scope.bottomContent() }
+                    Box(Modifier.layoutId(BottomSlot).semantics { traversalIndex = 2f }) { scope.bottomContent() }
                 }
                 if (overlayContent != null) {
-                    Box(Modifier.layoutId(OverlaySlot)) { scope.overlayContent() }
+                    Box(Modifier.layoutId(OverlaySlot).semantics { traversalIndex = 3f }) { scope.overlayContent() }
                 }
             }
         ) { measurables, constraints ->
