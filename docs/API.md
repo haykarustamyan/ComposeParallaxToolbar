@@ -11,8 +11,8 @@ Hoisted state returned by `rememberParallaxToolbarState()` and passed to the `st
 |---|---|
 | `collapseFraction: Float` | 0f while expanded, 1f once collapsed |
 | `isCollapsed: Boolean` | Whether the toolbar is collapsed |
-| `suspend fun collapse(animated = true)` | Scroll the body until the toolbar is collapsed |
-| `suspend fun expand(animated = true)` | Scroll the body back to the top |
+| `suspend fun collapse(animated = true)` | Collapse the header; the body keeps its scroll position |
+| `suspend fun expand(animated = true)` | Expand the header |
 | `scrollState` | `ScrollState` used by `ParallaxContent.Regular` |
 | `lazyListState` | `LazyListState` used by `ParallaxContent.Lazy` unless it carries its own |
 

@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 /** The expanded header: user content with a parallax translation and fade, under a gradient. */
 @Composable
 internal fun ParallaxHeader(
-    collapseState: CollapseState,
+    headerState: HeaderScrollState,
     headerHeightPx: Float,
     parallaxMultiplier: Float,
     gradientBrush: Brush?,
@@ -23,9 +23,9 @@ internal fun ParallaxHeader(
 ) {
     Box(
         modifier = modifier.graphicsLayer {
-            translationY = -collapseState.offsetPx * parallaxMultiplier
+            translationY = -headerState.offsetPx * parallaxMultiplier
             // Fully faded exactly when the toolbar covers it, so nothing shows through the body.
-            alpha = 1f - collapseState.fraction
+            alpha = 1f - headerState.fraction
         }
     ) {
         content()

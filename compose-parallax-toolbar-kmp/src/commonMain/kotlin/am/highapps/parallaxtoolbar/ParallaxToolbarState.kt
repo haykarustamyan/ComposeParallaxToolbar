@@ -6,51 +6,64 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 
 /**
  * Hoisted state of a [ComposeParallaxToolbarLayout]: observe how far the toolbar has collapsed
  * and drive it programmatically.
  *
- * Create it with [rememberParallaxToolbarState]. [scrollState] backs [ParallaxContent.Regular]
- * and [lazyListState] backs [ParallaxContent.Lazy] unless the content carries its own list state.
+ * Create it with [rememberParallaxToolbarState]. The collapse fraction survives configuration
+ * changes and process death. [scrollState] backs [ParallaxContent.Regular] and [lazyListState]
+ * backs [ParallaxContent.Lazy] unless the content carries its own list state; custom content
+ * manages its own scroll state.
  */
 @Stable
 public class ParallaxToolbarState internal constructor(
     public val scrollState: ScrollState,
-    public val lazyListState: LazyListState
+    public val lazyListState: LazyListState,
+    internal val headerState: HeaderScrollState
 ) {
-    internal var collapseState: CollapseState? by mutableStateOf(null)
-
     /** 0f while fully expanded, 1f once fully collapsed. */
     public val collapseFraction: Float
-        get() = collapseState?.fraction ?: 0f
+        get() = headerState.fraction
 
     public val isCollapsed: Boolean
-        get() = collapseState?.isCollapsed ?: false
+        get() = headerState.isCollapsed
 
-    /** Scrolls the body until the toolbar is collapsed. No-op before the layout is first measured. */
+    /** Collapses the header. The body keeps its own scroll position. */
     public suspend fun collapse(animated: Boolean = true) {
-        collapseState?.collapse(animated)
+        if (animated) headerState.animateFractionTo(1f) else headerState.snapFractionTo(1f)
     }
 
-    /** Scrolls the body back to the top so the header is fully expanded. */
+    /** Expands the header. The body keeps its own scroll position. */
     public suspend fun expand(animated: Boolean = true) {
-        collapseState?.expand(animated)
+        if (animated) headerState.animateFractionTo(0f) else headerState.snapFractionTo(0f)
     }
 }
 
 /**
  * Creates and remembers a [ParallaxToolbarState]. Pass your own [scrollState] or [lazyListState]
  * to share scroll position with other components; otherwise fresh ones are remembered.
+ *
+ * @param initiallyCollapsed Whether the header starts collapsed the first time it is shown.
+ *   Later restorations keep whatever fraction was saved.
  */
 @Composable
 public fun rememberParallaxToolbarState(
     scrollState: ScrollState = rememberScrollState(),
-    lazyListState: LazyListState = rememberLazyListState()
-): ParallaxToolbarState = remember(scrollState, lazyListState) {
-    ParallaxToolbarState(scrollState, lazyListState)
+    lazyListState: LazyListState = rememberLazyListState(),
+    initiallyCollapsed: Boolean = false
+): ParallaxToolbarState {
+    val headerState = rememberSaveable(saver = HeaderScrollStateSaver) {
+        HeaderScrollState(if (initiallyCollapsed) 1f else 0f)
+    }
+    return remember(scrollState, lazyListState, headerState) {
+        ParallaxToolbarState(scrollState, lazyListState, headerState)
+    }
 }
+
+private val HeaderScrollStateSaver = androidx.compose.runtime.saveable.Saver<HeaderScrollState, Float>(
+    save = { it.fraction },
+    restore = { HeaderScrollState(it) }
+)

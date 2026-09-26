@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -61,7 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
-enum class ContentKind { Regular, Lazy }
+enum class ContentKind { Regular, Lazy, Grid }
 enum class HeaderKind { Fixed, AspectRatio, Percentage }
 enum class ToolbarColor(val color: Color) {
     Black(Color.Black), Indigo(Color(0xFF3F51B5)), White(Color.White)
@@ -76,6 +78,7 @@ data class PlaygroundConfig(
     val percentage: Float = 0.4f,
     val gradient: Boolean = true,
     val startExpanded: Boolean = true,
+    val snapOnRelease: Boolean = false,
     val toolbarColor: ToolbarColor = ToolbarColor.Black,
     val elevation: Float = 0f,
     val subtitle: Boolean = true,
@@ -211,7 +214,8 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
                 Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)))
             } else null,
             isExpandedWhenFirstDisplayed = config.startExpanded,
-            parallaxMultiplier = config.parallaxMultiplier
+            parallaxMultiplier = config.parallaxMultiplier,
+            snapOnRelease = config.snapOnRelease
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
             targetColor = config.toolbarColor.color,
@@ -242,6 +246,18 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 )
             )
+            // Any scrollable works as the body; here a two-column grid.
+            ContentKind.Grid -> ParallaxContent.Custom { collapsed ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(config.itemCount) { i -> SampleCard(i, collapsed) }
+                }
+            }
         }
     )
 }
@@ -310,6 +326,7 @@ private fun ConfigSheet(
         }
         SwitchRow("Gradient overlay", config.gradient) { onChange(config.copy(gradient = it)) }
         SwitchRow("Start expanded", config.startExpanded) { onChange(config.copy(startExpanded = it)) }
+        SwitchRow("Snap on release", config.snapOnRelease) { onChange(config.copy(snapOnRelease = it)) }
 
         Section("Toolbar")
         Choice(ToolbarColor.entries, config.toolbarColor) { onChange(config.copy(toolbarColor = it)) }

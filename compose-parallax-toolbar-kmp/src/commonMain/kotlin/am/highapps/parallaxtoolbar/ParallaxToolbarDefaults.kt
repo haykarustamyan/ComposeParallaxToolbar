@@ -40,12 +40,14 @@ public object ParallaxToolbarDefaults {
         height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true,
-        parallaxMultiplier: Float = HeaderParallaxMultiplier
+        parallaxMultiplier: Float = HeaderParallaxMultiplier,
+        snapOnRelease: Boolean = false
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
         gradient = gradient,
         isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed,
-        parallaxMultiplier = parallaxMultiplier
+        parallaxMultiplier = parallaxMultiplier,
+        snapOnRelease = snapOnRelease
     )
 
     @Composable

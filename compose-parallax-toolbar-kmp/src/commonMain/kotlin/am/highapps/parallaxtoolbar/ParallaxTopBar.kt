@@ -34,12 +34,12 @@ private val SlotHorizontalPadding = 4.dp
  * The navigation icon and actions are laid out inside the bar. The title and subtitle are placed at
  * their collapsed position, constrained to the width left between the two slots, and a layer block
  * translates and scales them toward their expanded position in the header as the body scrolls.
- * Reading [collapseState] inside the layer block means scrolling only re-runs that block, never
+ * Reading [headerState] inside the layer block means scrolling only re-runs that block, never
  * measurement.
  */
 @Composable
 internal fun ParallaxTopBar(
-    collapseState: CollapseState,
+    headerState: HeaderScrollState,
     isCollapsed: Boolean,
     topInset: Dp,
     headerHeight: Dp,
@@ -128,7 +128,7 @@ internal fun ParallaxTopBar(
             val titleY = collapsedTop.roundToInt()
 
             title.placeWithLayer(titleX, titleY) {
-                val fraction = collapseState.fraction
+                val fraction = headerState.fraction
                 val scale = 1f + (collapsedScale - 1f) * fraction
                 transformOrigin = TransformOrigin(if (isRtl) 1f else 0f, 0f)
                 scaleX = scale
@@ -138,7 +138,7 @@ internal fun ParallaxTopBar(
             }
 
             subtitle?.placeWithLayer(titleX, titleY + title.height) {
-                val fraction = collapseState.fraction
+                val fraction = headerState.fraction
                 val scale = 1f + (collapsedScale - 1f) * fraction
                 transformOrigin = TransformOrigin(if (isRtl) 1f else 0f, 0f)
                 scaleX = scale
@@ -149,7 +149,7 @@ internal fun ParallaxTopBar(
                 alpha = when {
                     keepSubtitle -> 1f
                     titleConfig.animateSubTitleHiding -> 1f - fraction
-                    collapseState.isCollapsed -> 0f
+                    headerState.isCollapsed -> 0f
                     else -> 1f
                 }
             }

@@ -24,6 +24,8 @@ kotlin {
         }
     }
 
+    jvm("desktop")
+
     sourceSets {
         commonMain.dependencies {
             api(project(":compose-parallax-toolbar-kmp"))

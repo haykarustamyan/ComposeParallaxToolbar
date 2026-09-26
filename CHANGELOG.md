@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## 2.0.0
 
+- **NEW**: the header collapses through nested scrolling. Any vertically scrollable composable can be the body via `ParallaxContent.Custom`, including `LazyVerticalGrid`, `LazyVerticalStaggeredGrid` and pagers. Dragging on the header itself collapses it.
+- **NEW**: `snapOnRelease` on the header config settles a half-collapsed header to the nearer end.
+- **NEW**: desktop (JVM) and web (Kotlin/Wasm) targets, plus a desktop sample app.
+- **NEW**: the collapse fraction is saved and restored across configuration changes and process death.
+- **CHANGED**: `collapse()` and `expand()` move only the header; the body keeps its scroll position. `rememberParallaxToolbarState(initiallyCollapsed = true)` is the state-side equivalent of `isExpandedWhenFirstDisplayed = false`.
 - **NEW**: explicit API mode, a checked-in ABI dump verified on every pull request, and generated API docs in the javadoc jar
 - **NEW**: `ParallaxToolbarState` and `rememberParallaxToolbarState()`: observe `collapseFraction` and `isCollapsed`, and call `collapse()` / `expand()` (animated or not). The `scrollState` parameter is replaced by `state`; the deprecated overload still accepts a `ScrollState`.
 - **NEW**: `parallaxMultiplier` on the header config, `height` on the toolbar config, and `collapsedScale` on the title config.

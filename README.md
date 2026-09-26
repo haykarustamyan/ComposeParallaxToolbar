@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://search.maven.org/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
 [![Kotlin](https://img.shields.io/badge/kotlin-v2.4.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-v1.12.1-blue)](https://github.com/JetBrains/compose-multiplatform)
-[![Platform](https://img.shields.io/badge/platform-Android%20|%20iOS-green.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar)
+[![Platform](https://img.shields.io/badge/platform-Android%20|%20iOS%20|%20Desktop%20|%20Web-green.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A fully customizable Material 3 parallax toolbar layout built with **Compose Multiplatform**. This cross-platform library provides a modern, material design parallax effect for app bars that animate smoothly as users scroll through content, working seamlessly on Android, iOS.
@@ -459,6 +459,37 @@ ComposeParallaxToolbarLayout(
 For detailed information on all components, parameters, and configuration options, see the [API Documentation](docs/API.md).
 
 <details>
+<summary><b>Any scrollable as the body</b></summary>
+
+The header collapses through nested scrolling, so the body can be any vertically scrollable
+composable. `ParallaxContent.Regular` and `ParallaxContent.Lazy` are conveniences;
+`ParallaxContent.Custom` takes a grid, a staggered grid, a pager whose pages scroll, or your own
+scrollable. It receives the full width and the height below the collapsed toolbar; fill that size.
+
+```kotlin
+ComposeParallaxToolbarLayout(
+    titleContent = { Text("Gallery") },
+    headerContent = { /* ... */ },
+    content = ParallaxContent.Custom { collapsed ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            items(photos) { PhotoCell(it) }
+        }
+    }
+)
+```
+
+Scrolling up collapses the header before the body scrolls; scrolling down expands it only once
+the body is back at its top. Dragging on the header itself collapses it too. Set
+`headerConfig(snapOnRelease = true)` to settle a half-collapsed header to the nearer end when a
+drag or fling ends.
+
+</details>
+
+<details>
 <summary><b>Programmatic control</b></summary>
 
 ```kotlin
@@ -494,12 +525,19 @@ actions, padding); the other names show the fixed sample screens from the librar
 
 - `sample` holds the shared playground UI and the fixed sample screens.
 - `sample-android` is the Android host app.
+- `sample-desktop` is the desktop host app.
 - `iosApp` is the Xcode host project; it builds the shared framework through Gradle.
 
 Android:
 
 ```bash
 ./gradlew :sample-android:installDebug
+```
+
+Desktop:
+
+```bash
+./gradlew :sample-desktop:run
 ```
 
 iOS: open `iosApp/iosApp.xcodeproj` in Xcode and run, or from the terminal:
@@ -527,6 +565,8 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 - **Compose Multiplatform**: 1.12.1 (the library depends only on Compose UI and Foundation; use it with Material 2, Material 3 or a custom design system)
 - **Android**: API 24+ (Android 7.0+)
 - **iOS**: 15.0+ on arm64 devices and Apple Silicon simulators (the Intel `iosX64` simulator target was dropped by Compose Multiplatform 1.11 and is no longer published)
+- **Desktop**: JVM 17+ through Compose for Desktop
+- **Web**: Kotlin/Wasm in the browser
 
 </details>
 

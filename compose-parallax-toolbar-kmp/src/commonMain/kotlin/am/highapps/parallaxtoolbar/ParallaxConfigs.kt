@@ -27,37 +27,46 @@ import androidx.compose.ui.unit.dp
  *
  * @param parallaxMultiplier How much of the scroll distance the header content moves by. 0f pins
  *   it, 1f scrolls it with the body, 0.5f is the classic parallax.
+ * @param snapOnRelease When a drag or fling ends with the header partly collapsed, settle it to
+ *   the nearer end instead of leaving it there.
  */
 @Immutable
 public class ParallaxHeaderConfig(
     public val height: HeaderHeight,
     public val gradient: Brush?,
     public val isExpandedWhenFirstDisplayed: Boolean = true,
-    public val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier
+    public val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier,
+    public val snapOnRelease: Boolean = false
 ) {
     public fun copy(
         height: HeaderHeight = this.height,
         gradient: Brush? = this.gradient,
         isExpandedWhenFirstDisplayed: Boolean = this.isExpandedWhenFirstDisplayed,
-        parallaxMultiplier: Float = this.parallaxMultiplier
-    ): ParallaxHeaderConfig = ParallaxHeaderConfig(height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier)
+        parallaxMultiplier: Float = this.parallaxMultiplier,
+        snapOnRelease: Boolean = this.snapOnRelease
+    ): ParallaxHeaderConfig = ParallaxHeaderConfig(
+        height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease
+    )
 
     override fun equals(other: Any?): Boolean = other is ParallaxHeaderConfig &&
             height == other.height &&
             gradient == other.gradient &&
             isExpandedWhenFirstDisplayed == other.isExpandedWhenFirstDisplayed &&
-            parallaxMultiplier == other.parallaxMultiplier
+            parallaxMultiplier == other.parallaxMultiplier &&
+            snapOnRelease == other.snapOnRelease
 
     override fun hashCode(): Int {
         var result = height.hashCode()
         result = 31 * result + gradient.hashCode()
         result = 31 * result + isExpandedWhenFirstDisplayed.hashCode()
         result = 31 * result + parallaxMultiplier.hashCode()
+        result = 31 * result + snapOnRelease.hashCode()
         return result
     }
 
     override fun toString(): String = "ParallaxHeaderConfig(height=$height, gradient=$gradient, " +
-            "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, parallaxMultiplier=$parallaxMultiplier)"
+            "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, " +
+            "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease)"
 }
 
 /**

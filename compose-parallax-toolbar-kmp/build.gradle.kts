@@ -50,6 +50,16 @@ kotlin {
         }
     }
 
+    jvm("desktop")
+
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser {
+            // UI tests need a browser; the desktop and Android runs cover the shared code.
+            testTask { enabled = false }
+        }
+    }
+
     applyDefaultHierarchyTemplate()
 
     compilerOptions {
@@ -66,6 +76,12 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.compose.ui.test)
+        }
+        getByName("desktopTest").dependencies {
+            implementation(libs.kotlinx.coroutines.swing)
+            // Skia native runtime for headless Compose UI tests on the JVM.
+            @Suppress("DEPRECATION")
+            implementation(compose.desktop.currentOs)
         }
         // Android host tests render Compose through Robolectric.
         getByName("androidHostTest").dependencies {

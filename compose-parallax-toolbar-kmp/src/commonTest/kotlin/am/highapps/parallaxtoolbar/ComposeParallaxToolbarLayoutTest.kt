@@ -22,6 +22,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
@@ -553,5 +554,129 @@ class ParallaxConfigEqualityTest {
         kotlin.test.assertEquals(lazy.hashCode(), lazy.copy().hashCode())
         kotlin.test.assertTrue(lazy.toString().startsWith("LazyColumnConfig("))
         kotlin.test.assertNotEquals<Any>(lazy, "not a config")
+    }
+}
+
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarCustomContentTest : UiTestBase() {
+
+    @Test
+    fun customGridContent_collapsesThroughNestedScroll() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                content = ParallaxContent.Custom { collapsed ->
+                    androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                        columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize().testTag("grid")
+                    ) {
+                        items(120) { i -> Text("Cell $i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
+                    }
+                },
+                state = state
+            )
+        }
+        onNodeWithText("expanded").assertIsDisplayed()
+        onNodeWithText("Cell 0").assertIsDisplayed()
+
+        repeat(4) { onNodeWithTag("grid").performTouchInput { swipeUp() } }
+        waitForIdle()
+        onNodeWithText("collapsed").assertIsDisplayed()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+
+        // Scrolling back down expands only once the grid is at its top again.
+        repeat(8) { onNodeWithTag("grid").performTouchInput { swipeDown() } }
+        waitForIdle()
+        onNodeWithText("expanded").assertIsDisplayed()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+    }
+
+    @Test
+    fun dragOnHeader_collapsesIt_andSnapSettlesToNearestEnd() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(300.dp),
+                    snapOnRelease = true
+                ),
+                content = ParallaxContent.Regular { Column { repeat(3) { i -> Text("Row $i") } } },
+                state = state
+            )
+        }
+        // A short, slow drag on the header itself leaves it part way; snap settles it fully.
+        onNodeWithTag("header").performTouchInput {
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -60f))
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -60f))
+            up()
+        }
+        waitForIdle()
+        kotlin.test.assertTrue(state.collapseFraction == 0f || state.collapseFraction == 1f, "fraction=${state.collapseFraction}")
+    }
+
+}
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarSnapTest : UiTestBase() {
+
+    @Composable
+    private fun Snapping(state: ParallaxToolbarState, rows: Int) {
+        ComposeParallaxToolbarLayout(
+            titleContent = { Text(if (it) "collapsed" else "expanded") },
+            headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+            headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(300.dp), snapOnRelease = true),
+            content = ParallaxContent.Regular {
+                Column(Modifier.testTag("body")) { repeat(rows) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } }
+            },
+            state = state
+        )
+    }
+
+    @Test
+    fun headerDrag_releasedWithoutVelocity_settlesToNearestEnd() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent { state = rememberParallaxToolbarState(); Snapping(state, rows = 3) }
+        // Small drag, then a pause so the release velocity is zero: only settle() can finish it.
+        onNodeWithTag("header").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -40f)); advanceEventTime(400); up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+
+        onNodeWithTag("header").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -200f)); advanceEventTime(400); up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+    }
+
+    @Test
+    fun bodyFling_withShortContent_settlesInTheFlingDirection() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent { state = rememberParallaxToolbarState(); Snapping(state, rows = 2) }
+        // A short upward fling on the body: it cannot scroll, so the velocity reaches the header.
+        onNodeWithTag("body").performTouchInput { swipeUp(startY = centerY + 20f, endY = centerY - 20f, durationMillis = 50) }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+
+        onNodeWithTag("body").performTouchInput { swipeDown(startY = centerY - 20f, endY = centerY + 20f, durationMillis = 50) }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+
+        // Zero-velocity release on the body takes the nearest end.
+        onNodeWithTag("body").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -200f)); advanceEventTime(400); up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
     }
 }

@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   android:
-    name: Android tests, coverage, ABI, sample
+    name: Android and desktop tests, web compile, coverage, ABI, samples
     # Drafts skip the gate; marking a PR ready for review starts the real run.
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
@@ -34,8 +34,8 @@ jobs:
       # Also validates the Gradle wrapper checksum.
       - uses: gradle/actions/setup-gradle@v6
 
-      - name: Unit tests, coverage report, ABI check, sample app
-        run: ./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest :compose-parallax-toolbar-kmp:koverXmlReport :compose-parallax-toolbar-kmp:checkKotlinAbi :sample-android:assembleDebug
+      - name: Unit tests, coverage report, ABI check, sample apps
+        run: ./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest :compose-parallax-toolbar-kmp:desktopTest :compose-parallax-toolbar-kmp:compileKotlinWasmJs :compose-parallax-toolbar-kmp:koverXmlReport :compose-parallax-toolbar-kmp:checkKotlinAbi :sample-android:assembleDebug :sample-desktop:build
 
       # The numbers land in the run summary even when the gate below fails.
       - name: Coverage summary
