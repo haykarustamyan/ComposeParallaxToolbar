@@ -376,3 +376,53 @@ class ComposeParallaxToolbarLazyStartTest : UiTestBase() {
         onNodeWithText("collapsed").assertIsDisplayed()
     }
 }
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarRtlTest : UiTestBase() {
+
+    @Composable
+    private fun Rtl(content: @Composable () -> Unit) {
+        androidx.compose.runtime.CompositionLocalProvider(
+            androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl,
+            content = content
+        )
+    }
+
+    @Test
+    fun regularAndLazyContent_renderAndCollapse_inRtl() = runComposeUiTest {
+        setContent {
+            Rtl {
+                Column(Modifier.fillMaxSize()) {
+                    ComposeParallaxToolbarLayout(
+                        titleContent = { Text(if (it) "r-collapsed" else "r-expanded") },
+                        headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                        headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(150.dp)),
+                        navigationIcon = { IconButton(onClick = {}) { Text("<") } },
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 12.dp, end = 4.dp),
+                        content = ParallaxContent.Regular {
+                            Column { repeat(40) { i -> Text("R$i", modifier = Modifier.fillMaxWidth().height(48.dp)) } }
+                        },
+                        modifier = Modifier.weight(1f).testTag("regular")
+                    )
+                    ComposeParallaxToolbarLayout(
+                        titleContent = { Text(if (it) "l-collapsed" else "l-expanded") },
+                        headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                        headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(150.dp)),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 12.dp, end = 4.dp),
+                        content = ParallaxContent.Lazy(content = { _ ->
+                            items(40) { i -> Text("L$i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
+                        }),
+                        modifier = Modifier.weight(1f).testTag("lazy")
+                    )
+                }
+            }
+        }
+        onNodeWithText("r-expanded").assertIsDisplayed()
+        onNodeWithText("l-expanded").assertIsDisplayed()
+        repeat(3) { onNodeWithTag("regular").performTouchInput { swipeUp() } }
+        repeat(3) { onNodeWithTag("lazy").performTouchInput { swipeUp() } }
+        waitForIdle()
+        onNodeWithText("r-collapsed").assertIsDisplayed()
+        onNodeWithText("l-collapsed").assertIsDisplayed()
+    }
+}

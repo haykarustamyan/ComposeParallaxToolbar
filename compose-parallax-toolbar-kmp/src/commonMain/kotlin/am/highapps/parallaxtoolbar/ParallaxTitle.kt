@@ -12,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.lerp
 
 /**
@@ -37,6 +39,8 @@ internal fun ParallaxTitle(
     var subtitleHeightPx by remember { mutableStateOf(0f) }
 
     val isCollapsed by remember(collapseState) { derivedStateOf { collapseState.isCollapsed } }
+    // The column is start-aligned by its parent, so in RTL it sits at the right edge and moves left.
+    val directionSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
 
     Column(
         modifier = modifier
@@ -56,7 +60,7 @@ internal fun ParallaxTitle(
                         collapseFraction
                     ).toPx()
 
-                    translationX = if (hasNavigationIcon) {
+                    translationX = directionSign * if (hasNavigationIcon) {
                         lerp(
                             config.paddingStart,
                             config.collapsedPaddingStart - extraStartPadding,
@@ -75,7 +79,7 @@ internal fun ParallaxTitle(
                         collapseFraction
                     ).toPx()
 
-                    translationX = if (hasNavigationIcon) {
+                    translationX = directionSign * if (hasNavigationIcon) {
                         lerp(
                             config.paddingStart,
                             config.collapsedPaddingStart,

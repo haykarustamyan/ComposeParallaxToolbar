@@ -564,6 +564,11 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 - **CHANGED**: configuration classes are annotated `@Immutable` so the layout skips recomposition when its inputs are unchanged
 - **CHANGED**: the legacy overload taking `lazyContent` is now marked `@Deprecated` with a replacement; it delegates to the `ParallaxContent` overload
 - **FIXED**: `isExpandedWhenFirstDisplayed = false` now works for `ParallaxContent.Lazy`
+- **FIXED**: the last status-bar-inset height of the body could never be scrolled into view; the body is now padded by the inset instead of offset
+- **FIXED**: right-to-left layouts: content padding and the title's horizontal motion now follow the layout direction
+- **FIXED**: horizontal `contentPadding` is applied to `ParallaxContent.Regular`
+- **CHANGED**: the toolbar shadow (`elevation`) now appears only once the toolbar is collapsed, so it no longer draws a band across the expanded header
+- **CHANGED**: the bottom filler for short regular content is computed exactly, removing extra blank space
 - **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
 - **FIXED**: A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title
 - **NEW**: Compose Multiplatform sample playground with Android and iOS host apps

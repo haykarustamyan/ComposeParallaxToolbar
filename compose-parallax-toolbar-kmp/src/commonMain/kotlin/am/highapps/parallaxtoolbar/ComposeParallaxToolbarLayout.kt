@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
@@ -224,7 +225,9 @@ private fun ParallaxToolbarLayoutImpl(
         var actionsWidthPx by remember { mutableStateOf(0f) }
 
         // The body and title are pushed down by the status bar inset so the collapsed toolbar
-        // clears it. The header covers that inset too, or a gap would appear under it.
+        // clears it. The body is padded rather than offset so its scroll range shrinks with it
+        // and the end of the content stays reachable. The header covers the inset too, or a gap
+        // would appear under it.
         ParallaxHeader(
             collapseState = collapseState,
             headerHeightPx = headerHeightPx,
@@ -238,12 +241,12 @@ private fun ParallaxToolbarLayoutImpl(
         when (body) {
             is ParallaxBodySpec.Regular -> ParallaxBody(
                 scroll = body.scrollState,
-                screenHeight = maxHeight,
+                viewportHeight = maxHeight - topInset,
                 headerHeight = headerHeight,
                 toolbarHeight = toolbarHeight,
                 minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
                 contentPadding = contentPadding,
-                modifier = Modifier.offset(y = topInset),
+                modifier = Modifier.padding(top = topInset),
                 content = { body.content(isCollapsed) }
             )
 
@@ -253,7 +256,7 @@ private fun ParallaxToolbarLayoutImpl(
                 minBottomSpacerHeight = bodyConfig.minBottomSpacerHeight,
                 config = body.config,
                 contentPadding = contentPadding,
-                modifier = Modifier.offset(y = topInset),
+                modifier = Modifier.padding(top = topInset),
                 lazyContent = { body.content(this, isCollapsed) }
             )
         }
