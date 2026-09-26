@@ -31,6 +31,13 @@ public class ParallaxToolbarState internal constructor(
     public val isCollapsed: Boolean
         get() = headerState.isCollapsed
 
+    /**
+     * 0f while the toolbar is on screen, 1f once it has slid away. Only moves in
+     * [ScrollMode.EnterAlwaysCollapsed]; other modes keep the toolbar pinned at 0f.
+     */
+    public val toolbarExitFraction: Float
+        get() = headerState.exitFraction
+
     /** Collapses the header. The body keeps its own scroll position. */
     public suspend fun collapse(animated: Boolean = true) {
         if (animated) headerState.animateFractionTo(1f) else headerState.snapFractionTo(1f)
@@ -63,7 +70,7 @@ public fun rememberParallaxToolbarState(
     }
 }
 
-private val HeaderScrollStateSaver = androidx.compose.runtime.saveable.Saver<HeaderScrollState, Float>(
-    save = { it.fraction },
-    restore = { HeaderScrollState(it) }
+private val HeaderScrollStateSaver = androidx.compose.runtime.saveable.listSaver<HeaderScrollState, Float>(
+    save = { listOf(it.fraction, it.exitFraction) },
+    restore = { HeaderScrollState(it[0], it.getOrElse(1) { 0f }) }
 )

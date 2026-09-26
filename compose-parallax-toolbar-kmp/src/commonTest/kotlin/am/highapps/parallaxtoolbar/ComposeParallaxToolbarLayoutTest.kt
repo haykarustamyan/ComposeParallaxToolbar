@@ -722,3 +722,105 @@ class ComposeParallaxToolbarScopeTest : UiTestBase() {
         kotlin.test.assertEquals(1f, actionsFraction)
     }
 }
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
+
+    @Composable
+    private fun Modes(mode: ScrollMode, state: ParallaxToolbarState) {
+        ComposeParallaxToolbarLayout(
+            titleContent = { Text(if (it) "collapsed" else "expanded") },
+            headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+            headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp), scrollMode = mode),
+            content = ParallaxContent.Lazy(content = { _ ->
+                items(300) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) }
+            }),
+            modifier = Modifier.testTag("layout"),
+            state = state
+        )
+    }
+
+    private fun androidx.compose.ui.test.ComposeUiTest.scrollFarDown() {
+        repeat(4) { onNodeWithTag("layout").performTouchInput { swipeUp() } }
+        waitForIdle()
+    }
+
+    /** A short downward drag: far too small to reach the list top. */
+    private fun androidx.compose.ui.test.ComposeUiTest.nudgeDown() {
+        onNodeWithTag("layout").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, 80f)); moveBy(androidx.compose.ui.geometry.Offset(0f, 80f)); up()
+        }
+        waitForIdle()
+    }
+
+    @Test
+    fun exitUntilCollapsed_expandsOnlyAtTop() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent { state = rememberParallaxToolbarState(); Modes(ScrollMode.ExitUntilCollapsed, state) }
+        scrollFarDown()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        kotlin.test.assertEquals(0f, state.toolbarExitFraction)
+        nudgeDown()
+        kotlin.test.assertEquals(1f, state.collapseFraction, "stays collapsed away from the top")
+    }
+
+    @Test
+    fun enterAlways_expandsAnywhere() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent { state = rememberParallaxToolbarState(); Modes(ScrollMode.EnterAlways, state) }
+        scrollFarDown()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        kotlin.test.assertEquals(0f, state.toolbarExitFraction)
+        nudgeDown()
+        kotlin.test.assertTrue(state.collapseFraction < 1f, "expands away from the top, fraction=${state.collapseFraction}")
+        onNodeWithText("expanded").assertIsDisplayed()
+    }
+
+    @Test
+    fun enterAlwaysCollapsed_hidesToolbar_thenBringsItBackFirst() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent { state = rememberParallaxToolbarState(); Modes(ScrollMode.EnterAlwaysCollapsed, state) }
+        scrollFarDown()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        kotlin.test.assertEquals(1f, state.toolbarExitFraction, "toolbar left the screen")
+        nudgeDown()
+        kotlin.test.assertEquals(0f, state.toolbarExitFraction, "toolbar came back")
+        kotlin.test.assertEquals(1f, state.collapseFraction, "header stays collapsed away from the top")
+
+        repeat(8) { onNodeWithTag("layout").performTouchInput { swipeDown() } }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction, "expands at the top")
+        onNodeWithText("expanded").assertIsDisplayed()
+
+        // Programmatic collapse only collapses the header; expand clears any exit as well.
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.toolbarExitFraction)
+        onNodeWithText("collapsed").assertIsDisplayed()
+    }
+
+    @Test
+    fun enterAlwaysCollapsed_snapSettlesExitToo() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp), scrollMode = ScrollMode.EnterAlwaysCollapsed, snapOnRelease = true
+                ),
+                content = ParallaxContent.Regular { Column { repeat(2) { i -> Text("Row $i") } } },
+                modifier = Modifier.testTag("layout"),
+                state = state
+            )
+        }
+        // Collapse the header fully and push a little into the exit, then release without velocity.
+        onNodeWithTag("layout").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -400f)); moveBy(androidx.compose.ui.geometry.Offset(0f, -20f)); advanceEventTime(400); up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        kotlin.test.assertTrue(state.toolbarExitFraction == 0f || state.toolbarExitFraction == 1f, "exit=${state.toolbarExitFraction}")
+    }
+}

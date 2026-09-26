@@ -5,6 +5,7 @@ import am.highapps.parallaxtoolbar.HeaderHeight
 import am.highapps.parallaxtoolbar.ParallaxContent
 import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
 import am.highapps.parallaxtoolbar.ParallaxToolbarState
+import am.highapps.parallaxtoolbar.ScrollMode
 import am.highapps.parallaxtoolbar.rememberParallaxToolbarState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -80,6 +81,7 @@ data class PlaygroundConfig(
     val gradient: Boolean = true,
     val startExpanded: Boolean = true,
     val snapOnRelease: Boolean = false,
+    val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
     val toolbarColor: ToolbarColor = ToolbarColor.Black,
     val elevation: Float = 0f,
     val subtitle: Boolean = true,
@@ -223,7 +225,8 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
             } else null,
             isExpandedWhenFirstDisplayed = config.startExpanded,
             parallaxMultiplier = config.parallaxMultiplier,
-            snapOnRelease = config.snapOnRelease
+            snapOnRelease = config.snapOnRelease,
+            scrollMode = config.scrollMode
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
             targetColor = config.toolbarColor.color,
@@ -336,6 +339,15 @@ private fun ConfigSheet(
         SwitchRow("Start expanded", config.startExpanded) { onChange(config.copy(startExpanded = it)) }
         SwitchRow("Snap on release", config.snapOnRelease) { onChange(config.copy(snapOnRelease = it)) }
 
+        Section("Scroll mode")
+        Choice(ScrollMode.entries, config.scrollMode, label = { mode ->
+            when (mode) {
+                ScrollMode.ExitUntilCollapsed -> "Exit until\ncollapsed"
+                ScrollMode.EnterAlways -> "Enter\nalways"
+                ScrollMode.EnterAlwaysCollapsed -> "Enter always\ncollapsed"
+            }
+        }) { onChange(config.copy(scrollMode = it)) }
+
         Section("Toolbar")
         Choice(ToolbarColor.entries, config.toolbarColor) { onChange(config.copy(toolbarColor = it)) }
         SliderRow("Elevation: ${config.elevation.toInt()} dp", config.elevation, 0f..12f) {
@@ -380,14 +392,19 @@ private fun Section(title: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T : Enum<T>> Choice(options: List<T>, selected: T, onSelect: (T) -> Unit) {
+private fun <T : Enum<T>> Choice(
+    options: List<T>,
+    selected: T,
+    label: (T) -> String = { it.name },
+    onSelect: (T) -> Unit
+) {
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
         options.forEachIndexed { index, option ->
             SegmentedButton(
                 selected = option == selected,
                 onClick = { onSelect(option) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
-            ) { Text(option.name) }
+            ) { Text(label(option), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 12.sp) }
         }
     }
 }

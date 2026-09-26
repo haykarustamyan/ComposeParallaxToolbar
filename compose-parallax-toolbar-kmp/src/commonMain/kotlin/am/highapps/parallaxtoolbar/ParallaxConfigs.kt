@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.dp
  * @param parallaxMultiplier How much of the scroll distance the header content moves by. 0f pins
  *   it, 1f scrolls it with the body, 0.5f is the classic parallax.
  * @param snapOnRelease When a drag or fling ends with the header partly collapsed, settle it to
- *   the nearer end instead of leaving it there.
+ *   the nearer resting position instead of leaving it there.
+ * @param scrollMode How the header and toolbar react to the body scrolling; see [ScrollMode].
  */
 @Immutable
 public class ParallaxHeaderConfig(
@@ -36,16 +37,18 @@ public class ParallaxHeaderConfig(
     public val gradient: Brush?,
     public val isExpandedWhenFirstDisplayed: Boolean = true,
     public val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier,
-    public val snapOnRelease: Boolean = false
+    public val snapOnRelease: Boolean = false,
+    public val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed
 ) {
     public fun copy(
         height: HeaderHeight = this.height,
         gradient: Brush? = this.gradient,
         isExpandedWhenFirstDisplayed: Boolean = this.isExpandedWhenFirstDisplayed,
         parallaxMultiplier: Float = this.parallaxMultiplier,
-        snapOnRelease: Boolean = this.snapOnRelease
+        snapOnRelease: Boolean = this.snapOnRelease,
+        scrollMode: ScrollMode = this.scrollMode
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease
+        height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease, scrollMode
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxHeaderConfig &&
@@ -53,7 +56,8 @@ public class ParallaxHeaderConfig(
             gradient == other.gradient &&
             isExpandedWhenFirstDisplayed == other.isExpandedWhenFirstDisplayed &&
             parallaxMultiplier == other.parallaxMultiplier &&
-            snapOnRelease == other.snapOnRelease
+            snapOnRelease == other.snapOnRelease &&
+            scrollMode == other.scrollMode
 
     override fun hashCode(): Int {
         var result = height.hashCode()
@@ -61,12 +65,13 @@ public class ParallaxHeaderConfig(
         result = 31 * result + isExpandedWhenFirstDisplayed.hashCode()
         result = 31 * result + parallaxMultiplier.hashCode()
         result = 31 * result + snapOnRelease.hashCode()
+        result = 31 * result + scrollMode.hashCode()
         return result
     }
 
     override fun toString(): String = "ParallaxHeaderConfig(height=$height, gradient=$gradient, " +
             "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, " +
-            "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease)"
+            "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease, scrollMode=$scrollMode)"
 }
 
 /**

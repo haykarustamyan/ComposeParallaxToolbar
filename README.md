@@ -482,10 +482,18 @@ ComposeParallaxToolbarLayout(
 )
 ```
 
-Scrolling up collapses the header before the body scrolls; scrolling down expands it only once
-the body is back at its top. Dragging on the header itself collapses it too. Set
-`headerConfig(snapOnRelease = true)` to settle a half-collapsed header to the nearer end when a
-drag or fling ends.
+Dragging on the header itself collapses it too. Set `headerConfig(snapOnRelease = true)` to settle
+a half-collapsed header to the nearer resting position when a drag or fling ends.
+
+`headerConfig(scrollMode = ...)` picks how the header and toolbar react to the body:
+
+| `ScrollMode` | Scrolling up | Scrolling down |
+|---|---|---|
+| `ExitUntilCollapsed` (default) | collapses the header, toolbar stays | expands only once the body is at its top |
+| `EnterAlways` | collapses the header, toolbar stays | expands immediately, wherever the body is |
+| `EnterAlwaysCollapsed` | collapses the header, then the toolbar slides away | the toolbar returns immediately; the header expands at the top |
+
+`state.toolbarExitFraction` reports the toolbar's exit in the last mode.
 
 </details>
 

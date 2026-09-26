@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -245,8 +246,8 @@ private fun ParallaxToolbarLayoutImpl(
         }
     }
 
-    val connection = remember(headerState, headerConfig.snapOnRelease) {
-        headerState.connection(snapOnRelease = headerConfig.snapOnRelease)
+    val connection = remember(headerState, headerConfig.scrollMode, headerConfig.snapOnRelease) {
+        headerState.connection(mode = headerConfig.scrollMode, snapOnRelease = headerConfig.snapOnRelease)
     }
     val headerFling = remember(headerState, headerConfig.snapOnRelease) {
         HeaderFlingBehavior(headerState, headerConfig.snapOnRelease)
@@ -260,19 +261,21 @@ private fun ParallaxToolbarLayoutImpl(
         val headerHeightPx = with(density) { headerHeight.toPx() }
         val toolbarHeightPx = with(density) { toolbarHeight.toPx() }
         val collapseRangePx = (headerHeightPx - toolbarHeightPx).coerceAtLeast(0f)
-        SideEffect { headerState.collapseRangePx = collapseRangePx }
+        val insetPxF = with(density) { topInset.toPx() }
+        // Only EnterAlwaysCollapsed lets the toolbar leave; it travels its own height plus the inset.
+        val exitRangePx = if (headerConfig.scrollMode == ScrollMode.EnterAlwaysCollapsed) toolbarHeightPx + insetPxF else 0f
+        SideEffect {
+            headerState.collapseRangePx = collapseRangePx
+            headerState.exitRangePx = exitRangePx
+        }
 
         Layout(
             modifier = Modifier
                 .fillMaxSize()
-                // Drags that start on the header area collapse it directly.
-                .scrollable(
-                    state = headerState,
-                    orientation = Orientation.Vertical,
-                    reverseDirection = true,
-                    flingBehavior = headerFling
-                )
-                // Scrolls that start in the body reach the header through nested scroll.
+                // Scrolls that start in the body reach the header through nested scroll. The
+                // scrollable for drags on the header sits on the header itself, not here: a
+                // scrollable ancestor would also swallow whatever the body leaves unconsumed and
+                // bypass the mode rules in the connection.
                 .nestedScroll(connection),
             content = {
                 // The body and title are pushed down by the status bar inset so the collapsed
@@ -284,7 +287,17 @@ private fun ParallaxToolbarLayoutImpl(
                     gradientBrush = headerConfig.gradient,
                     initialColor = toolbarConfig.initialColor,
                     targetColor = toolbarConfig.targetColor,
-                    modifier = Modifier.layoutId(HeaderSlot).fillMaxWidth().height(headerHeight + topInset),
+                    modifier = Modifier
+                        .layoutId(HeaderSlot)
+                        .fillMaxWidth()
+                        .height(headerHeight + topInset)
+                        // Drags that start on the header collapse it directly.
+                        .scrollable(
+                            state = headerState,
+                            orientation = Orientation.Vertical,
+                            reverseDirection = true,
+                            flingBehavior = headerFling
+                        ),
                     content = { scope.headerContent() }
                 )
 
@@ -334,18 +347,24 @@ private fun ParallaxToolbarLayoutImpl(
                 .measure(Constraints.fixedWidth(width))
             val topBar = measurables.first { it.layoutId == TopBarSlot }
                 .measure(Constraints.fixedWidth(width))
-            // The body gets the space below the collapsed toolbar. While the header is expanded it
-            // is pushed down and its tail is off screen; it slides up as the header collapses.
-            val bodyHeight = (height - insetPx - toolbarPx).coerceAtLeast(0)
+            // The body gets the space below the collapsed toolbar, plus whatever the toolbar can
+            // vacate by exiting. While the header is expanded it is pushed down and its tail is off
+            // screen; it slides up as the header collapses and the toolbar exits.
+            val exitPx = exitRangePx.roundToInt()
+            val bodyHeight = (height - insetPx - toolbarPx + exitPx).coerceAtLeast(0)
             val bodyPlaceable = measurables.first { it.layoutId == BodySlot }
                 .measure(Constraints.fixed(width, bodyHeight))
 
             layout(width, height) {
-                header.placeRelative(0, 0)
-                bodyPlaceable.placeRelativeWithLayer(0, insetPx + headerPx) {
-                    translationY = -headerState.offsetPx
+                header.placeRelativeWithLayer(0, 0) {
+                    translationY = -headerState.exitOffsetPx
                 }
-                topBar.placeRelative(0, 0)
+                bodyPlaceable.placeRelativeWithLayer(0, insetPx + headerPx) {
+                    translationY = -headerState.offsetPx - headerState.exitOffsetPx
+                }
+                topBar.placeRelativeWithLayer(0, 0) {
+                    translationY = -headerState.exitOffsetPx
+                }
             }
         }
     }

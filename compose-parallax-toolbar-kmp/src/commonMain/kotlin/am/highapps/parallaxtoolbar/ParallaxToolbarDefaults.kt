@@ -41,13 +41,15 @@ public object ParallaxToolbarDefaults {
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true,
         parallaxMultiplier: Float = HeaderParallaxMultiplier,
-        snapOnRelease: Boolean = false
+        snapOnRelease: Boolean = false,
+        scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
         gradient = gradient,
         isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed,
         parallaxMultiplier = parallaxMultiplier,
-        snapOnRelease = snapOnRelease
+        snapOnRelease = snapOnRelease,
+        scrollMode = scrollMode
     )
 
     @Composable

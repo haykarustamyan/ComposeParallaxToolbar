@@ -23,6 +23,7 @@ Hoisted state returned by `rememberParallaxToolbarState()` and passed to the `st
 |---|---|
 | `collapseFraction: Float` | 0f while expanded, 1f once collapsed |
 | `isCollapsed: Boolean` | Whether the toolbar is collapsed |
+| `toolbarExitFraction: Float` | 0f on screen, 1f slid away; moves only in `ScrollMode.EnterAlwaysCollapsed` |
 | `suspend fun collapse(animated = true)` | Collapse the header; the body keeps its scroll position |
 | `suspend fun expand(animated = true)` | Expand the header |
 | `scrollState` | `ScrollState` used by `ParallaxContent.Regular` |
