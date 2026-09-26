@@ -508,7 +508,7 @@ class ComposeParallaxToolbarStateTest : UiTestBase() {
     fun configs_haveDefaultsForNewFields() {
         val toolbar = ParallaxToolbarConfig(
             initialColor = Color.Transparent, targetColor = Color.Black, elevation = 0.dp,
-            iconSize = 24.dp, iconSpacing = 8.dp, animationSpec = androidx.compose.animation.core.tween()
+            animationSpec = androidx.compose.animation.core.tween()
         )
         val title = ParallaxTitleConfig(
             paddingBottom = 0.dp, paddingStart = 16.dp, collapsedPaddingStart = 64.dp,

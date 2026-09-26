@@ -41,8 +41,6 @@ data class ParallaxToolbarConfig(
     val initialColor: Color,
     val targetColor: Color,
     val elevation: Dp,
-    val iconSize: Dp,
-    val iconSpacing: Dp,
     val animationSpec: AnimationSpec<Color>,
     val height: Dp = ParallaxToolbarDefaults.ToolbarHeight
 )

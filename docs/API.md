@@ -438,8 +438,6 @@ data class ParallaxToolbarConfig(
     val initialColor: Color,
     val targetColor: Color,
     val elevation: Dp,
-    val iconSize: Dp,
-    val iconSpacing: Dp,
     val animationSpec: AnimationSpec<Color>
 )
 ```
@@ -451,8 +449,6 @@ data class ParallaxToolbarConfig(
 | `initialColor`  | `Color`                | The toolbar background color when expanded              | `Color.Transparent` |
 | `targetColor`   | `Color`                | The toolbar background color when collapsed             | `Color.Black`       |
 | `elevation`     | `Dp`                   | The elevation of the toolbar when visible               | `0.dp`              |
-| `iconSize`      | `Dp`                   | The size of toolbar icons                               | `24.dp`             |
-| `iconSpacing`   | `Dp`                   | The spacing between toolbar actions                     | `8.dp`              |
 | `animationSpec` | `AnimationSpec<Color>` | Animation specification for background color transition | `tween(300)`        |
 
 ### ParallaxTitleConfig
@@ -711,9 +707,6 @@ object ParallaxToolbarDefaults {
 
     // Toolbar defaults
     internal val ToolbarHeight: Dp = 64.dp
-    val ToolbarMinWidth: Dp = 56.dp
-    val ToolbarIconSize: Dp = 24.dp
-    val ToolbarIconSpacing: Dp = 8.dp
 
     // Title and subtitle defaults
     val TitlePaddingBottom: Dp = (-16).dp
@@ -814,8 +807,6 @@ fun toolbarConfig(
     initialColor: Color = Color.Transparent,
     targetColor: Color = Color.Black,
     elevation: Dp = 0.dp,
-    iconSize: Dp = ToolbarIconSize,
-    iconSpacing: Dp = ToolbarIconSpacing,
     animationSpec: AnimationSpec<Color> = tween(durationMillis = 300)
 ): ParallaxToolbarConfig
 ```

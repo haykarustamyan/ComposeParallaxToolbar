@@ -25,9 +25,6 @@ object ParallaxToolbarDefaults {
 
     // Toolbar defaults
     val ToolbarHeight: Dp = 64.dp
-    val ToolbarMinWidth: Dp = 56.dp
-    val ToolbarIconSize: Dp = 24.dp
-    val ToolbarIconSpacing: Dp = 8.dp
 
     // Title and subtitle defaults
     val TitlePaddingBottom: Dp = (-16).dp
@@ -78,16 +75,12 @@ object ParallaxToolbarDefaults {
         initialColor: Color = Color.Transparent,
         targetColor: Color = Color.Black,
         elevation: Dp = 0.dp,
-        iconSize: Dp = ToolbarIconSize,
-        iconSpacing: Dp = ToolbarIconSpacing,
         animationSpec: AnimationSpec<Color> = tween(durationMillis = 300),
         height: Dp = ToolbarHeight
     ): ParallaxToolbarConfig = ParallaxToolbarConfig(
         initialColor = initialColor,
         targetColor = targetColor,
         elevation = elevation,
-        iconSize = iconSize,
-        iconSpacing = iconSpacing,
         animationSpec = animationSpec,
         height = height
     )

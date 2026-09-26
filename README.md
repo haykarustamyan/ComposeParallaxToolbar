@@ -582,6 +582,7 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 
 - **NEW**: `ParallaxToolbarState` and `rememberParallaxToolbarState()`: observe `collapseFraction` and `isCollapsed`, and call `collapse()` / `expand()` (animated or not). The `scrollState` parameter is replaced by `state`; the deprecated overload still accepts a `ScrollState`.
 - **NEW**: `parallaxMultiplier` on the header config, `height` on the toolbar config, and `collapsedScale` on the title config.
+- **REMOVED**: `iconSize` and `iconSpacing` from `ParallaxToolbarConfig` and `ToolbarMinWidth`, `ToolbarIconSize`, `ToolbarIconSpacing` from `ParallaxToolbarDefaults`. Nothing ever read them; size icons inside the slots.
 - **REMOVED**: the Material 3 dependency. The library now depends only on Compose UI and Foundation, so it works with any design system
 - **CHANGED**: the header fades out over the collapse range instead of its full height, so it is fully hidden once the toolbar covers it
 - **CHANGED**: the toolbar and title are measured in one pass by a custom layout instead of position callbacks, removing the one-frame jump on first display and rotation. The toolbar no longer uses Material's `TopAppBar` internally; its look is unchanged.
