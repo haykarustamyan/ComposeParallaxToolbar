@@ -29,18 +29,18 @@ import androidx.compose.ui.unit.dp
  *   it, 1f scrolls it with the body, 0.5f is the classic parallax.
  */
 @Immutable
-class ParallaxHeaderConfig(
-    val height: HeaderHeight,
-    val gradient: Brush?,
-    val isExpandedWhenFirstDisplayed: Boolean = true,
-    val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier
+public class ParallaxHeaderConfig(
+    public val height: HeaderHeight,
+    public val gradient: Brush?,
+    public val isExpandedWhenFirstDisplayed: Boolean = true,
+    public val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier
 ) {
-    fun copy(
+    public fun copy(
         height: HeaderHeight = this.height,
         gradient: Brush? = this.gradient,
         isExpandedWhenFirstDisplayed: Boolean = this.isExpandedWhenFirstDisplayed,
         parallaxMultiplier: Float = this.parallaxMultiplier
-    ) = ParallaxHeaderConfig(height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier)
+    ): ParallaxHeaderConfig = ParallaxHeaderConfig(height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier)
 
     override fun equals(other: Any?): Boolean = other is ParallaxHeaderConfig &&
             height == other.height &&
@@ -66,20 +66,20 @@ class ParallaxHeaderConfig(
  * @param height Height of the pinned toolbar, excluding the status bar inset.
  */
 @Immutable
-class ParallaxToolbarConfig(
-    val initialColor: Color,
-    val targetColor: Color,
-    val elevation: Dp,
-    val animationSpec: AnimationSpec<Color>,
-    val height: Dp = ParallaxToolbarDefaults.ToolbarHeight
+public class ParallaxToolbarConfig(
+    public val initialColor: Color,
+    public val targetColor: Color,
+    public val elevation: Dp,
+    public val animationSpec: AnimationSpec<Color>,
+    public val height: Dp = ParallaxToolbarDefaults.ToolbarHeight
 ) {
-    fun copy(
+    public fun copy(
         initialColor: Color = this.initialColor,
         targetColor: Color = this.targetColor,
         elevation: Dp = this.elevation,
         animationSpec: AnimationSpec<Color> = this.animationSpec,
         height: Dp = this.height
-    ) = ParallaxToolbarConfig(initialColor, targetColor, elevation, animationSpec, height)
+    ): ParallaxToolbarConfig = ParallaxToolbarConfig(initialColor, targetColor, elevation, animationSpec, height)
 
     override fun equals(other: Any?): Boolean = other is ParallaxToolbarConfig &&
             initialColor == other.initialColor &&
@@ -108,22 +108,22 @@ class ParallaxToolbarConfig(
  *   toolbar. It scales about its start edge.
  */
 @Immutable
-class ParallaxTitleConfig(
-    val paddingBottom: Dp,
-    val paddingStart: Dp,
-    val collapsedPaddingStart: Dp,
-    val keepSubtitleAfterCollapse: Boolean,
-    val animateSubTitleHiding: Boolean,
-    val collapsedScale: Float = ParallaxToolbarDefaults.TitleCollapsedScale
+public class ParallaxTitleConfig(
+    public val paddingBottom: Dp,
+    public val paddingStart: Dp,
+    public val collapsedPaddingStart: Dp,
+    public val keepSubtitleAfterCollapse: Boolean,
+    public val animateSubTitleHiding: Boolean,
+    public val collapsedScale: Float = ParallaxToolbarDefaults.TitleCollapsedScale
 ) {
-    fun copy(
+    public fun copy(
         paddingBottom: Dp = this.paddingBottom,
         paddingStart: Dp = this.paddingStart,
         collapsedPaddingStart: Dp = this.collapsedPaddingStart,
         keepSubtitleAfterCollapse: Boolean = this.keepSubtitleAfterCollapse,
         animateSubTitleHiding: Boolean = this.animateSubTitleHiding,
         collapsedScale: Float = this.collapsedScale
-    ) = ParallaxTitleConfig(
+    ): ParallaxTitleConfig = ParallaxTitleConfig(
         paddingBottom, paddingStart, collapsedPaddingStart,
         keepSubtitleAfterCollapse, animateSubTitleHiding, collapsedScale
     )
@@ -154,10 +154,10 @@ class ParallaxTitleConfig(
 
 /** Body spacing. */
 @Immutable
-class ParallaxBodyConfig(
-    val minBottomSpacerHeight: Dp
+public class ParallaxBodyConfig(
+    public val minBottomSpacerHeight: Dp
 ) {
-    fun copy(minBottomSpacerHeight: Dp = this.minBottomSpacerHeight) =
+    public fun copy(minBottomSpacerHeight: Dp = this.minBottomSpacerHeight): ParallaxBodyConfig =
         ParallaxBodyConfig(minBottomSpacerHeight)
 
     override fun equals(other: Any?): Boolean =
@@ -170,22 +170,22 @@ class ParallaxBodyConfig(
 
 /** Options forwarded to the `LazyColumn` used by [ParallaxContent.Lazy]. */
 @Immutable
-class LazyColumnConfig(
-    val contentPadding: PaddingValues = PaddingValues(0.dp),
-    val verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    val horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    val flingBehavior: FlingBehavior? = null,
-    val userScrollEnabled: Boolean = true,
-    val overscrollEffect: OverscrollEffect? = null
+public class LazyColumnConfig(
+    public val contentPadding: PaddingValues = PaddingValues(0.dp),
+    public val verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    public val horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    public val flingBehavior: FlingBehavior? = null,
+    public val userScrollEnabled: Boolean = true,
+    public val overscrollEffect: OverscrollEffect? = null
 ) {
-    fun copy(
+    public fun copy(
         contentPadding: PaddingValues = this.contentPadding,
         verticalArrangement: Arrangement.Vertical = this.verticalArrangement,
         horizontalAlignment: Alignment.Horizontal = this.horizontalAlignment,
         flingBehavior: FlingBehavior? = this.flingBehavior,
         userScrollEnabled: Boolean = this.userScrollEnabled,
         overscrollEffect: OverscrollEffect? = this.overscrollEffect
-    ) = LazyColumnConfig(
+    ): LazyColumnConfig = LazyColumnConfig(
         contentPadding, verticalArrangement, horizontalAlignment,
         flingBehavior, userScrollEnabled, overscrollEffect
     )

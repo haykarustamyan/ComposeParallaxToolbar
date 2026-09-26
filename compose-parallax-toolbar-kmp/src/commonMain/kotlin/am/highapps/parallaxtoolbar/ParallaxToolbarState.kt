@@ -19,32 +19,36 @@ import androidx.compose.runtime.setValue
  * and [lazyListState] backs [ParallaxContent.Lazy] unless the content carries its own list state.
  */
 @Stable
-class ParallaxToolbarState internal constructor(
-    val scrollState: ScrollState,
-    val lazyListState: LazyListState
+public class ParallaxToolbarState internal constructor(
+    public val scrollState: ScrollState,
+    public val lazyListState: LazyListState
 ) {
     internal var collapseState: CollapseState? by mutableStateOf(null)
 
     /** 0f while fully expanded, 1f once fully collapsed. */
-    val collapseFraction: Float
+    public val collapseFraction: Float
         get() = collapseState?.fraction ?: 0f
 
-    val isCollapsed: Boolean
+    public val isCollapsed: Boolean
         get() = collapseState?.isCollapsed ?: false
 
     /** Scrolls the body until the toolbar is collapsed. No-op before the layout is first measured. */
-    suspend fun collapse(animated: Boolean = true) {
+    public suspend fun collapse(animated: Boolean = true) {
         collapseState?.collapse(animated)
     }
 
     /** Scrolls the body back to the top so the header is fully expanded. */
-    suspend fun expand(animated: Boolean = true) {
+    public suspend fun expand(animated: Boolean = true) {
         collapseState?.expand(animated)
     }
 }
 
+/**
+ * Creates and remembers a [ParallaxToolbarState]. Pass your own [scrollState] or [lazyListState]
+ * to share scroll position with other components; otherwise fresh ones are remembered.
+ */
 @Composable
-fun rememberParallaxToolbarState(
+public fun rememberParallaxToolbarState(
     scrollState: ScrollState = rememberScrollState(),
     lazyListState: LazyListState = rememberLazyListState()
 ): ParallaxToolbarState = remember(scrollState, lazyListState) {

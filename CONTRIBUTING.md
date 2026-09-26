@@ -38,3 +38,15 @@ Please correct any failures before requesting a review.
 Feel free to open an issue for any questions.
 
 Thank you for your contributions! 
+
+## Public API changes
+
+The library uses explicit API mode and a checked-in ABI dump under
+`compose-parallax-toolbar-kmp/api/`. If a change touches the public surface on purpose, run
+
+```bash
+./gradlew :compose-parallax-toolbar-kmp:updateKotlinAbi
+```
+
+and commit the updated dump together with a CHANGELOG entry. CI runs `checkKotlinAbi` and fails on
+any unrecorded change.

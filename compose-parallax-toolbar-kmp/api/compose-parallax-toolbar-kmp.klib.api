@@ -1,0 +1,255 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <ComposeParallaxToolbar:compose-parallax-toolbar-kmp>
+final class am.highapps.parallaxtoolbar/LazyColumnConfig { // am.highapps.parallaxtoolbar/LazyColumnConfig|null[0]
+    constructor <init>(androidx.compose.foundation.layout/PaddingValues = ..., androidx.compose.foundation.layout/Arrangement.Vertical = ..., androidx.compose.ui/Alignment.Horizontal = ..., androidx.compose.foundation.gestures/FlingBehavior? = ..., kotlin/Boolean = ..., androidx.compose.foundation/OverscrollEffect? = ...) // am.highapps.parallaxtoolbar/LazyColumnConfig.<init>|<init>(androidx.compose.foundation.layout.PaddingValues;androidx.compose.foundation.layout.Arrangement.Vertical;androidx.compose.ui.Alignment.Horizontal;androidx.compose.foundation.gestures.FlingBehavior?;kotlin.Boolean;androidx.compose.foundation.OverscrollEffect?){}[0]
+
+    final val contentPadding // am.highapps.parallaxtoolbar/LazyColumnConfig.contentPadding|{}contentPadding[0]
+        final fun <get-contentPadding>(): androidx.compose.foundation.layout/PaddingValues // am.highapps.parallaxtoolbar/LazyColumnConfig.contentPadding.<get-contentPadding>|<get-contentPadding>(){}[0]
+    final val flingBehavior // am.highapps.parallaxtoolbar/LazyColumnConfig.flingBehavior|{}flingBehavior[0]
+        final fun <get-flingBehavior>(): androidx.compose.foundation.gestures/FlingBehavior? // am.highapps.parallaxtoolbar/LazyColumnConfig.flingBehavior.<get-flingBehavior>|<get-flingBehavior>(){}[0]
+    final val horizontalAlignment // am.highapps.parallaxtoolbar/LazyColumnConfig.horizontalAlignment|{}horizontalAlignment[0]
+        final fun <get-horizontalAlignment>(): androidx.compose.ui/Alignment.Horizontal // am.highapps.parallaxtoolbar/LazyColumnConfig.horizontalAlignment.<get-horizontalAlignment>|<get-horizontalAlignment>(){}[0]
+    final val overscrollEffect // am.highapps.parallaxtoolbar/LazyColumnConfig.overscrollEffect|{}overscrollEffect[0]
+        final fun <get-overscrollEffect>(): androidx.compose.foundation/OverscrollEffect? // am.highapps.parallaxtoolbar/LazyColumnConfig.overscrollEffect.<get-overscrollEffect>|<get-overscrollEffect>(){}[0]
+    final val userScrollEnabled // am.highapps.parallaxtoolbar/LazyColumnConfig.userScrollEnabled|{}userScrollEnabled[0]
+        final fun <get-userScrollEnabled>(): kotlin/Boolean // am.highapps.parallaxtoolbar/LazyColumnConfig.userScrollEnabled.<get-userScrollEnabled>|<get-userScrollEnabled>(){}[0]
+    final val verticalArrangement // am.highapps.parallaxtoolbar/LazyColumnConfig.verticalArrangement|{}verticalArrangement[0]
+        final fun <get-verticalArrangement>(): androidx.compose.foundation.layout/Arrangement.Vertical // am.highapps.parallaxtoolbar/LazyColumnConfig.verticalArrangement.<get-verticalArrangement>|<get-verticalArrangement>(){}[0]
+
+    final fun copy(androidx.compose.foundation.layout/PaddingValues = ..., androidx.compose.foundation.layout/Arrangement.Vertical = ..., androidx.compose.ui/Alignment.Horizontal = ..., androidx.compose.foundation.gestures/FlingBehavior? = ..., kotlin/Boolean = ..., androidx.compose.foundation/OverscrollEffect? = ...): am.highapps.parallaxtoolbar/LazyColumnConfig // am.highapps.parallaxtoolbar/LazyColumnConfig.copy|copy(androidx.compose.foundation.layout.PaddingValues;androidx.compose.foundation.layout.Arrangement.Vertical;androidx.compose.ui.Alignment.Horizontal;androidx.compose.foundation.gestures.FlingBehavior?;kotlin.Boolean;androidx.compose.foundation.OverscrollEffect?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/LazyColumnConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/LazyColumnConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/LazyColumnConfig.toString|toString(){}[0]
+}
+
+final class am.highapps.parallaxtoolbar/ParallaxBodyConfig { // am.highapps.parallaxtoolbar/ParallaxBodyConfig|null[0]
+    constructor <init>(androidx.compose.ui.unit/Dp) // am.highapps.parallaxtoolbar/ParallaxBodyConfig.<init>|<init>(androidx.compose.ui.unit.Dp){}[0]
+
+    final val minBottomSpacerHeight // am.highapps.parallaxtoolbar/ParallaxBodyConfig.minBottomSpacerHeight|{}minBottomSpacerHeight[0]
+        final fun <get-minBottomSpacerHeight>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxBodyConfig.minBottomSpacerHeight.<get-minBottomSpacerHeight>|<get-minBottomSpacerHeight>(){}[0]
+
+    final fun copy(androidx.compose.ui.unit/Dp = ...): am.highapps.parallaxtoolbar/ParallaxBodyConfig // am.highapps.parallaxtoolbar/ParallaxBodyConfig.copy|copy(androidx.compose.ui.unit.Dp){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxBodyConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/ParallaxBodyConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/ParallaxBodyConfig.toString|toString(){}[0]
+}
+
+final class am.highapps.parallaxtoolbar/ParallaxHeaderConfig { // am.highapps.parallaxtoolbar/ParallaxHeaderConfig|null[0]
+    constructor <init>(am.highapps.parallaxtoolbar/HeaderHeight, androidx.compose.ui.graphics/Brush?, kotlin/Boolean = ..., kotlin/Float = ...) // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.<init>|<init>(am.highapps.parallaxtoolbar.HeaderHeight;androidx.compose.ui.graphics.Brush?;kotlin.Boolean;kotlin.Float){}[0]
+
+    final val gradient // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.gradient|{}gradient[0]
+        final fun <get-gradient>(): androidx.compose.ui.graphics/Brush? // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.gradient.<get-gradient>|<get-gradient>(){}[0]
+    final val height // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.height|{}height[0]
+        final fun <get-height>(): am.highapps.parallaxtoolbar/HeaderHeight // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.height.<get-height>|<get-height>(){}[0]
+    final val isExpandedWhenFirstDisplayed // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.isExpandedWhenFirstDisplayed|{}isExpandedWhenFirstDisplayed[0]
+        final fun <get-isExpandedWhenFirstDisplayed>(): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.isExpandedWhenFirstDisplayed.<get-isExpandedWhenFirstDisplayed>|<get-isExpandedWhenFirstDisplayed>(){}[0]
+    final val parallaxMultiplier // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.parallaxMultiplier|{}parallaxMultiplier[0]
+        final fun <get-parallaxMultiplier>(): kotlin/Float // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.parallaxMultiplier.<get-parallaxMultiplier>|<get-parallaxMultiplier>(){}[0]
+
+    final fun copy(am.highapps.parallaxtoolbar/HeaderHeight = ..., androidx.compose.ui.graphics/Brush? = ..., kotlin/Boolean = ..., kotlin/Float = ...): am.highapps.parallaxtoolbar/ParallaxHeaderConfig // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.copy|copy(am.highapps.parallaxtoolbar.HeaderHeight;androidx.compose.ui.graphics.Brush?;kotlin.Boolean;kotlin.Float){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/ParallaxHeaderConfig.toString|toString(){}[0]
+}
+
+final class am.highapps.parallaxtoolbar/ParallaxTitleConfig { // am.highapps.parallaxtoolbar/ParallaxTitleConfig|null[0]
+    constructor <init>(androidx.compose.ui.unit/Dp, androidx.compose.ui.unit/Dp, androidx.compose.ui.unit/Dp, kotlin/Boolean, kotlin/Boolean, kotlin/Float = ...) // am.highapps.parallaxtoolbar/ParallaxTitleConfig.<init>|<init>(androidx.compose.ui.unit.Dp;androidx.compose.ui.unit.Dp;androidx.compose.ui.unit.Dp;kotlin.Boolean;kotlin.Boolean;kotlin.Float){}[0]
+
+    final val animateSubTitleHiding // am.highapps.parallaxtoolbar/ParallaxTitleConfig.animateSubTitleHiding|{}animateSubTitleHiding[0]
+        final fun <get-animateSubTitleHiding>(): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxTitleConfig.animateSubTitleHiding.<get-animateSubTitleHiding>|<get-animateSubTitleHiding>(){}[0]
+    final val collapsedPaddingStart // am.highapps.parallaxtoolbar/ParallaxTitleConfig.collapsedPaddingStart|{}collapsedPaddingStart[0]
+        final fun <get-collapsedPaddingStart>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxTitleConfig.collapsedPaddingStart.<get-collapsedPaddingStart>|<get-collapsedPaddingStart>(){}[0]
+    final val collapsedScale // am.highapps.parallaxtoolbar/ParallaxTitleConfig.collapsedScale|{}collapsedScale[0]
+        final fun <get-collapsedScale>(): kotlin/Float // am.highapps.parallaxtoolbar/ParallaxTitleConfig.collapsedScale.<get-collapsedScale>|<get-collapsedScale>(){}[0]
+    final val keepSubtitleAfterCollapse // am.highapps.parallaxtoolbar/ParallaxTitleConfig.keepSubtitleAfterCollapse|{}keepSubtitleAfterCollapse[0]
+        final fun <get-keepSubtitleAfterCollapse>(): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxTitleConfig.keepSubtitleAfterCollapse.<get-keepSubtitleAfterCollapse>|<get-keepSubtitleAfterCollapse>(){}[0]
+    final val paddingBottom // am.highapps.parallaxtoolbar/ParallaxTitleConfig.paddingBottom|{}paddingBottom[0]
+        final fun <get-paddingBottom>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxTitleConfig.paddingBottom.<get-paddingBottom>|<get-paddingBottom>(){}[0]
+    final val paddingStart // am.highapps.parallaxtoolbar/ParallaxTitleConfig.paddingStart|{}paddingStart[0]
+        final fun <get-paddingStart>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxTitleConfig.paddingStart.<get-paddingStart>|<get-paddingStart>(){}[0]
+
+    final fun copy(androidx.compose.ui.unit/Dp = ..., androidx.compose.ui.unit/Dp = ..., androidx.compose.ui.unit/Dp = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Float = ...): am.highapps.parallaxtoolbar/ParallaxTitleConfig // am.highapps.parallaxtoolbar/ParallaxTitleConfig.copy|copy(androidx.compose.ui.unit.Dp;androidx.compose.ui.unit.Dp;androidx.compose.ui.unit.Dp;kotlin.Boolean;kotlin.Boolean;kotlin.Float){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxTitleConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/ParallaxTitleConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/ParallaxTitleConfig.toString|toString(){}[0]
+}
+
+final class am.highapps.parallaxtoolbar/ParallaxToolbarConfig { // am.highapps.parallaxtoolbar/ParallaxToolbarConfig|null[0]
+    constructor <init>(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.unit/Dp, androidx.compose.animation.core/AnimationSpec<androidx.compose.ui.graphics/Color>, androidx.compose.ui.unit/Dp = ...) // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.<init>|<init>(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.unit.Dp;androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color>;androidx.compose.ui.unit.Dp){}[0]
+
+    final val animationSpec // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.animationSpec|{}animationSpec[0]
+        final fun <get-animationSpec>(): androidx.compose.animation.core/AnimationSpec<androidx.compose.ui.graphics/Color> // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.animationSpec.<get-animationSpec>|<get-animationSpec>(){}[0]
+    final val elevation // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.elevation|{}elevation[0]
+        final fun <get-elevation>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.elevation.<get-elevation>|<get-elevation>(){}[0]
+    final val height // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.height|{}height[0]
+        final fun <get-height>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.height.<get-height>|<get-height>(){}[0]
+    final val initialColor // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.initialColor|{}initialColor[0]
+        final fun <get-initialColor>(): androidx.compose.ui.graphics/Color // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.initialColor.<get-initialColor>|<get-initialColor>(){}[0]
+    final val targetColor // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.targetColor|{}targetColor[0]
+        final fun <get-targetColor>(): androidx.compose.ui.graphics/Color // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.targetColor.<get-targetColor>|<get-targetColor>(){}[0]
+
+    final fun copy(androidx.compose.ui.graphics/Color = ..., androidx.compose.ui.graphics/Color = ..., androidx.compose.ui.unit/Dp = ..., androidx.compose.animation.core/AnimationSpec<androidx.compose.ui.graphics/Color> = ..., androidx.compose.ui.unit/Dp = ...): am.highapps.parallaxtoolbar/ParallaxToolbarConfig // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.copy|copy(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.unit.Dp;androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color>;androidx.compose.ui.unit.Dp){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/ParallaxToolbarConfig.toString|toString(){}[0]
+}
+
+final class am.highapps.parallaxtoolbar/ParallaxToolbarState { // am.highapps.parallaxtoolbar/ParallaxToolbarState|null[0]
+    final val collapseFraction // am.highapps.parallaxtoolbar/ParallaxToolbarState.collapseFraction|{}collapseFraction[0]
+        final fun <get-collapseFraction>(): kotlin/Float // am.highapps.parallaxtoolbar/ParallaxToolbarState.collapseFraction.<get-collapseFraction>|<get-collapseFraction>(){}[0]
+    final val isCollapsed // am.highapps.parallaxtoolbar/ParallaxToolbarState.isCollapsed|{}isCollapsed[0]
+        final fun <get-isCollapsed>(): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxToolbarState.isCollapsed.<get-isCollapsed>|<get-isCollapsed>(){}[0]
+    final val lazyListState // am.highapps.parallaxtoolbar/ParallaxToolbarState.lazyListState|{}lazyListState[0]
+        final fun <get-lazyListState>(): androidx.compose.foundation.lazy/LazyListState // am.highapps.parallaxtoolbar/ParallaxToolbarState.lazyListState.<get-lazyListState>|<get-lazyListState>(){}[0]
+    final val scrollState // am.highapps.parallaxtoolbar/ParallaxToolbarState.scrollState|{}scrollState[0]
+        final fun <get-scrollState>(): androidx.compose.foundation/ScrollState // am.highapps.parallaxtoolbar/ParallaxToolbarState.scrollState.<get-scrollState>|<get-scrollState>(){}[0]
+
+    final suspend fun collapse(kotlin/Boolean = ...) // am.highapps.parallaxtoolbar/ParallaxToolbarState.collapse|collapse(kotlin.Boolean){}[0]
+    final suspend fun expand(kotlin/Boolean = ...) // am.highapps.parallaxtoolbar/ParallaxToolbarState.expand|expand(kotlin.Boolean){}[0]
+}
+
+sealed class am.highapps.parallaxtoolbar/HeaderHeight { // am.highapps.parallaxtoolbar/HeaderHeight|null[0]
+    final class AspectRatio : am.highapps.parallaxtoolbar/HeaderHeight { // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio|null[0]
+        constructor <init>(kotlin/Float) // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.<init>|<init>(kotlin.Float){}[0]
+
+        final val ratio // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.ratio|{}ratio[0]
+            final fun <get-ratio>(): kotlin/Float // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.ratio.<get-ratio>|<get-ratio>(){}[0]
+
+        final fun component1(): kotlin/Float // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.component1|component1(){}[0]
+        final fun copy(kotlin/Float = ...): am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.copy|copy(kotlin.Float){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/HeaderHeight.AspectRatio.toString|toString(){}[0]
+    }
+
+    final class Fixed : am.highapps.parallaxtoolbar/HeaderHeight { // am.highapps.parallaxtoolbar/HeaderHeight.Fixed|null[0]
+        constructor <init>(androidx.compose.ui.unit/Dp) // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.<init>|<init>(androidx.compose.ui.unit.Dp){}[0]
+
+        final val height // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.height|{}height[0]
+            final fun <get-height>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.height.<get-height>|<get-height>(){}[0]
+
+        final fun component1(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.component1|component1(){}[0]
+        final fun copy(androidx.compose.ui.unit/Dp = ...): am.highapps.parallaxtoolbar/HeaderHeight.Fixed // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.copy|copy(androidx.compose.ui.unit.Dp){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/HeaderHeight.Fixed.toString|toString(){}[0]
+    }
+
+    final class Percentage : am.highapps.parallaxtoolbar/HeaderHeight { // am.highapps.parallaxtoolbar/HeaderHeight.Percentage|null[0]
+        constructor <init>(kotlin/Float) // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.<init>|<init>(kotlin.Float){}[0]
+
+        final val percentage // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.percentage|{}percentage[0]
+            final fun <get-percentage>(): kotlin/Float // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.percentage.<get-percentage>|<get-percentage>(){}[0]
+
+        final fun component1(): kotlin/Float // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.component1|component1(){}[0]
+        final fun copy(kotlin/Float = ...): am.highapps.parallaxtoolbar/HeaderHeight.Percentage // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.copy|copy(kotlin.Float){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/HeaderHeight.Percentage.toString|toString(){}[0]
+    }
+}
+
+sealed class am.highapps.parallaxtoolbar/ParallaxContent { // am.highapps.parallaxtoolbar/ParallaxContent|null[0]
+    final class Lazy : am.highapps.parallaxtoolbar/ParallaxContent { // am.highapps.parallaxtoolbar/ParallaxContent.Lazy|null[0]
+        constructor <init>(kotlin/Function2<androidx.compose.foundation.lazy/LazyListScope, kotlin/Boolean, kotlin/Unit>, am.highapps.parallaxtoolbar/LazyColumnConfig = ..., androidx.compose.foundation.lazy/LazyListState? = ...) // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.<init>|<init>(kotlin.Function2<androidx.compose.foundation.lazy.LazyListScope,kotlin.Boolean,kotlin.Unit>;am.highapps.parallaxtoolbar.LazyColumnConfig;androidx.compose.foundation.lazy.LazyListState?){}[0]
+
+        final val config // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.config|{}config[0]
+            final fun <get-config>(): am.highapps.parallaxtoolbar/LazyColumnConfig // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.config.<get-config>|<get-config>(){}[0]
+        final val content // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.content|{}content[0]
+            final fun <get-content>(): kotlin/Function2<androidx.compose.foundation.lazy/LazyListScope, kotlin/Boolean, kotlin/Unit> // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.content.<get-content>|<get-content>(){}[0]
+        final val lazyListState // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.lazyListState|{}lazyListState[0]
+            final fun <get-lazyListState>(): androidx.compose.foundation.lazy/LazyListState? // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.lazyListState.<get-lazyListState>|<get-lazyListState>(){}[0]
+
+        final fun component1(): kotlin/Function2<androidx.compose.foundation.lazy/LazyListScope, kotlin/Boolean, kotlin/Unit> // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.component1|component1(){}[0]
+        final fun component2(): am.highapps.parallaxtoolbar/LazyColumnConfig // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.component2|component2(){}[0]
+        final fun component3(): androidx.compose.foundation.lazy/LazyListState? // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.component3|component3(){}[0]
+        final fun copy(kotlin/Function2<androidx.compose.foundation.lazy/LazyListScope, kotlin/Boolean, kotlin/Unit> = ..., am.highapps.parallaxtoolbar/LazyColumnConfig = ..., androidx.compose.foundation.lazy/LazyListState? = ...): am.highapps.parallaxtoolbar/ParallaxContent.Lazy // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.copy|copy(kotlin.Function2<androidx.compose.foundation.lazy.LazyListScope,kotlin.Boolean,kotlin.Unit>;am.highapps.parallaxtoolbar.LazyColumnConfig;androidx.compose.foundation.lazy.LazyListState?){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/ParallaxContent.Lazy.toString|toString(){}[0]
+    }
+
+    final class Regular : am.highapps.parallaxtoolbar/ParallaxContent { // am.highapps.parallaxtoolbar/ParallaxContent.Regular|null[0]
+        constructor <init>(kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>) // am.highapps.parallaxtoolbar/ParallaxContent.Regular.<init>|<init>(kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>){}[0]
+
+        final val content // am.highapps.parallaxtoolbar/ParallaxContent.Regular.content|{}content[0]
+            final fun <get-content>(): kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit> // am.highapps.parallaxtoolbar/ParallaxContent.Regular.content.<get-content>|<get-content>(){}[0]
+
+        final fun component1(): kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit> // am.highapps.parallaxtoolbar/ParallaxContent.Regular.component1|component1(){}[0]
+        final fun copy(kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit> = ...): am.highapps.parallaxtoolbar/ParallaxContent.Regular // am.highapps.parallaxtoolbar/ParallaxContent.Regular.copy|copy(kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // am.highapps.parallaxtoolbar/ParallaxContent.Regular.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // am.highapps.parallaxtoolbar/ParallaxContent.Regular.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // am.highapps.parallaxtoolbar/ParallaxContent.Regular.toString|toString(){}[0]
+    }
+}
+
+final object am.highapps.parallaxtoolbar/ParallaxToolbarDefaults { // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults|null[0]
+    final const val HeaderParallaxMultiplier // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.HeaderParallaxMultiplier|{}HeaderParallaxMultiplier[0]
+        final fun <get-HeaderParallaxMultiplier>(): kotlin/Float // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.HeaderParallaxMultiplier.<get-HeaderParallaxMultiplier>|<get-HeaderParallaxMultiplier>(){}[0]
+    final const val TitleCollapsedScale // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitleCollapsedScale|{}TitleCollapsedScale[0]
+        final fun <get-TitleCollapsedScale>(): kotlin/Float // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitleCollapsedScale.<get-TitleCollapsedScale>|<get-TitleCollapsedScale>(){}[0]
+
+    final val BodyMinBottomSpacing // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.BodyMinBottomSpacing|{}BodyMinBottomSpacing[0]
+        final fun <get-BodyMinBottomSpacing>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.BodyMinBottomSpacing.<get-BodyMinBottomSpacing>|<get-BodyMinBottomSpacing>(){}[0]
+    final val HeaderHeightDp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.HeaderHeightDp|{}HeaderHeightDp[0]
+        final fun <get-HeaderHeightDp>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.HeaderHeightDp.<get-HeaderHeightDp>|<get-HeaderHeightDp>(){}[0]
+    final val TitleCollapsedPaddingStart // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitleCollapsedPaddingStart|{}TitleCollapsedPaddingStart[0]
+        final fun <get-TitleCollapsedPaddingStart>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitleCollapsedPaddingStart.<get-TitleCollapsedPaddingStart>|<get-TitleCollapsedPaddingStart>(){}[0]
+    final val TitlePaddingBottom // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitlePaddingBottom|{}TitlePaddingBottom[0]
+        final fun <get-TitlePaddingBottom>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitlePaddingBottom.<get-TitlePaddingBottom>|<get-TitlePaddingBottom>(){}[0]
+    final val TitlePaddingStart // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitlePaddingStart|{}TitlePaddingStart[0]
+        final fun <get-TitlePaddingStart>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.TitlePaddingStart.<get-TitlePaddingStart>|<get-TitlePaddingStart>(){}[0]
+    final val ToolbarHeight // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.ToolbarHeight|{}ToolbarHeight[0]
+        final fun <get-ToolbarHeight>(): androidx.compose.ui.unit/Dp // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.ToolbarHeight.<get-ToolbarHeight>|<get-ToolbarHeight>(){}[0]
+
+    final fun bodyConfig(androidx.compose.ui.unit/Dp, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxBodyConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.bodyConfig|bodyConfig(androidx.compose.ui.unit.Dp;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun headerConfig(am.highapps.parallaxtoolbar/HeaderHeight?, androidx.compose.ui.graphics/Brush?, kotlin/Boolean, kotlin/Float, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxHeaderConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.headerConfig|headerConfig(am.highapps.parallaxtoolbar.HeaderHeight?;androidx.compose.ui.graphics.Brush?;kotlin.Boolean;kotlin.Float;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun headerConfigWithAspectRatio(kotlin/Float, androidx.compose.ui.graphics/Brush?, kotlin/Boolean, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxHeaderConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.headerConfigWithAspectRatio|headerConfigWithAspectRatio(kotlin.Float;androidx.compose.ui.graphics.Brush?;kotlin.Boolean;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun headerConfigWithPercentage(kotlin/Float, androidx.compose.ui.graphics/Brush?, kotlin/Boolean, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxHeaderConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.headerConfigWithPercentage|headerConfigWithPercentage(kotlin.Float;androidx.compose.ui.graphics.Brush?;kotlin.Boolean;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun lazyColumnConfig(androidx.compose.foundation.layout/PaddingValues?, androidx.compose.foundation.layout/Arrangement.Vertical?, androidx.compose.ui/Alignment.Horizontal?, androidx.compose.foundation.gestures/FlingBehavior?, kotlin/Boolean, androidx.compose.foundation/OverscrollEffect?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/LazyColumnConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.lazyColumnConfig|lazyColumnConfig(androidx.compose.foundation.layout.PaddingValues?;androidx.compose.foundation.layout.Arrangement.Vertical?;androidx.compose.ui.Alignment.Horizontal?;androidx.compose.foundation.gestures.FlingBehavior?;kotlin.Boolean;androidx.compose.foundation.OverscrollEffect?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun titleConfig(androidx.compose.ui.unit/Dp, androidx.compose.ui.unit/Dp, androidx.compose.ui.unit/Dp, kotlin/Boolean, kotlin/Boolean, kotlin/Float, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxTitleConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.titleConfig|titleConfig(androidx.compose.ui.unit.Dp;androidx.compose.ui.unit.Dp;androidx.compose.ui.unit.Dp;kotlin.Boolean;kotlin.Boolean;kotlin.Float;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun toolbarConfig(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.unit/Dp, androidx.compose.animation.core/AnimationSpec<androidx.compose.ui.graphics/Color>?, androidx.compose.ui.unit/Dp, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxToolbarConfig // am.highapps.parallaxtoolbar/ParallaxToolbarDefaults.toolbarConfig|toolbarConfig(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.unit.Dp;androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color>?;androidx.compose.ui.unit.Dp;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+}
+
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight$stableprop|#static{}am_highapps_parallaxtoolbar_HeaderHeight$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_AspectRatio$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_AspectRatio$stableprop|#static{}am_highapps_parallaxtoolbar_HeaderHeight_AspectRatio$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Fixed$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Fixed$stableprop|#static{}am_highapps_parallaxtoolbar_HeaderHeight_Fixed$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Percentage$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Percentage$stableprop|#static{}am_highapps_parallaxtoolbar_HeaderHeight_Percentage$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_LazyColumnConfig$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_LazyColumnConfig$stableprop|#static{}am_highapps_parallaxtoolbar_LazyColumnConfig$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodyConfig$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodyConfig$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxBodyConfig$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Lazy$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Lazy$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxBodySpec_Lazy$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Regular$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Regular$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxBodySpec_Regular$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxContent$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Lazy$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Lazy$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxContent_Lazy$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Regular$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Regular$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxContent_Regular$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxHeaderConfig$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxHeaderConfig$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxHeaderConfig$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxTitleConfig$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxTitleConfig$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxTitleConfig$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarConfig$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarConfig$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxToolbarConfig$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarDefaults$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarDefaults$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxToolbarDefaults$stableprop[0]
+final val am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarState$stableprop // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarState$stableprop|#static{}am_highapps_parallaxtoolbar_ParallaxToolbarState$stableprop[0]
+
+final fun am.highapps.parallaxtoolbar/ComposeParallaxToolbarLayout(kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, kotlin/Function2<androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, am.highapps.parallaxtoolbar/ParallaxContent, androidx.compose.ui/Modifier?, androidx.compose.foundation.layout/PaddingValues?, kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>?, kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>?, kotlin/Function4<androidx.compose.foundation.layout/RowScope, kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>?, am.highapps.parallaxtoolbar/ParallaxHeaderConfig?, am.highapps.parallaxtoolbar/ParallaxToolbarConfig?, am.highapps.parallaxtoolbar/ParallaxTitleConfig?, am.highapps.parallaxtoolbar/ParallaxBodyConfig?, am.highapps.parallaxtoolbar/ParallaxToolbarState?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int, kotlin/Int) // am.highapps.parallaxtoolbar/ComposeParallaxToolbarLayout|ComposeParallaxToolbarLayout(kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;kotlin.Function2<androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;am.highapps.parallaxtoolbar.ParallaxContent;androidx.compose.ui.Modifier?;androidx.compose.foundation.layout.PaddingValues?;kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>?;kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>?;kotlin.Function4<androidx.compose.foundation.layout.RowScope,kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>?;am.highapps.parallaxtoolbar.ParallaxHeaderConfig?;am.highapps.parallaxtoolbar.ParallaxToolbarConfig?;am.highapps.parallaxtoolbar.ParallaxTitleConfig?;am.highapps.parallaxtoolbar.ParallaxBodyConfig?;am.highapps.parallaxtoolbar.ParallaxToolbarState?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int;kotlin.Int){}[0]
+final fun am.highapps.parallaxtoolbar/ComposeParallaxToolbarLayout(kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, kotlin/Function2<androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, androidx.compose.ui/Modifier?, androidx.compose.foundation.layout/PaddingValues?, kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>?, kotlin/Function3<kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>?, kotlin/Function4<androidx.compose.foundation.layout/RowScope, kotlin/Boolean, androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>?, am.highapps.parallaxtoolbar/ParallaxHeaderConfig?, am.highapps.parallaxtoolbar/ParallaxToolbarConfig?, am.highapps.parallaxtoolbar/ParallaxTitleConfig?, am.highapps.parallaxtoolbar/ParallaxBodyConfig?, androidx.compose.foundation/ScrollState?, kotlin/Function2<androidx.compose.foundation.lazy/LazyListScope, kotlin/Boolean, kotlin/Unit>?, androidx.compose.foundation.lazy/LazyListState?, am.highapps.parallaxtoolbar/LazyColumnConfig?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int, kotlin/Int) // am.highapps.parallaxtoolbar/ComposeParallaxToolbarLayout|ComposeParallaxToolbarLayout(kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;kotlin.Function2<androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;androidx.compose.ui.Modifier?;androidx.compose.foundation.layout.PaddingValues?;kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>?;kotlin.Function3<kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>?;kotlin.Function4<androidx.compose.foundation.layout.RowScope,kotlin.Boolean,androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>?;am.highapps.parallaxtoolbar.ParallaxHeaderConfig?;am.highapps.parallaxtoolbar.ParallaxToolbarConfig?;am.highapps.parallaxtoolbar.ParallaxTitleConfig?;am.highapps.parallaxtoolbar.ParallaxBodyConfig?;androidx.compose.foundation.ScrollState?;kotlin.Function2<androidx.compose.foundation.lazy.LazyListScope,kotlin.Boolean,kotlin.Unit>?;androidx.compose.foundation.lazy.LazyListState?;am.highapps.parallaxtoolbar.LazyColumnConfig?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int;kotlin.Int){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight$stableprop_getter|am_highapps_parallaxtoolbar_HeaderHeight$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_AspectRatio$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_AspectRatio$stableprop_getter|am_highapps_parallaxtoolbar_HeaderHeight_AspectRatio$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Fixed$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Fixed$stableprop_getter|am_highapps_parallaxtoolbar_HeaderHeight_Fixed$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Percentage$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_HeaderHeight_Percentage$stableprop_getter|am_highapps_parallaxtoolbar_HeaderHeight_Percentage$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_LazyColumnConfig$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_LazyColumnConfig$stableprop_getter|am_highapps_parallaxtoolbar_LazyColumnConfig$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodyConfig$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodyConfig$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxBodyConfig$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Lazy$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Lazy$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxBodySpec_Lazy$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Regular$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxBodySpec_Regular$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxBodySpec_Regular$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxContent$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Lazy$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Lazy$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxContent_Lazy$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Regular$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxContent_Regular$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxContent_Regular$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxHeaderConfig$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxHeaderConfig$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxHeaderConfig$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxTitleConfig$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxTitleConfig$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxTitleConfig$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarConfig$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarConfig$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxToolbarConfig$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarDefaults$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarDefaults$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxToolbarDefaults$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarState$stableprop_getter(): kotlin/Int // am.highapps.parallaxtoolbar/am_highapps_parallaxtoolbar_ParallaxToolbarState$stableprop_getter|am_highapps_parallaxtoolbar_ParallaxToolbarState$stableprop_getter(){}[0]
+final fun am.highapps.parallaxtoolbar/rememberParallaxToolbarState(androidx.compose.foundation/ScrollState?, androidx.compose.foundation.lazy/LazyListState?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): am.highapps.parallaxtoolbar/ParallaxToolbarState // am.highapps.parallaxtoolbar/rememberParallaxToolbarState|rememberParallaxToolbarState(androidx.compose.foundation.ScrollState?;androidx.compose.foundation.lazy.LazyListState?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]

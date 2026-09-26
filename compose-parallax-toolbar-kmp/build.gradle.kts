@@ -7,9 +7,17 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.kover)
+    alias(libs.plugins.dokka)
 }
 
 kotlin {
+    // Every public declaration must say so; nothing leaks into the API by omission.
+    explicitApi()
+
+    // Public API surface is dumped to api/ and checked in CI; run updateAbi after intended changes.
+    @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+    abiValidation()
+
     android {
         namespace = "am.highapps.parallaxtoolbar"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -89,6 +97,17 @@ tasks.register("buildIosFramework") {
     }
 }
 
+dokka {
+    moduleName.set("ComposeParallaxToolbar")
+    dokkaSourceSets.configureEach {
+        sourceLink {
+            localDirectory.set(file("src"))
+            remoteUrl("https://github.com/haykarustamyan/ComposeParallaxToolbar/tree/main/compose-parallax-toolbar-kmp/src")
+            remoteLineSuffix.set("#L")
+        }
+    }
+}
+
 compose.resources {
     // The library ships no Compose resources, so skip generating the Res accessor class.
     generateResClass = never
@@ -113,6 +132,13 @@ kover {
 
 mavenPublishing {
     publishToMavenCentral()
+
+    configure(
+        com.vanniktech.maven.publish.KotlinMultiplatform(
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
+            sourcesJar = true
+        )
+    )
 
     signAllPublications()
 

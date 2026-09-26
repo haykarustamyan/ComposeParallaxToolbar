@@ -18,25 +18,25 @@ import androidx.compose.ui.unit.dp
 /**
  * Default values and factory methods for [ComposeParallaxToolbarLayout].
  */
-object ParallaxToolbarDefaults {
+public object ParallaxToolbarDefaults {
     // Header defaults
-    val HeaderHeightDp: Dp = 450.dp
-    const val HeaderParallaxMultiplier: Float = 0.5f
+    public val HeaderHeightDp: Dp = 450.dp
+    public const val HeaderParallaxMultiplier: Float = 0.5f
 
     // Toolbar defaults
-    val ToolbarHeight: Dp = 64.dp
+    public val ToolbarHeight: Dp = 64.dp
 
     // Title and subtitle defaults
-    val TitlePaddingBottom: Dp = (-16).dp
-    val TitlePaddingStart: Dp = 16.dp
-    val TitleCollapsedPaddingStart: Dp = 64.dp
-    const val TitleCollapsedScale: Float = 1f
+    public val TitlePaddingBottom: Dp = (-16).dp
+    public val TitlePaddingStart: Dp = 16.dp
+    public val TitleCollapsedPaddingStart: Dp = 64.dp
+    public const val TitleCollapsedScale: Float = 1f
 
     // Body defaults
-    val BodyMinBottomSpacing: Dp = 0.dp
+    public val BodyMinBottomSpacing: Dp = 0.dp
 
     @Composable
-    fun headerConfig(
+    public fun headerConfig(
         height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true,
@@ -49,7 +49,7 @@ object ParallaxToolbarDefaults {
     )
 
     @Composable
-    fun headerConfigWithAspectRatio(
+    public fun headerConfigWithAspectRatio(
         aspectRatio: Float = 16f / 9f,
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true
@@ -60,7 +60,7 @@ object ParallaxToolbarDefaults {
     )
 
     @Composable
-    fun headerConfigWithPercentage(
+    public fun headerConfigWithPercentage(
         heightPercentage: Float = 0.4f,
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true
@@ -71,7 +71,7 @@ object ParallaxToolbarDefaults {
     )
 
     @Composable
-    fun toolbarConfig(
+    public fun toolbarConfig(
         initialColor: Color = Color.Transparent,
         targetColor: Color = Color.Black,
         elevation: Dp = 0.dp,
@@ -86,7 +86,7 @@ object ParallaxToolbarDefaults {
     )
 
     @Composable
-    fun titleConfig(
+    public fun titleConfig(
         paddingBottom: Dp = TitlePaddingBottom,
         paddingStart: Dp = TitlePaddingStart,
         collapsedPaddingStart: Dp = TitleCollapsedPaddingStart,
@@ -103,14 +103,14 @@ object ParallaxToolbarDefaults {
     )
 
     @Composable
-    fun bodyConfig(
+    public fun bodyConfig(
         minBottomSpacerHeight: Dp = BodyMinBottomSpacing
     ): ParallaxBodyConfig = ParallaxBodyConfig(
         minBottomSpacerHeight = minBottomSpacerHeight
     )
 
     @Composable
-    fun lazyColumnConfig(
+    public fun lazyColumnConfig(
         contentPadding: PaddingValues = PaddingValues(0.dp),
         verticalArrangement: Arrangement.Vertical = Arrangement.Top,
         horizontalAlignment: Alignment.Horizontal = Alignment.Start,

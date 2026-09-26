@@ -22,7 +22,7 @@ jobs:
         include:
           - target: iosSimulatorArm64Test :sample:compileKotlinIosSimulatorArm64
             os: macos-latest
-          - target: testAndroidHostTest koverVerify :sample-android:assembleDebug
+          - target: testAndroidHostTest koverVerify checkKotlinAbi :sample-android:assembleDebug
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
 

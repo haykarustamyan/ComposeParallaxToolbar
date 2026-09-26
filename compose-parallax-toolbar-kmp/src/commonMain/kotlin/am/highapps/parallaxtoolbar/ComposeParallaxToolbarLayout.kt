@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.dp
  * ```
  */
 @Composable
-fun ComposeParallaxToolbarLayout(
+public fun ComposeParallaxToolbarLayout(
     titleContent: @Composable (Boolean) -> Unit,
     headerContent: @Composable () -> Unit,
     content: ParallaxContent,
@@ -112,7 +112,9 @@ fun ComposeParallaxToolbarLayout(
 }
 
 /**
- * Previous entry point. Prefer the overload taking [ParallaxContent].
+ * The 1.x entry point, kept so existing call sites compile. It wraps [content] or [lazyContent]
+ * into a [ParallaxContent] and [scroll] into a [ParallaxToolbarState], then delegates to the
+ * main overload. It will be removed in 3.0.
  */
 @Deprecated(
     message = "Use the overload that takes ParallaxContent.",
@@ -123,7 +125,7 @@ fun ComposeParallaxToolbarLayout(
     )
 )
 @Composable
-fun ComposeParallaxToolbarLayout(
+public fun ComposeParallaxToolbarLayout(
     titleContent: @Composable (Boolean) -> Unit,
     headerContent: @Composable () -> Unit,
     content: @Composable (Boolean) -> Unit,
