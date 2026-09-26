@@ -1,0 +1,79 @@
+# Platform guide
+
+The library is pure common Compose code. This page covers what differs per host.
+
+## Android
+
+**Edge-to-edge.** The layout reads the status bar inset itself: the header covers the inset, the
+toolbar and body are pushed below it. Call `enableEdgeToEdge()` in your activity and do not add a
+status bar padding of your own around the layout. Status bar icon color is your app's concern;
+switch it when `collapsed` flips if the toolbar colors need it.
+
+**Scaffold.** Pass the padding `Scaffold` gives you as `contentPadding` so the body clears a bottom
+bar or a floating action button. The horizontal and bottom padding is applied to `Regular` and
+merged into the `LazyColumn` for `Lazy`. For `Custom` content apply it inside your scrollable.
+
+```kotlin
+Scaffold(bottomBar = { NavigationBar { /* ... */ } }) { padding ->
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Feed") },
+        headerContent = { HeaderImage() },
+        contentPadding = padding,
+        content = ParallaxContent.Lazy(content = { items(posts) { PostRow(it) } })
+    )
+}
+```
+
+**Previews.** The layout renders in `@Preview`. The sample module keeps a set of previews under
+`sample/src/androidMain`.
+
+## iOS
+
+Add the dependency to your shared module's `commonMain` and build screens there. Expose them to
+Swift through a `ComposeUIViewController`, as with any Compose Multiplatform screen:
+
+```kotlin
+// shared module, iosMain
+fun AlbumViewController(album: Album): UIViewController = ComposeUIViewController { AlbumScreen(album) }
+```
+
+```swift
+struct AlbumView: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController { AlbumViewControllerKt.AlbumViewController(album: album) }
+    func updateUIViewController(_ vc: UIViewController, context: Context) {}
+}
+
+AlbumView().ignoresSafeArea()
+```
+
+Use `ignoresSafeArea()` so the header can extend under the status bar; the layout places the
+toolbar and body below the inset on its own.
+
+**Info.plist.** Compose for iOS refuses to start on high refresh rate iPhones without this key,
+and the failure is a crash on launch:
+
+```xml
+<key>CADisableMinimumFrameDurationOnPhone</key>
+<true/>
+```
+
+**Minimum version.** Kotlin 2.4 targets iOS 15.0. Only arm64 devices and Apple Silicon simulators
+are supported; Compose Multiplatform no longer publishes the Intel simulator target.
+
+## Desktop
+
+Add the dependency to the `jvm` source set or `commonMain`. Mouse wheel scrolling drives the
+header through nested scroll, including expansion when scrolling back up. Dragging the header
+with the mouse works as on touch.
+
+## Web
+
+Add the dependency to the `wasmJs` source set or `commonMain` and mount your screen with
+`ComposeViewport`. Wheel and touch input behave as on desktop and mobile. Resizing the browser
+window restarts the Compose viewport, which is standard Compose for Web behavior.
+
+## Insets and the toolbar height
+
+The status bar inset is read from `WindowInsets.statusBars` on every platform and is zero on
+desktop and web. `toolbarConfig(height = ...)` sets the toolbar height excluding that inset;
+`state.layoutInfo` exposes the resolved values in pixels if you need them.

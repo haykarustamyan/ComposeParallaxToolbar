@@ -1,17 +1,11 @@
-## What's changed
-<!-- Brief description of changes -->
+## What changed and why
 
-## Related Issue
-Fixes #(issue number)
+Fixes #
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Documentation update
-- [ ] Other (please describe)
+## Checklist
 
-## Testing
-<!-- Describe how you tested these changes -->
-
-## Screenshots
-<!-- If applicable --> 
+- [ ] Tests added or updated, and `testAndroidHostTest` and `desktopTest` pass
+- [ ] iOS simulator tests run if scrolling or layout changed
+- [ ] `CHANGELOG.md` updated
+- [ ] Docs updated (`README.md`, `docs/API.md`, `docs/PLATFORMS.md`) if behavior or API changed
+- [ ] ABI dump updated with `updateKotlinAbi` if the public API changed on purpose

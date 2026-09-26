@@ -95,23 +95,6 @@ kotlin {
 }
 
 
-// Add a task to build the iOS framework for easier access
-tasks.register("buildIosFramework") {
-    group = "build"
-    description = "Builds the iOS framework for use in Xcode projects"
-
-    dependsOn(
-        "linkReleaseFrameworkIosArm64",
-        "linkReleaseFrameworkIosSimulatorArm64"
-    )
-
-    doLast {
-        println("iOS frameworks built successfully!")
-        println("You can find the frameworks at:")
-        println("- build/bin/iosArm64/releaseFramework/compose-parallax-toolbar-kmp.framework")
-        println("- build/bin/iosSimulatorArm64/releaseFramework/compose-parallax-toolbar-kmp.framework")
-    }
-}
 
 dokka {
     moduleName.set("ComposeParallaxToolbar")

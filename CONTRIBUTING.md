@@ -1,63 +1,76 @@
-# Contributing to ComposeParallaxToolbar
+# Contributing
 
-Thank you for your interest in contributing! Here's how you can help:
+Thanks for helping. Bug reports, feature requests and pull requests are all welcome.
 
-## Ways to Contribute
+## Reporting
 
-### Reporting Bugs
-- Create an issue with a clear title
-- Describe how to reproduce the bug
-- Include device info and library version
+- **Bugs**: open an issue with the library version, platform, and steps or a snippet that
+  reproduces it. The issue template asks for exactly that.
+- **Features**: open an issue describing the use case before a large change, so we can agree on
+  the API first.
+- **Security**: see [SECURITY.md](SECURITY.md); do not open a public issue.
 
-### Feature Requests
-- Create an issue with "[Feature]" in the title
-- Describe what you need and why it's useful
+## Setup
 
-### Pull Requests
+Requirements: JDK 17 or newer, Android SDK with API 37, and Xcode for the iOS targets.
 
-1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Submit a pull request
+```bash
+git clone https://github.com/haykarustamyan/ComposeParallaxToolbar.git
+cd ComposeParallaxToolbar
+./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest :compose-parallax-toolbar-kmp:desktopTest
+```
 
-## Development Setup
+Modules:
 
-1. Clone the repository
-2. Open in Android Studio or IntelliJ IDEA
-3. Build the project
+| Module | Purpose |
+|---|---|
+| `compose-parallax-toolbar-kmp` | The library |
+| `sample` | Shared playground and sample screens |
+| `sample-android`, `sample-desktop`, `sample-web`, `iosApp` | Hosts for the playground |
 
-## Guidelines
+## Tests
 
-- Follow Kotlin coding conventions
-- Test your changes thoroughly
-- Update documentation if needed
+The Compose UI tests live in `commonTest` and run on three targets. Run what your change touches;
+CI runs all of them.
 
-## Questions?
+```bash
+./gradlew :compose-parallax-toolbar-kmp:testAndroidHostTest        # Robolectric
+./gradlew :compose-parallax-toolbar-kmp:desktopTest                # JVM
+./gradlew :compose-parallax-toolbar-kmp:iosSimulatorArm64Test      # needs a booted simulator
+./gradlew :compose-parallax-toolbar-kmp:koverVerify                # 95% line coverage gate
+```
 
-Please correct any failures before requesting a review.
-Feel free to open an issue for any questions.
+iOS is where platform differences show up, so a change to scrolling or layout should run there
+at least once.
 
-Thank you for your contributions! 
-
-## Public API changes
+## Public API
 
 The library uses explicit API mode and a checked-in ABI dump under
-`compose-parallax-toolbar-kmp/api/`. If a change touches the public surface on purpose, run
+`compose-parallax-toolbar-kmp/api/`. When a change to the public surface is intended:
 
 ```bash
 ./gradlew :compose-parallax-toolbar-kmp:updateKotlinAbi
 ```
 
-and commit the updated dump together with a CHANGELOG entry. CI runs `checkKotlinAbi` and fails on
-any unrecorded change.
+Commit the updated dump with a `CHANGELOG.md` entry. CI runs `checkKotlinAbi` and fails on any
+unrecorded change. Configuration types are plain classes on purpose; when adding a field, append
+it with a default, extend `equals`, `hashCode`, `toString` and `copy`, and keep the previous
+`copy` overload.
+
+## Pull requests
+
+1. Branch from `main`.
+2. Keep the change focused; add or update tests; update the docs that describe the behavior.
+3. Add a line under the unreleased section of `CHANGELOG.md`.
+4. Make sure the tests above pass, then open the pull request. The template lists what to include.
 
 ## Releasing
 
-1. Set the new version in `compose-parallax-toolbar-kmp/build.gradle.kts` and in the README
-   install snippets.
+1. Set the version in `compose-parallax-toolbar-kmp/build.gradle.kts` and the README install snippet.
 2. Add a `## x.y.z` section at the top of `CHANGELOG.md`.
 3. Commit, then push a tag: `git tag vx.y.z && git push origin vx.y.z`.
 
 The Release workflow refuses a tag whose version does not match the build file or has no
-changelog section, publishes to Maven Central, and creates the GitHub release with the changelog
-section as notes. A tag with a suffix, such as `v2.1.0-rc1`, is marked as a pre-release.
+changelog section, publishes to Maven Central, and then creates the GitHub release with that
+changelog section as its notes. A tag with a suffix, such as `v2.1.0-rc1`, is marked as a
+pre-release.

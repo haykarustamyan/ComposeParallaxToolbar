@@ -1,53 +1,39 @@
-# ComposeParallaxToolbar - Compose Multiplatform
+# ComposeParallaxToolbar
 
-[![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://search.maven.org/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
-[![Kotlin](https://img.shields.io/badge/kotlin-v2.4.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-v1.12.1-blue)](https://github.com/JetBrains/compose-multiplatform)
-[![Platform](https://img.shields.io/badge/platform-Android%20|%20iOS%20|%20Desktop%20|%20Web-green.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://central.sonatype.com/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.4.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12.1-blue)](https://github.com/JetBrains/compose-multiplatform)
+[![Platforms](https://img.shields.io/badge/platforms-Android%20|%20iOS%20|%20Desktop%20|%20Web-green.svg)](#compatibility)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A fully customizable Material 3 parallax toolbar layout built with **Compose Multiplatform**. This cross-platform library provides a modern, material design parallax effect for app bars that animate smoothly as users scroll through content, working seamlessly on Android, iOS.
+A collapsing toolbar with a parallax header for Compose Multiplatform. The header collapses as
+the body scrolls, the title glides into the toolbar, and every slot knows how far along it is.
+It depends only on Compose UI and Foundation, so it works with Material 2, Material 3 or your own
+design system, on Android, iOS, desktop and web.
 
-![Parallax Toolbar Animation](https://github.com/haykarustamyan/ComposeParallaxToolbar/raw/main/raw/main/images/parallax_gif.gif)
+![Parallax toolbar animation](https://github.com/haykarustamyan/ComposeParallaxToolbar/raw/main/raw/main/images/parallax_gif.gif)
 
 ## Features
 
-- **Material 3 Integration**: Built with Material 3 components, theming, and color system
-- **Responsive Header Heights**: Configure headers using fixed heights, aspect ratios, or screen percentages for perfect scaling across all devices
-- **Highly Customizable**: Full control over colors, dimensions, animations, and behaviors
-- **Parallax Effect**: Smooth transitions and animations while scrolling
-- **Title & Subtitle**: Animated title and subtitle with customizable transitions
-- **Curved Motion**: Beautiful quadratic Bézier curve animations for title transitions
-- **Cross-Platform**: Full support for Android, iOS with native integration
+- **Any scrollable body.** A column, a `LazyColumn`, or anything else that scrolls: grids,
+  staggered grids, pagers. The header collapses through nested scrolling.
+- **Scroll modes.** Exit until collapsed, enter always, or enter always collapsed with the
+  toolbar sliding away. Optional snap on release.
+- **Header height** as a fixed size, an aspect ratio or a fraction of the screen, with a cap.
+- **Per-element behaviors.** Give any header element its own parallax, fade or scale, and glide
+  elements such as an avatar from the header into the toolbar.
+- **Bottom slot** pinned under the toolbar for tabs or a search field.
+- **Overscroll stretch** with a trigger callback for pull-to-refresh.
+- **Hoisted state** with the collapse fraction, `collapse()` and `expand()`, saved across
+  configuration changes and process death.
+- **Accessibility** built in: state announcements, expand and collapse actions, reading order,
+  and a heading for the title.
+- **Right-to-left** layouts, edge-to-edge insets and the iPhone status bar handled for you.
 
 ## Installation
 
-<details open>
-<summary><b>Compose Multiplatform Projects</b></summary>
-
-For Compose Multiplatform projects, add the dependency to your shared module's `build.gradle.kts`:
-
-```kotlin
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0")
-            }
-        }
-    }
-}
-```
-
-This will make the library available in all your platform-specific source sets (androidMain, iosMain, etc.).
-</details>
-
-<details>
-<summary><b>Android Only Projects</b></summary>
-
-#### Gradle (Kotlin DSL)
-
-Add the dependency to your module's build.gradle.kts file:
+Add the dependency to the source set that holds your screens. In a Compose Multiplatform project
+that is `commonMain`; in an Android-only project it is the app module.
 
 ```kotlin
 dependencies {
@@ -55,738 +41,159 @@ dependencies {
 }
 ```
 
-#### Gradle (Groovy)
+iOS, desktop and web apps consume it through their shared Kotlin module; nothing is imported on
+the Swift or JavaScript side. See the [platform guide](docs/PLATFORMS.md) for the one iOS
+`Info.plist` key Compose needs.
 
-```groovy
-dependencies {
-    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0'
-}
-```
-</details>
-
-<details>
-<summary><b>iOS Installation</b></summary>
-
-### Direct XCFramework Integration
-
-For direct integration:
-
-1. Download the project
-   from [GitHub repository](https://github.com/haykarustamyan/ComposeParallaxToolbar)
-
-2. After downloading, run the following command to build the iOS framework:
-```bash
-./gradlew buildIosFramework
-```
-
-3. Create XCFramework by running:
-```bash
-xcodebuild -create-xcframework \
--framework compose-parallax-toolbar-kmp/build/bin/iosArm64/releaseFramework/compose_parallax_toolbar_kmp.framework \
--framework compose-parallax-toolbar-kmp/build/bin/iosSimulatorArm64/releaseFramework/compose_parallax_toolbar_kmp.framework \
--output compose-parallax-toolbar-kmp.xcframework
-```
-
-4. **Integrate XCFramework with Xcode:**
-   - Open ios folder in Xcode
-   - Add the XCFramework to ios project:
-     - Go to Targets → Project → General → Frameworks, Libraries, and Embedded Content
-     - Click + → Add Other → Add Files
-     - Navigate to generated `compose-parallax-toolbar-kmp.xcframework` and add it
-
-5. Import in your Swift files:
-
-```swift
-import compose_parallax_toolbar_kmp
-```
-</details>
-
-## Basic Usage
-
-Here's a simple example of how to implement the parallax toolbar in your Compose code:
+## Quick start
 
 ```kotlin
 import am.highapps.parallaxtoolbar.ComposeParallaxToolbarLayout
 import am.highapps.parallaxtoolbar.ParallaxContent
 
 @Composable
-fun MyScreen() {
+fun AlbumScreen(album: Album) {
     ComposeParallaxToolbarLayout(
-        titleContent = { isCollapsed ->
+        titleContent = { collapsed ->
             Text(
-                text = "My App",
-                color = if (isCollapsed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                style = if (isCollapsed)
-                    MaterialTheme.typography.titleMedium
-                else
-                    MaterialTheme.typography.headlineMedium
+                album.title,
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineMedium
             )
         },
+        subtitleContent = { Text(album.artist) },
         headerContent = {
-            // Your header image or content
-            Icon(
-                imageVector = Icons.Default.Share,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
+            Image(album.cover, contentDescription = null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         },
-        content = ParallaxContent.Regular { isCollapsed ->
-            // Your main content
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                repeat(10) { index ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "Item ${index + 1}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-            }
-        }
+        navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } },
+        actions = { IconButton(onClick = onShare) { Icon(Icons.Default.Share, null) } },
+        content = ParallaxContent.Lazy(
+            content = { collapsed -> items(album.tracks) { TrackRow(it) } },
+            config = ParallaxToolbarDefaults.lazyColumnConfig(contentPadding = PaddingValues(16.dp))
+        )
     )
 }
 ```
 
-## Platform Integration
-
-<details>
-<summary><b>Android Integration</b></summary>
-
-For Android, you can use the component directly in your Compose UI:
+The Material calls are the app's choice; the library itself has no Material dependency. Every
+slot receives `collapsed` and runs in a `ParallaxToolbarScope`, which also exposes the continuous
+`collapseFraction`. Use `ParallaxContent.Regular` for a scrolling column, or
+`ParallaxContent.Custom` to bring your own scrollable:
 
 ```kotlin
-import am.highapps.parallaxtoolbar.ParallaxContent
-
-@Composable
-fun AndroidScreen() {
-    // Use Material Theme from your Android app
-    MaterialTheme {
-        ComposeParallaxToolbarLayout(
-            titleContent = { isCollapsed ->
-                Text(
-                    text = "Android App",
-                    fontSize = if (isCollapsed) 18.sp else 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) 
-                        MaterialTheme.colorScheme.onSurface 
-                    else 
-                        Color.White
-                )
-            },
-            headerContent = {
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primary)
-                        .fillMaxSize()
-                )
-            },
-            content = ParallaxContent.Regular { isCollapsed ->
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(20) { index ->
-                        ListItem(
-                            headlineContent = { Text("Item $index") },
-                            supportingContent = { Text("Supporting text") }
-                        )
-                    }
-                }
-            }
-        )
-    }
-}
-```
-</details>
-
-<details>
-<summary><b>iOS Integration</b></summary>
-
-### UIKit Integration
-
-```swift
-import UIKit
-import compose_parallax_toolbar_kmp
-
-class MyViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        let composeVC = MyToolbarViewControllerKt.MyToolbarViewController()
-        addChild(composeVC)
-        view.addSubview(composeVC.view)
-        composeVC.view.frame = view.bounds
-        composeVC.didMove(toParent: self)
-    }
+content = ParallaxContent.Custom {
+    LazyVerticalGrid(GridCells.Fixed(2), Modifier.fillMaxSize()) { items(photos) { PhotoCell(it) } }
 }
 ```
 
-### SwiftUI Integration
+## Configuration
 
-```swift
-import SwiftUI
-import compose_parallax_toolbar_kmp
-
-struct ComposeToolbarView: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        return MyToolbarViewControllerKt.MyToolbarViewController()
-    }
-    func updateUIViewController(_ uivc: UIViewController, context: Context) {}
-}
-
-struct ContentView: View {
-    var body: some View {
-        ComposeToolbarView()
-            .ignoresSafeArea(edges: .top)  // Optional: makes the toolbar use full height
-    }
-}
-```
-
-`MyToolbarViewController` is a function you write in your own shared module, as shown below.
-Ready-made examples such as `SimpleParallaxToolbarViewController` and `IOSPhotoGalleryViewController`
-live in the `sample` module of this repository, not in the published library.
-
-### Custom Implementations
-
-To create custom implementations, you need to add your custom composable functions in the **common
-code** (specifically in the iOS part of the multiplatform module), then use them from your iOS
-application.
-
-**Step 1:** Add your custom implementation in the common code (iOS part):
-
-```kotlin
-// Add this in src/iosMain/kotlin (common code - iOS part)
-import am.highapps.parallaxtoolbar.ParallaxContent
-
-fun MyCustomToolbarViewController() = ComposeUIViewController {
-    MaterialTheme {
-        ComposeParallaxToolbarLayout(
-            titleContent = { isCollapsed ->
-                Text(
-                    text = "My Custom Title",
-                    fontSize = if (isCollapsed) 18.sp else 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) 
-                        MaterialTheme.colorScheme.onSurface 
-                    else 
-                        Color.White
-                )
-            },
-            headerContent = {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))
-                            )
-                        )
-                        .fillMaxSize()
-                )
-            },
-            content = ParallaxContent.Lazy(
-                content = { isCollapsed ->
-                    items(50) { index ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = "Custom Item ${index + 1}",
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    }
-                },
-                config = ParallaxToolbarDefaults.lazyColumnConfig(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ),
-                lazyListState = rememberLazyListState()
-            )
-        )
-    }
-}
-```
-
-**Step 2:** After adding your custom implementation, rebuild the framework:
-```bash
-./gradlew buildIosFramework
-```
-
-**Step 3:** Use it in your iOS application:
-```swift
-// In your iOS app
-let customVC = MyCustomToolbarViewControllerKt.MyCustomToolbarViewController()
-```
-
-> **Note:** Custom implementations cannot be created directly in the iOS application code. They must
-> be added to the common multiplatform code (iOS part) and then accessed from the iOS app.
-
-For more details:
-- **[iOS Integration Guide](sample/docs/iOS-README.md)** - Setup and basic usage
-- **[iOS Sample Implementation Guide](sample/docs/iOS-Samples.md)** - Detailed examples
-</details>
-
-<details open>
-<summary><b>Advanced Customization</b></summary>
-
-For more control, use the `ParallaxToolbarDefaults` object to customize various aspects:
-
-```kotlin
-import am.highapps.parallaxtoolbar.ParallaxContent
-import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
-
-// Create customized configurations using factory methods
-// NEW: Responsive header height with aspect ratio
-val headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-    aspectRatio = 16f/9f,  // Responsive widescreen header
-    gradient = Brush.verticalGradient(
-        colors = listOf(
-            Color.Transparent,
-            Color(0x80000000),
-            Color(0xCC000000)
-        ),
-        startY = 300f
-    )
-)
-
-val titleConfig = ParallaxToolbarDefaults.titleConfig(
-    paddingStart = 20.dp,
-    collapsedPaddingStart = 60.dp,
-    keepSubtitleAfterCollapse = true,
-    animateSubTitleHiding = true
-)
-
-val toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
-    initialColor = Color.Transparent,
-    targetColor = MaterialTheme.colorScheme.surface,
-    elevation = 2.dp,
-    animationSpec = tween(durationMillis = 400)
-)
-
-val bodyConfig = ParallaxToolbarDefaults.bodyConfig(
-    minBottomSpacerHeight = 32.dp
-)
-
-ComposeParallaxToolbarLayout(
-    // Required parameters
-    titleContent = { /* ... */ },
-    headerContent = { /* ... */ },
-    content = ParallaxContent.Regular { /* ... */ },
-    
-    // Scaffold integration (important for bottom navigation)
-    contentPadding = paddingValues, // Pass from Scaffold for proper spacing
-    
-    // Optional customizations
-    headerConfig = headerConfig,
-    toolbarConfig = toolbarConfig,
-    titleConfig = titleConfig,
-    bodyConfig = bodyConfig
-)
-```
-
-### LazyColumn Customization
-
-For `ParallaxContent.Lazy`, you can customize the LazyColumn behavior using `LazyColumnConfig`:
-
-```kotlin
-import am.highapps.parallaxtoolbar.ParallaxContent
-import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
-
-// Create a custom LazyColumn configuration
-val lazyConfig = ParallaxToolbarDefaults.lazyColumnConfig(
-    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    userScrollEnabled = true,
-    flingBehavior = null, // Uses default
-    overscrollEffect = null // Uses default
-)
-
-// Example with external LazyListState control
-val lazyListState = rememberLazyListState()
-
-// You can programmatically control scrolling
-LaunchedEffect(someCondition) {
-    lazyListState.animateScrollToItem(index = 10)
-}
-
-ComposeParallaxToolbarLayout(
-    titleContent = { isCollapsed ->
-        Text(
-            text = "Custom LazyList",
-            fontSize = if (isCollapsed) 18.sp else 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-    },
-    headerContent = { /* ... */ },
-    
-    // For Scaffold integration (merges with LazyColumn's own contentPadding)
-    contentPadding = paddingValues, // External padding (e.g., from Scaffold)
-    
-    content = ParallaxContent.Lazy(
-        content = { isCollapsed ->
-            items(100) { index ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    Text(
-                        text = "Item ${index + 1}",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
-        },
-        config = lazyConfig, // Internal LazyColumn padding (16dp) + External padding = Total padding
-        lazyListState = lazyListState // Pass your controlled state
-    )
-)
-```
-</details>
-
-## Documentation
-
-For detailed information on all components, parameters, and configuration options, see the [API Documentation](docs/API.md).
-
-<details>
-<summary><b>Any scrollable as the body</b></summary>
-
-The header collapses through nested scrolling, so the body can be any vertically scrollable
-composable. `ParallaxContent.Regular` and `ParallaxContent.Lazy` are conveniences;
-`ParallaxContent.Custom` takes a grid, a staggered grid, a pager whose pages scroll, or your own
-scrollable. It receives the full width and the height below the collapsed toolbar; fill that size.
+Everything is set through small immutable configs built by `ParallaxToolbarDefaults`:
 
 ```kotlin
 ComposeParallaxToolbarLayout(
-    titleContent = { Text("Gallery") },
-    headerContent = { /* ... */ },
-    content = ParallaxContent.Custom { collapsed ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            items(photos) { PhotoCell(it) }
-        }
-    }
+    // ...slots...
+    headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
+        heightPercentage = 0.4f,
+        maxHeight = 320.dp,
+        scrollMode = ScrollMode.EnterAlways,
+        snapOnRelease = true,
+        stretchEnabled = true
+    ),
+    onStretchTrigger = { viewModel.refresh() },
+    toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = colorScheme.surface, elevation = 3.dp),
+    titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedScale = 0.8f, collapsedAlignment = Alignment.CenterHorizontally),
+    bottomContent = { TabRow(/* ... */) },
+    contentPadding = scaffoldPadding
 )
 ```
 
-Dragging on the header itself collapses it too. Set `headerConfig(snapOnRelease = true)` to settle
-a half-collapsed header to the nearer resting position when a drag or fling ends.
+| Config | What it controls |
+|---|---|
+| `headerConfig` | Height, gradient, initial state, parallax factor, scroll mode, snap, fade, stretch |
+| `toolbarConfig` | Colors and their animation, elevation, height |
+| `titleConfig` | Title and subtitle padding, collapsed scale and alignment, subtitle behavior |
+| `bodyConfig` | Extra space after the content |
+| `semanticsConfig` | Strings announced to screen readers |
 
-`headerConfig(scrollMode = ...)` picks how the header and toolbar react to the body:
+The [API reference](docs/API.md) lists every parameter and default.
 
-| `ScrollMode` | Scrolling up | Scrolling down |
-|---|---|---|
-| `ExitUntilCollapsed` (default) | collapses the header, toolbar stays | expands only once the body is at its top |
-| `EnterAlways` | collapses the header, toolbar stays | expands immediately, wherever the body is |
-| `EnterAlwaysCollapsed` | collapses the header, then the toolbar slides away | the toolbar returns immediately; the header expands at the top |
-
-`state.toolbarExitFraction` reports the toolbar's exit in the last mode.
-
-</details>
-
-<details>
-<summary><b>Per-element behaviors and the overlay slot</b></summary>
-
-Elements inside `headerContent` can declare their own collapse behavior with modifiers from the
-slot scope. Turn off the header-wide effects first so they do not stack:
-
-```kotlin
-headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
-headerContent = {
-    Image(cover, null, Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse())
-    Text("Est. 1998", Modifier.align(Alignment.BottomEnd).scaleOnCollapse(0.6f).fadeOnCollapse())
-}
-```
-
-`headerContent` is drawn under the body, so an element that must stay visible after collapsing,
-such as an avatar that ends up in the toolbar, goes in `overlayContent`, a layer above the body
-and the toolbar. `moveBetween` glides it from an alignment in the header to one in the toolbar:
-
-```kotlin
-overlayContent = {
-    Avatar(
-        Modifier.size(72.dp).moveBetween(
-            expanded = Alignment.BottomStart,
-            collapsed = Alignment.CenterEnd,
-            expandedPadding = PaddingValues(start = 16.dp, bottom = 72.dp),
-            collapsedPadding = PaddingValues(end = 104.dp),
-            collapsedScale = 0.5f
-        )
-    )
-}
-```
-
-`state.layoutInfo` exposes the measured geometry in pixels (width, header and toolbar heights,
-inset, current header offset and bottom edge) for custom overlays.
-
-</details>
-
-<details>
-<summary><b>Bottom slot, stretch and title alignment</b></summary>
-
-- `bottomContent` pins a row under the toolbar, such as tabs or a search field. It rides the
-  header's bottom edge while expanded and stays below the toolbar once collapsed. Give it a
-  background; the body scrolls underneath.
-- `headerConfig(stretchEnabled = true)` lets a pull past the top stretch the header, zooming its
-  content and pushing the body down, then springing back. `onStretchTrigger` fires when the release
-  happens past `stretchTriggerDistance`, which is the usual hook for pull-to-refresh.
-- `titleConfig(collapsedAlignment = Alignment.CenterHorizontally)` centers the collapsed title
-  between the navigation icon and the actions, as iOS does; `Alignment.End` places it before the
-  actions.
-- `HeaderHeight.Percentage(0.4f, maxHeight = 320.dp)` and `HeaderHeight.AspectRatio(16f / 9f,
-  maxHeight = 320.dp)` cap relative heights on tablets and in landscape.
-- `toolbarConfig(alwaysElevated = true)` keeps the shadow while expanded.
-
-</details>
-
-<details>
-<summary><b>Accessibility</b></summary>
-
-Screen readers get a usable component without extra work:
-
-- The layout announces its state and offers the standard expand and collapse actions, so a
-  TalkBack or VoiceOver user can open or close the header without scrolling.
-- Reading order is toolbar, header, bottom slot, overlay, then body, regardless of draw order.
-- The title is marked as a heading.
-- The faded header, and an exited toolbar in `ScrollMode.EnterAlwaysCollapsed`, are hidden from
-  accessibility so nothing invisible is announced.
-
-The announced strings default to English; pass `semanticsConfig = ParallaxToolbarDefaults.semanticsConfig(...)`
-with translated values.
-
-</details>
-
-<details>
-<summary><b>Programmatic control</b></summary>
+## State and effects
 
 ```kotlin
 val state = rememberParallaxToolbarState()
 val scope = rememberCoroutineScope()
 
-ComposeParallaxToolbarLayout(
-    titleContent = { Text("Title") },
-    headerContent = { /* ... */ },
-    content = ParallaxContent.Regular { /* ... */ },
-    state = state
-)
+ComposeParallaxToolbarLayout(/* ... */, state = state)
 
-// Anywhere with access to `state`:
-Text("Collapsed ${(state.collapseFraction * 100).toInt()}%")
+Text("${(state.collapseFraction * 100).toInt()} %")
 Button(onClick = { scope.launch { state.collapse() } }) { Text("Collapse") }
-Button(onClick = { scope.launch { state.expand() } }) { Text("Expand") }
 ```
 
-`state.scrollState` backs regular content and `state.lazyListState` backs lazy content, so
-they can be passed to other scroll-aware components.
-
-Every slot also runs in a `ParallaxToolbarScope`, so it can read `collapseFraction`, `isCollapsed`
-and `state` without capturing anything. Read the fraction in a `graphicsLayer` or `drawBehind`
-block for per-frame effects; that keeps scrolling off the recomposition path:
+Inside any slot the scope offers modifiers for per-element effects, and an `overlayContent` slot
+above everything hosts elements that travel into the toolbar:
 
 ```kotlin
+headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
 headerContent = {
-    Image(
-        painter = painterResource(Res.drawable.cover),
-        contentDescription = null,
-        modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 1f - collapseFraction / 2 }
-    )
+    Image(cover, null, Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse())
+},
+overlayContent = {
+    Avatar(Modifier.size(72.dp).moveBetween(
+        expanded = Alignment.BottomStart, collapsed = Alignment.CenterEnd,
+        expandedPadding = PaddingValues(start = 16.dp, bottom = 72.dp),
+        collapsedPadding = PaddingValues(end = 104.dp), collapsedScale = 0.5f
+    ))
 }
 ```
 
-</details>
+## Documentation
 
-<details>
-<summary><b>Sample app</b></summary>
+- [API reference](docs/API.md): every parameter, config, state member and modifier.
+- [Platform guide](docs/PLATFORMS.md): Android edge-to-edge and `Scaffold`, iOS hosting, desktop, web.
+- [Migrating from 1.x](docs/MIGRATION.md).
+- [Changelog](CHANGELOG.md).
 
-The sample is a Compose Multiplatform playground shared by Android and iOS. The configuration
-sheet opens on launch and can be reopened any time with the **Configure** button at the bottom
-right. Pick a screen at the top of the sheet: `playground` applies every setting below it live
-(content type, header height mode, toolbar colors, elevation, subtitle behavior, navigation icon,
-actions, padding); the other names show the fixed sample screens from the library.
+## Sample app
 
-- `sample` holds the shared playground UI and the fixed sample screens.
-- `sample-android` is the Android host app.
-- `sample-desktop` is the desktop host app.
-- `sample-web` is the browser host (Kotlin/Wasm).
-- `iosApp` is the Xcode host project; it builds the shared framework through Gradle.
+The `sample` module is an interactive playground shared by Android, iOS, desktop and web. Every
+option above is a switch or slider in its configuration sheet, and the library's fixed sample
+screens are one tap away. See [sample/README.md](sample/README.md) for how to run each host.
 
-Android:
+## Compatibility
 
-```bash
-./gradlew :sample-android:installDebug
-```
+| | Tested with |
+|---|---|
+| Kotlin | 2.4.20 |
+| Compose Multiplatform | 1.12.1 |
+| Android | API 24+ |
+| iOS | 15.0+, arm64 devices and Apple Silicon simulators |
+| Desktop | JVM 17+ |
+| Web | Kotlin/Wasm |
 
-Desktop:
+The library depends only on `org.jetbrains.compose.ui:ui` and `org.jetbrains.compose.foundation:foundation`.
 
-```bash
-./gradlew :sample-desktop:run
-```
+## Versioning
 
-Web: build the bundle and serve it from any static server:
+Semantic versioning: breaking changes ship only in a major version. The public API is explicit
+and its dump under `compose-parallax-toolbar-kmp/api/` is checked on every pull request. A
+deprecated API keeps working for at least one minor release, carries a `ReplaceWith`, and is
+removed in the next major. Report bugs through [issues](https://github.com/haykarustamyan/ComposeParallaxToolbar/issues)
+and security concerns as described in [SECURITY.md](SECURITY.md).
 
-```bash
-./gradlew :sample-web:wasmJsBrowserDistribution
-python3 -m http.server 8080 --directory sample-web/build/dist/wasmJs/productionExecutable
-```
+## Contributing
 
-Open `http://localhost:8080`; add `?screen=lazyPadding` to open a fixed sample.
-
-iOS: open `iosApp/iosApp.xcodeproj` in Xcode and run, or from the terminal:
-
-```bash
-xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17' build
-```
-
-A fixed sample screen can be opened instead of the playground. On Android pass an intent extra,
-on iOS set the `SAMPLE_SCREEN` environment variable in the run scheme:
-
-```bash
-adb shell am start -n am.highapps.parallaxtoolbar.sample/.MainActivity --es screen lazyPadding
-```
-
-Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`, `lazySpacing`,
-`lazyScrollControl`, `scaffold`, `aspectRatio`, `percentage`, `square`, `compact`, `ultrawide`.
-
-</details>
-
-<details>
-<summary><b>Compatibility</b></summary>
-
-- **Kotlin**: 2.4.20
-- **Compose Multiplatform**: 1.12.1 (the library depends only on Compose UI and Foundation; use it with Material 2, Material 3 or a custom design system)
-- **Android**: API 24+ (Android 7.0+)
-- **iOS**: 15.0+ on arm64 devices and Apple Silicon simulators (the Intel `iosX64` simulator target was dropped by Compose Multiplatform 1.11 and is no longer published)
-- **Desktop**: JVM 17+ through Compose for Desktop
-- **Web**: Kotlin/Wasm in the browser
-
-</details>
-
-<details>
-<summary><b>API stability and versioning</b></summary>
-
-- **Semantic versioning.** Breaking changes ship only in a major version. Minor versions add
-  API, patch versions fix bugs.
-- **Explicit API.** Everything not marked `public` is internal implementation and may change at
-  any time. The public surface is dumped to `compose-parallax-toolbar-kmp/api/` and checked on
-  every pull request; an unintended change fails CI.
-- **Deprecation.** A deprecated API keeps working for at least one minor release and carries a
-  `ReplaceWith`. It is removed in the next major version.
-- **Supported versions.** Each release states the Kotlin and Compose Multiplatform versions it is
-  built and tested against in the Compatibility section. Older Compose versions may work but are
-  not tested.
-- **Reporting.** Bugs and requests go through GitHub issues; security concerns through
-  [SECURITY.md](SECURITY.md).
-- **Releasing.** Bump the version in `compose-parallax-toolbar-kmp/build.gradle.kts`, add the
-  matching `## x.y.z` section to `CHANGELOG.md`, and push a `vx.y.z` tag. CI verifies, publishes
-  to Maven Central, then creates the GitHub release with that changelog section as its notes.
-
-</details>
-
-<details>
-<summary><b>Best Practices</b></summary>
-
-### Material 3 Integration
-
-- Use Material 3 typography and color schemes
-- Adapt your UI using the `isCollapsed` parameter
-- Leverage Material 3 components like `TopAppBar`
-
-### Performance Optimization
-
-- Use `ParallaxContent.Lazy` for large lists to ensure optimal performance
-- Avoid heavy computations in recomposing content
-- Use `remember` and `derivedStateOf` for scroll-based calculations
-- Optimize images for mobile rendering
-- Keep header content lightweight to maintain smooth scrolling
-
-### Multiplatform Considerations
-
-- Use platform-agnostic libraries for image loading
-- Handle differences in status bar behavior
-- Test across screen sizes for responsive layouts
-- Choose appropriate content type based on your data size
-
-</details>
-
-<details>
-<summary><b>Troubleshooting</b></summary>
-
-### Common Issues
-
-#### Android
-
-- Ensure you're using a compatible Material 3 theme
-- Use proper insets handling to avoid system UI overlaps
-- Make sure you're using the correct content type (`ParallaxContent.Regular` for regular scrollable content, `ParallaxContent.Lazy` for LazyColumn)
-
-#### iOS
-
-- "No such module" errors: check framework linkage and make sure the framework is properly embedded
-- Memory issues: maintain strong references to view controllers
-- Custom implementations must be added to the common multiplatform code (iOS part), not directly in iOS app code
-
-</details>
-
-<details>
-<summary><b>Changelog</b></summary>
-
-See [CHANGELOG.md](CHANGELOG.md).
-
-</details>
-
-## Contribution
-
-Contributions are welcome! Check out the [Contributing Guidelines](CONTRIBUTING.md) for more information.
+See [CONTRIBUTING.md](CONTRIBUTING.md). The project follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Acknowledgments
 
-This library was inspired by and based mainly on the excellent article [Collapsing toolbar with parallax effect and curve motion in Jetpack Compose](https://proandroiddev.com/collapsing-toolbar-with-parallax-effect-and-curve-motion-in-jetpack-compose-9ed1c3c0393f) by Morad Azzouzi.
+The original motion was inspired by Morad Azzouzi's article
+[Collapsing toolbar with parallax effect and curve motion in Jetpack Compose](https://proandroiddev.com/collapsing-toolbar-with-parallax-effect-and-curve-motion-in-jetpack-compose-9ed1c3c0393f).
 
-## Author & Support
+## Author
 
-This project was created by [Hayk Arustamyan](https://github.com/haykarustamyan).
-
-⭐ If you find this library helpful, consider giving it a star on GitHub!
-
-If this project helps you reduce time to develop, you can give me a cup of coffee :)
-
-[![Ko-Fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/haykarustamyan)
+Created by [Hayk Arustamyan](https://github.com/haykarustamyan). If the library saves you time,
+a star on GitHub or a [coffee](https://ko-fi.com/haykarustamyan) is appreciated.
 
 ## License
 
-```
-MIT License
-
-Copyright (c) 2025 Hayk Arustamyan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+[MIT](LICENSE)

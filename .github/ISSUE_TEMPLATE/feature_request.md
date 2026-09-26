@@ -1,16 +1,17 @@
 ---
 name: Feature request
-about: Suggest an idea
-title: '[FEATURE] '
+about: Suggest a capability or an API change
+title: ''
 labels: enhancement
 assignees: ''
 ---
 
-## What do you need?
-Describe the feature you'd like to have.
+## The use case
 
-## Why is it useful?
-Explain why this would be valuable.
+What are you building, and what does the library not let you do today?
 
-## Screenshots or Examples
-(If applicable) 
+## Proposed API or behavior
+
+If you have one. A sketch of the call site is ideal.
+
+## Alternatives you considered

@@ -1,21 +1,29 @@
 ---
 name: Bug report
-about: Report a bug in the library
-title: '[BUG] '
+about: Something does not work as documented
+title: ''
 labels: bug
 assignees: ''
 ---
 
-## Bug Description
-What happened?
+## What happened
 
-## How to Reproduce
-1. 
-2. 
+## What you expected
 
-## Device Info
-- Library version: 
-- Device/OS: 
+## How to reproduce
 
-## Screenshots
-(If applicable) 
+A minimal snippet or the steps in the sample app:
+
+```kotlin
+```
+
+## Environment
+
+- Library version:
+- Platform and OS version (Android / iOS / desktop / web):
+- Compose Multiplatform and Kotlin versions:
+- Content type (`Regular`, `Lazy`, `Custom`) and scroll mode:
+
+## Screenshots or recording
+
+(if applicable)
