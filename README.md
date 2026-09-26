@@ -470,7 +470,7 @@ For detailed information on all components, parameters, and configuration option
 - **Kotlin**: 2.4.20
 - **Compose Multiplatform**: 1.12.1 (Material 3 1.9.0)
 - **Android**: API 24+ (Android 7.0+)
-- **iOS**: arm64 devices and Apple Silicon simulators (the Intel `iosX64` simulator target was dropped by Compose Multiplatform 1.11 and is no longer published)
+- **iOS**: 15.0+ on arm64 devices and Apple Silicon simulators (the Intel `iosX64` simulator target was dropped by Compose Multiplatform 1.11 and is no longer published)
 
 </details>
 

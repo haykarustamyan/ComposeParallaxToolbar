@@ -51,6 +51,11 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling)
         }
+        // Compose UI tests run on the iOS simulator; the Android host test has no UI runtime.
+        iosTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.compose.ui.test)
+        }
     }
 }
 

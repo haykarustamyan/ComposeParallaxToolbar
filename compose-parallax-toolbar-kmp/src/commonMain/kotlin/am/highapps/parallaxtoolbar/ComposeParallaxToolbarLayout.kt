@@ -414,7 +414,7 @@ fun ComposeParallaxToolbarLayout(
         }
 
         val isCollapsed =
-            remember(scroll.value, lazyListState.firstVisibleItemScrollOffset, collapseRange) {
+            remember(scroll.value, lazyListState.firstVisibleItemIndex, lazyListState.firstVisibleItemScrollOffset, collapseRange) {
                 derivedStateOf {
                     if (lazyContent != null) {
                         val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
@@ -425,7 +425,7 @@ fun ComposeParallaxToolbarLayout(
                         } else {
                             collapseRange.toInt() + firstVisibleItemScrollOffset
                         }
-                        totalScrollOffset > collapseRange
+                        totalScrollOffset >= collapseRange
                     } else {
                         scroll.value > collapseRange
                     }
@@ -653,7 +653,7 @@ private fun LazyBody(
             } else {
                 collapseRange.toInt() + firstVisibleItemScrollOffset
             }
-            totalScrollOffset > collapseRange
+            totalScrollOffset >= collapseRange
         }
     }
 
@@ -714,6 +714,7 @@ private fun Toolbar(
 
     val isToolbarVisible by remember(
         scroll.value,
+        lazyListState?.firstVisibleItemIndex,
         lazyListState?.firstVisibleItemScrollOffset,
         toolbarBottom
     ) {
@@ -779,7 +780,7 @@ private fun TitleWithSubtitle(
         remember(headerHeightPx, toolbarHeightPx) { headerHeightPx - toolbarHeightPx }
 
     val collapseFraction =
-        remember(scroll.value, lazyListState?.firstVisibleItemScrollOffset, collapseRange) {
+        remember(scroll.value, lazyListState?.firstVisibleItemIndex, lazyListState?.firstVisibleItemScrollOffset, collapseRange) {
             if (lazyListState != null) {
                 val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
                 val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
@@ -795,7 +796,7 @@ private fun TitleWithSubtitle(
         }
 
     val isCollapsed =
-        remember(scroll.value, lazyListState?.firstVisibleItemScrollOffset, collapseRange) {
+        remember(scroll.value, lazyListState?.firstVisibleItemIndex, lazyListState?.firstVisibleItemScrollOffset, collapseRange) {
             if (lazyListState != null) {
                 val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
                 val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
@@ -804,7 +805,7 @@ private fun TitleWithSubtitle(
                 } else {
                     collapseRange.toInt() + firstVisibleItemScrollOffset
                 }
-                totalScrollOffset > collapseRange
+                totalScrollOffset >= collapseRange
             } else {
                 scroll.value > collapseRange
             }
