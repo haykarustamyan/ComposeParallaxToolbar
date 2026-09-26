@@ -219,7 +219,7 @@ class MyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let composeVC = IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
+        let composeVC = MyToolbarViewControllerKt.MyToolbarViewController()
         addChild(composeVC)
         view.addSubview(composeVC.view)
         composeVC.view.frame = view.bounds
@@ -236,7 +236,7 @@ import compose_parallax_toolbar_kmp
 
 struct ComposeToolbarView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        return IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
+        return MyToolbarViewControllerKt.MyToolbarViewController()
     }
     func updateUIViewController(_ uivc: UIViewController, context: Context) {}
 }
@@ -249,15 +249,9 @@ struct ContentView: View {
 }
 ```
 
-iOS Sample View Controllers:
-- `SimpleParallaxToolbarViewController()` - Basic implementation with regular content
-- `LazyParallaxToolbarViewController()` - LazyColumn content example
-- `LazyWithPaddingViewController()` - Custom padding configuration
-- `LazyWithSpacingViewController()` - Custom spacing and arrangement
-- `LazyWithScrollControlViewController()` - Custom scroll behavior
-- `IOSSettingsStyleViewController()` - iOS Settings app style with grouped sections
-- `IOSPhotoGalleryViewController()` - iOS Photos app style with grid layout
-- `AllSamplesViewController()` - Container with all samples
+`MyToolbarViewController` is a function you write in your own shared module, as shown below.
+Ready-made examples such as `SimpleParallaxToolbarViewController` and `IOSPhotoGalleryViewController`
+live in the `sample` module of this repository, not in the published library.
 
 ### Custom Implementations
 
@@ -330,15 +324,15 @@ fun MyCustomToolbarViewController() = ComposeUIViewController {
 **Step 3:** Use it in your iOS application:
 ```swift
 // In your iOS app
-let customVC = IosParallaxToolbarSampleKt.MyCustomToolbarViewController()
+let customVC = MyCustomToolbarViewControllerKt.MyCustomToolbarViewController()
 ```
 
 > **Note:** Custom implementations cannot be created directly in the iOS application code. They must
 > be added to the common multiplatform code (iOS part) and then accessed from the iOS app.
 
 For more details:
-- **[iOS Integration Guide](compose-parallax-toolbar-kmp/iOS-README.md)** - Setup and basic usage
-- **[iOS Sample Implementation Guide](compose-parallax-toolbar-kmp/src/iosMain/kotlin/am/highapps/parallaxtoolbar/iOS-Samples.md)** - Detailed examples
+- **[iOS Integration Guide](sample/docs/iOS-README.md)** - Setup and basic usage
+- **[iOS Sample Implementation Guide](sample/docs/iOS-Samples.md)** - Detailed examples
 </details>
 
 <details open>
@@ -566,6 +560,8 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 - **CHANGED**: Migrated to the `com.android.kotlin.multiplatform.library` plugin required by AGP 9
 - **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
 - **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
+- **REMOVED**: sample screens, previews and iOS sample view controllers from the published artifact; they now live in the `sample` module. The library no longer depends on `material-icons-extended`.
+- **CHANGED**: configuration classes are annotated `@Immutable` so the layout skips recomposition when its inputs are unchanged
 - **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
 - **FIXED**: A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title
 - **NEW**: Compose Multiplatform sample playground with Android and iOS host apps

@@ -37,6 +37,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -174,6 +175,7 @@ object ParallaxToolbarDefaults {
 /**
  * Represents different ways to specify header height
  */
+@Immutable
 sealed class HeaderHeight {
     /**
      * Fixed height in Dp
@@ -194,14 +196,17 @@ sealed class HeaderHeight {
 }
 
 /**
- * Data classes for type-safe parameters
+ * Configuration holders. They are immutable so the layout can skip recomposition when the parent
+ * recomposes with the same values.
  */
+@Immutable
 data class ParallaxHeaderConfig(
     val height: HeaderHeight,
     val gradient: Brush?,
     val isExpandedWhenFirstDisplayed: Boolean = true
 )
 
+@Immutable
 data class ParallaxToolbarConfig(
     val initialColor: Color,
     val targetColor: Color,
@@ -211,6 +216,7 @@ data class ParallaxToolbarConfig(
     val animationSpec: AnimationSpec<Color>
 )
 
+@Immutable
 data class ParallaxTitleConfig(
     val paddingBottom: Dp,
     val paddingStart: Dp,
@@ -219,10 +225,12 @@ data class ParallaxTitleConfig(
     val animateSubTitleHiding: Boolean
 )
 
+@Immutable
 data class ParallaxBodyConfig(
     val minBottomSpacerHeight: Dp
 )
 
+@Immutable
 data class LazyColumnConfig(
     val contentPadding: PaddingValues = PaddingValues(0.dp),
     val verticalArrangement: Arrangement.Vertical = Arrangement.Top,

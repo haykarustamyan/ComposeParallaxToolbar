@@ -584,7 +584,7 @@ The library provides several ready-to-use UIViewController implementations for i
 ### View Controller Factories
 
 ```kotlin
-// In the IosParallaxToolbarSample.kt file
+// In your shared module, e.g. MyToolbarViewController.kt
 
 // Basic Examples
 fun SimpleParallaxToolbarViewController(): UIViewController
@@ -616,7 +616,7 @@ class MyViewController: UIViewController {
         super.viewDidLoad()
 
         // Create a Compose view controller with the toolbar
-        let composeVC = IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
+        let composeVC = MyToolbarViewControllerKt.MyToolbarViewController()
 
         // Add it to your view hierarchy
         addChild(composeVC)
@@ -635,7 +635,7 @@ import compose_parallax_toolbar_kmp
 
 struct ComposeParallaxToolbarView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        return IosParallaxToolbarSampleKt.SimpleParallaxToolbarViewController()
+        return MyToolbarViewControllerKt.MyToolbarViewController()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {

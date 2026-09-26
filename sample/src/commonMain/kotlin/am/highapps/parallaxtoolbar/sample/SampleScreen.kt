@@ -1,18 +1,5 @@
 package am.highapps.parallaxtoolbar.sample
 
-import am.highapps.parallaxtoolbar.AspectRatioHeaderSample
-import am.highapps.parallaxtoolbar.CompactHeaderSample
-import am.highapps.parallaxtoolbar.LazyParallaxToolbarCenteredScreen
-import am.highapps.parallaxtoolbar.LazyParallaxToolbarReversedScreen
-import am.highapps.parallaxtoolbar.LazyParallaxToolbarScreen
-import am.highapps.parallaxtoolbar.LazyParallaxToolbarWithPaddingScreen
-import am.highapps.parallaxtoolbar.LazyParallaxToolbarWithScrollControlScreen
-import am.highapps.parallaxtoolbar.LazyParallaxToolbarWithSpacingScreen
-import am.highapps.parallaxtoolbar.ParallaxToolbarInScaffoldScreen
-import am.highapps.parallaxtoolbar.PercentageHeaderSample
-import am.highapps.parallaxtoolbar.SimpleParallaxToolbarScreen
-import am.highapps.parallaxtoolbar.SquareHeaderSample
-import am.highapps.parallaxtoolbar.UltrawideHeaderSample
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 

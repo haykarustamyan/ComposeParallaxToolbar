@@ -1,4 +1,6 @@
-package am.highapps.parallaxtoolbar
+package am.highapps.parallaxtoolbar.sample
+
+import am.highapps.parallaxtoolbar.*
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

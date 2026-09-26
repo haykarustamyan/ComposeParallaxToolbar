@@ -1,4 +1,6 @@
-package am.highapps.parallaxtoolbar
+package am.highapps.parallaxtoolbar.sample
+
+import am.highapps.parallaxtoolbar.*
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background

@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,9 +46,7 @@ class ComposeParallaxToolbarLayoutTest : UiTestBase() {
                 titleContent = { Title(it) },
                 headerContent = { Header() },
                 navigationIcon = {
-                    IconButton(onClick = {}, modifier = Modifier.testTag("nav")) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
-                    }
+                    IconButton(onClick = {}, modifier = Modifier.testTag("nav")) { Text("<") }
                 },
                 content = ParallaxContent.Regular { _ ->
                     Column(Modifier.testTag("body")) {
@@ -175,7 +170,7 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 subtitleContent = { Text(if (it) "sub-collapsed" else "sub-expanded") },
                 navigationIcon = {
-                    IconButton(onClick = {}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back") }
+                    IconButton(onClick = {}) { Text("<") }
                 },
                 actions = { Text("action") },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
