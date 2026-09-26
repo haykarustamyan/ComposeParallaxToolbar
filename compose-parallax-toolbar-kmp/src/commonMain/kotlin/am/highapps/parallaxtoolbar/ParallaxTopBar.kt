@@ -45,10 +45,11 @@ internal fun ParallaxTopBar(
     headerHeight: Dp,
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
-    navigationIcon: (@Composable (Boolean) -> Unit)?,
-    actions: (@Composable RowScope.(Boolean) -> Unit)?,
-    titleContent: @Composable (Boolean) -> Unit,
-    subtitleContent: (@Composable (Boolean) -> Unit)?,
+    scope: ParallaxToolbarScope,
+    navigationIcon: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
+    actions: (@Composable ParallaxActionsScope.(Boolean) -> Unit)?,
+    titleContent: @Composable ParallaxToolbarScope.(Boolean) -> Unit,
+    subtitleContent: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     val backgroundColor by animateColorAsState(
@@ -65,14 +66,16 @@ internal fun ParallaxTopBar(
             .drawBehind { drawRect(backgroundColor) },
         content = {
             if (navigationIcon != null) {
-                Box(Modifier.layoutId(NavigationSlot)) { navigationIcon(isCollapsed) }
+                Box(Modifier.layoutId(NavigationSlot)) { scope.navigationIcon(isCollapsed) }
             }
             if (actions != null) {
-                Row(Modifier.layoutId(ActionsSlot)) { actions(isCollapsed) }
+                Row(Modifier.layoutId(ActionsSlot)) {
+                    ParallaxActionsScopeImpl(scope, this).actions(isCollapsed)
+                }
             }
-            Box(Modifier.layoutId(TitleSlot)) { titleContent(isCollapsed) }
+            Box(Modifier.layoutId(TitleSlot)) { scope.titleContent(isCollapsed) }
             if (subtitleContent != null) {
-                Box(Modifier.layoutId(SubtitleSlot)) { subtitleContent(isCollapsed) }
+                Box(Modifier.layoutId(SubtitleSlot)) { scope.subtitleContent(isCollapsed) }
             }
         }
     ) { measurables, constraints ->

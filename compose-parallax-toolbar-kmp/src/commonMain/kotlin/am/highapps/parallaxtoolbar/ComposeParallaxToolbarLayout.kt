@@ -74,14 +74,14 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 public fun ComposeParallaxToolbarLayout(
-    titleContent: @Composable (Boolean) -> Unit,
-    headerContent: @Composable () -> Unit,
+    titleContent: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit,
+    headerContent: @Composable ParallaxToolbarScope.() -> Unit,
     content: ParallaxContent,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    subtitleContent: (@Composable (Boolean) -> Unit)? = null,
-    navigationIcon: (@Composable (Boolean) -> Unit)? = null,
-    actions: (@Composable RowScope.(Boolean) -> Unit)? = null,
+    subtitleContent: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
+    navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
+    actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
     headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
@@ -158,14 +158,14 @@ public fun ComposeParallaxToolbarLayout(
 )
 @Composable
 public fun ComposeParallaxToolbarLayout(
-    titleContent: @Composable (Boolean) -> Unit,
-    headerContent: @Composable () -> Unit,
-    content: @Composable (Boolean) -> Unit,
+    titleContent: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit,
+    headerContent: @Composable ParallaxToolbarScope.() -> Unit,
+    content: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    subtitleContent: (@Composable (Boolean) -> Unit)? = null,
-    navigationIcon: (@Composable (Boolean) -> Unit)? = null,
-    actions: (@Composable RowScope.(Boolean) -> Unit)? = null,
+    subtitleContent: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
+    navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
+    actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
     headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
@@ -199,7 +199,7 @@ public fun ComposeParallaxToolbarLayout(
 /** Resolved body: which scroll source drives the collapse and how to render the content. */
 private sealed class ParallaxBodySpec {
     class Regular(
-        val content: @Composable (Boolean) -> Unit
+        val content: @Composable ParallaxToolbarScope.(Boolean) -> Unit
     ) : ParallaxBodySpec()
 
     class Lazy(
@@ -209,19 +209,19 @@ private sealed class ParallaxBodySpec {
     ) : ParallaxBodySpec()
 
     class Custom(
-        val content: @Composable (Boolean) -> Unit
+        val content: @Composable ParallaxToolbarScope.(Boolean) -> Unit
     ) : ParallaxBodySpec()
 }
 
 @Composable
 private fun ParallaxToolbarLayoutImpl(
-    titleContent: @Composable (Boolean) -> Unit,
-    headerContent: @Composable () -> Unit,
+    titleContent: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit,
+    headerContent: @Composable ParallaxToolbarScope.() -> Unit,
     modifier: Modifier,
     contentPadding: PaddingValues,
-    subtitleContent: (@Composable (Boolean) -> Unit)?,
-    navigationIcon: (@Composable (Boolean) -> Unit)?,
-    actions: (@Composable RowScope.(Boolean) -> Unit)?,
+    subtitleContent: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
+    navigationIcon: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
+    actions: (@Composable ParallaxActionsScope.(Boolean) -> Unit)?,
     headerConfig: ParallaxHeaderConfig,
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
@@ -234,6 +234,7 @@ private fun ParallaxToolbarLayoutImpl(
     val toolbarHeight = toolbarConfig.height
     val headerState = state.headerState
     val isCollapsed by remember(headerState) { derivedStateOf { headerState.isCollapsed } }
+    val scope = remember(state) { ParallaxToolbarScopeImpl(state) }
 
     // The first composition honors the config; later ones keep the saved fraction.
     var appliedInitialState by rememberSaveable { mutableStateOf(false) }
@@ -284,7 +285,7 @@ private fun ParallaxToolbarLayoutImpl(
                     initialColor = toolbarConfig.initialColor,
                     targetColor = toolbarConfig.targetColor,
                     modifier = Modifier.layoutId(HeaderSlot).fillMaxWidth().height(headerHeight + topInset),
-                    content = headerContent
+                    content = { scope.headerContent() }
                 )
 
                 val bodyModifier = Modifier.layoutId(BodySlot)
@@ -293,7 +294,7 @@ private fun ParallaxToolbarLayoutImpl(
                         scroll = state.scrollState,
                         contentPadding = contentPadding.withExtraBottom(bodyConfig.minBottomSpacerHeight),
                         modifier = bodyModifier,
-                        content = { body.content(isCollapsed) }
+                        content = { body.content(scope, isCollapsed) }
                     )
 
                     is ParallaxBodySpec.Lazy -> ParallaxLazyBody(
@@ -304,7 +305,7 @@ private fun ParallaxToolbarLayoutImpl(
                         lazyContent = { body.content(this, isCollapsed) }
                     )
 
-                    is ParallaxBodySpec.Custom -> Box(bodyModifier) { body.content(isCollapsed) }
+                    is ParallaxBodySpec.Custom -> Box(bodyModifier) { body.content(scope, isCollapsed) }
                 }
 
                 ParallaxTopBar(
@@ -314,6 +315,7 @@ private fun ParallaxToolbarLayoutImpl(
                     headerHeight = headerHeight,
                     toolbarConfig = toolbarConfig,
                     titleConfig = titleConfig,
+                    scope = scope,
                     navigationIcon = navigationIcon,
                     actions = actions,
                     titleContent = titleContent,

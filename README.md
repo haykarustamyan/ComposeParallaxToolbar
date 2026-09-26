@@ -512,6 +512,20 @@ Button(onClick = { scope.launch { state.expand() } }) { Text("Expand") }
 `state.scrollState` backs regular content and `state.lazyListState` backs lazy content, so
 they can be passed to other scroll-aware components.
 
+Every slot also runs in a `ParallaxToolbarScope`, so it can read `collapseFraction`, `isCollapsed`
+and `state` without capturing anything. Read the fraction in a `graphicsLayer` or `drawBehind`
+block for per-frame effects; that keeps scrolling off the recomposition path:
+
+```kotlin
+headerContent = {
+    Image(
+        painter = painterResource(Res.drawable.cover),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 1f - collapseFraction / 2 }
+    )
+}
+```
+
 </details>
 
 <details>

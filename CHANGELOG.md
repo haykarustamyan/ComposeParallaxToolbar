@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## 2.0.0
 
 - **NEW**: the header collapses through nested scrolling. Any vertically scrollable composable can be the body via `ParallaxContent.Custom`, including `LazyVerticalGrid`, `LazyVerticalStaggeredGrid` and pagers. Dragging on the header itself collapses it.
+- **NEW**: every slot runs in a `ParallaxToolbarScope` exposing `collapseFraction`, `isCollapsed` and `state`; the `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
 - **NEW**: `snapOnRelease` on the header config settles a half-collapsed header to the nearer end.
 - **NEW**: desktop (JVM) and web (Kotlin/Wasm) targets, plus a desktop sample app.
 - **NEW**: the collapse fraction is saved and restored across configuration changes and process death.

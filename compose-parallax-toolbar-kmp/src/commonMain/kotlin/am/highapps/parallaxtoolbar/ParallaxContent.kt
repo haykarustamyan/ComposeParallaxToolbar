@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
  */
 public sealed class ParallaxContent {
     /** Regular content laid out in a `Column` with vertical scroll. */
-    public data class Regular(val content: @Composable (Boolean) -> Unit) : ParallaxContent()
+    public data class Regular(val content: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit) : ParallaxContent()
 
     /**
      * Content laid out in a `LazyColumn`, for long lists.
@@ -35,5 +35,5 @@ public sealed class ParallaxContent {
      * collapsed toolbar; it should fill that size and scroll vertically so nested scroll events
      * reach the header. `contentPadding` passed to the layout is not applied; apply it inside.
      */
-    public data class Custom(val content: @Composable (Boolean) -> Unit) : ParallaxContent()
+    public data class Custom(val content: @Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit) : ParallaxContent()
 }

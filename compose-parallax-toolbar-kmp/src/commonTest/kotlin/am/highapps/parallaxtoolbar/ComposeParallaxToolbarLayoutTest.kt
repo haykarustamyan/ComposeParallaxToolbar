@@ -680,3 +680,45 @@ class ComposeParallaxToolbarSnapTest : UiTestBase() {
         kotlin.test.assertEquals(1f, state.collapseFraction)
     }
 }
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarScopeTest : UiTestBase() {
+
+    @Test
+    fun slots_receiveCollapseFraction_throughTheScope() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var headerFraction = -1f
+        var actionsFraction = -1f
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { collapsed -> Text("title ${(collapseFraction * 100).toInt()} $collapsed") },
+                headerContent = {
+                    headerFraction = collapseFraction
+                    Box(Modifier.fillMaxSize().background(Color.Blue))
+                },
+                subtitleContent = { Text("sub $isCollapsed") },
+                navigationIcon = { Text(if (collapseFraction > 0.5f) ">" else "<") },
+                actions = {
+                    actionsFraction = collapseFraction
+                    Text("a")
+                },
+                content = ParallaxContent.Regular { Column { Text("body ${state.isCollapsed}") } },
+                state = state
+            )
+        }
+        onNodeWithText("title 0 false").assertIsDisplayed()
+        onNodeWithText("sub false").assertIsDisplayed()
+        onNodeWithText("body false").assertIsDisplayed()
+        kotlin.test.assertEquals(0f, headerFraction)
+        kotlin.test.assertEquals(0f, actionsFraction)
+
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        onNodeWithText("title 100 true").assertIsDisplayed()
+        onNodeWithText("sub true").assertIsDisplayed()
+        onNodeWithText(">").assertIsDisplayed()
+        kotlin.test.assertEquals(1f, headerFraction)
+        kotlin.test.assertEquals(1f, actionsFraction)
+    }
+}

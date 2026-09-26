@@ -58,6 +58,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -184,10 +185,17 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
             }
         } else null,
         headerContent = {
+            // The slot scope exposes collapseFraction; reading it in graphicsLayer keeps the
+            // effect on the draw path so scrolling never recomposes the header.
             Box(
-                Modifier.fillMaxSize().background(
-                    Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))
-                )
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        val zoom = 1f + 0.15f * collapseFraction
+                        scaleX = zoom
+                        scaleY = zoom
+                    }
+                    .background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC))))
             )
         },
         navigationIcon = if (config.navigationIcon) {

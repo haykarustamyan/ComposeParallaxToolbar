@@ -3,6 +3,18 @@
 This document provides detailed API documentation for the ComposeParallaxToolbar Compose
 Multiplatform library. It covers the main composable, configuration classes, and utilities.
 
+## ParallaxToolbarScope
+
+Receiver of every content slot (`titleContent`, `subtitleContent`, `headerContent`, `navigationIcon`, `actions`, and the body lambdas).
+
+| Member | Description |
+|---|---|
+| `collapseFraction: Float` | 0f while expanded, 1f once collapsed |
+| `isCollapsed: Boolean` | Whether the toolbar is collapsed |
+| `state: ParallaxToolbarState` | The layout's state |
+
+`actions` receives a `ParallaxActionsScope`, which is also a `RowScope`.
+
 ## ParallaxToolbarState
 
 Hoisted state returned by `rememberParallaxToolbarState()` and passed to the `state` parameter.
