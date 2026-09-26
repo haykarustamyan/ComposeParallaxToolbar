@@ -33,6 +33,11 @@ import androidx.compose.ui.unit.dp
  * @param fadeOnCollapse Fade the whole header out as it collapses. Turn off, together with a
  *   `parallaxMultiplier` of 0f, when header elements use the per-element modifiers of
  *   [ParallaxToolbarScope] instead.
+ * @param stretchEnabled Let a downward drag past the top stretch the header, which zooms its
+ *   content and pushes the body down, then springs back on release. Pair with the layout's
+ *   `onStretchTrigger` for pull-to-refresh.
+ * @param stretchTriggerDistance How far the header must be stretched when released for
+ *   `onStretchTrigger` to fire.
  */
 @Immutable
 public class ParallaxHeaderConfig(
@@ -42,7 +47,9 @@ public class ParallaxHeaderConfig(
     public val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier,
     public val snapOnRelease: Boolean = false,
     public val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
-    public val fadeOnCollapse: Boolean = true
+    public val fadeOnCollapse: Boolean = true,
+    public val stretchEnabled: Boolean = false,
+    public val stretchTriggerDistance: Dp = ParallaxToolbarDefaults.StretchTriggerDistance
 ) {
     public fun copy(
         height: HeaderHeight = this.height,
@@ -51,9 +58,12 @@ public class ParallaxHeaderConfig(
         parallaxMultiplier: Float = this.parallaxMultiplier,
         snapOnRelease: Boolean = this.snapOnRelease,
         scrollMode: ScrollMode = this.scrollMode,
-        fadeOnCollapse: Boolean = this.fadeOnCollapse
+        fadeOnCollapse: Boolean = this.fadeOnCollapse,
+        stretchEnabled: Boolean = this.stretchEnabled,
+        stretchTriggerDistance: Dp = this.stretchTriggerDistance
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease, scrollMode, fadeOnCollapse
+        height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease, scrollMode,
+        fadeOnCollapse, stretchEnabled, stretchTriggerDistance
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxHeaderConfig &&
@@ -63,7 +73,9 @@ public class ParallaxHeaderConfig(
             parallaxMultiplier == other.parallaxMultiplier &&
             snapOnRelease == other.snapOnRelease &&
             scrollMode == other.scrollMode &&
-            fadeOnCollapse == other.fadeOnCollapse
+            fadeOnCollapse == other.fadeOnCollapse &&
+            stretchEnabled == other.stretchEnabled &&
+            stretchTriggerDistance == other.stretchTriggerDistance
 
     override fun hashCode(): Int {
         var result = height.hashCode()
@@ -73,19 +85,23 @@ public class ParallaxHeaderConfig(
         result = 31 * result + snapOnRelease.hashCode()
         result = 31 * result + scrollMode.hashCode()
         result = 31 * result + fadeOnCollapse.hashCode()
+        result = 31 * result + stretchEnabled.hashCode()
+        result = 31 * result + stretchTriggerDistance.hashCode()
         return result
     }
 
     override fun toString(): String = "ParallaxHeaderConfig(height=$height, gradient=$gradient, " +
             "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, " +
             "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease, " +
-            "scrollMode=$scrollMode, fadeOnCollapse=$fadeOnCollapse)"
+            "scrollMode=$scrollMode, fadeOnCollapse=$fadeOnCollapse, " +
+            "stretchEnabled=$stretchEnabled, stretchTriggerDistance=$stretchTriggerDistance)"
 }
 
 /**
  * Toolbar colors, elevation and height.
  *
  * @param height Height of the pinned toolbar, excluding the status bar inset.
+ * @param alwaysElevated Draw the shadow while expanded too, instead of only once collapsed.
  */
 @Immutable
 public class ParallaxToolbarConfig(
@@ -93,22 +109,25 @@ public class ParallaxToolbarConfig(
     public val targetColor: Color,
     public val elevation: Dp,
     public val animationSpec: AnimationSpec<Color>,
-    public val height: Dp = ParallaxToolbarDefaults.ToolbarHeight
+    public val height: Dp = ParallaxToolbarDefaults.ToolbarHeight,
+    public val alwaysElevated: Boolean = false
 ) {
     public fun copy(
         initialColor: Color = this.initialColor,
         targetColor: Color = this.targetColor,
         elevation: Dp = this.elevation,
         animationSpec: AnimationSpec<Color> = this.animationSpec,
-        height: Dp = this.height
-    ): ParallaxToolbarConfig = ParallaxToolbarConfig(initialColor, targetColor, elevation, animationSpec, height)
+        height: Dp = this.height,
+        alwaysElevated: Boolean = this.alwaysElevated
+    ): ParallaxToolbarConfig = ParallaxToolbarConfig(initialColor, targetColor, elevation, animationSpec, height, alwaysElevated)
 
     override fun equals(other: Any?): Boolean = other is ParallaxToolbarConfig &&
             initialColor == other.initialColor &&
             targetColor == other.targetColor &&
             elevation == other.elevation &&
             animationSpec == other.animationSpec &&
-            height == other.height
+            height == other.height &&
+            alwaysElevated == other.alwaysElevated
 
     override fun hashCode(): Int {
         var result = initialColor.hashCode()
@@ -116,11 +135,13 @@ public class ParallaxToolbarConfig(
         result = 31 * result + elevation.hashCode()
         result = 31 * result + animationSpec.hashCode()
         result = 31 * result + height.hashCode()
+        result = 31 * result + alwaysElevated.hashCode()
         return result
     }
 
     override fun toString(): String = "ParallaxToolbarConfig(initialColor=$initialColor, " +
-            "targetColor=$targetColor, elevation=$elevation, animationSpec=$animationSpec, height=$height)"
+            "targetColor=$targetColor, elevation=$elevation, animationSpec=$animationSpec, " +
+            "height=$height, alwaysElevated=$alwaysElevated)"
 }
 
 /**
@@ -128,6 +149,10 @@ public class ParallaxToolbarConfig(
  *
  * @param collapsedScale Scale of the title block once collapsed, e.g. 0.8f to shrink it into the
  *   toolbar. It scales about its start edge.
+ * @param collapsedAlignment Where the collapsed title sits in the space between the navigation
+ *   icon and the actions: [Alignment.Start] next to the navigation icon at
+ *   [collapsedPaddingStart], [Alignment.CenterHorizontally] centered as on iOS, or
+ *   [Alignment.End] before the actions.
  */
 @Immutable
 public class ParallaxTitleConfig(
@@ -136,7 +161,8 @@ public class ParallaxTitleConfig(
     public val collapsedPaddingStart: Dp,
     public val keepSubtitleAfterCollapse: Boolean,
     public val animateSubTitleHiding: Boolean,
-    public val collapsedScale: Float = ParallaxToolbarDefaults.TitleCollapsedScale
+    public val collapsedScale: Float = ParallaxToolbarDefaults.TitleCollapsedScale,
+    public val collapsedAlignment: Alignment.Horizontal = Alignment.Start
 ) {
     public fun copy(
         paddingBottom: Dp = this.paddingBottom,
@@ -144,10 +170,11 @@ public class ParallaxTitleConfig(
         collapsedPaddingStart: Dp = this.collapsedPaddingStart,
         keepSubtitleAfterCollapse: Boolean = this.keepSubtitleAfterCollapse,
         animateSubTitleHiding: Boolean = this.animateSubTitleHiding,
-        collapsedScale: Float = this.collapsedScale
+        collapsedScale: Float = this.collapsedScale,
+        collapsedAlignment: Alignment.Horizontal = this.collapsedAlignment
     ): ParallaxTitleConfig = ParallaxTitleConfig(
         paddingBottom, paddingStart, collapsedPaddingStart,
-        keepSubtitleAfterCollapse, animateSubTitleHiding, collapsedScale
+        keepSubtitleAfterCollapse, animateSubTitleHiding, collapsedScale, collapsedAlignment
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxTitleConfig &&
@@ -156,7 +183,8 @@ public class ParallaxTitleConfig(
             collapsedPaddingStart == other.collapsedPaddingStart &&
             keepSubtitleAfterCollapse == other.keepSubtitleAfterCollapse &&
             animateSubTitleHiding == other.animateSubTitleHiding &&
-            collapsedScale == other.collapsedScale
+            collapsedScale == other.collapsedScale &&
+            collapsedAlignment == other.collapsedAlignment
 
     override fun hashCode(): Int {
         var result = paddingBottom.hashCode()
@@ -165,13 +193,15 @@ public class ParallaxTitleConfig(
         result = 31 * result + keepSubtitleAfterCollapse.hashCode()
         result = 31 * result + animateSubTitleHiding.hashCode()
         result = 31 * result + collapsedScale.hashCode()
+        result = 31 * result + collapsedAlignment.hashCode()
         return result
     }
 
     override fun toString(): String = "ParallaxTitleConfig(paddingBottom=$paddingBottom, " +
             "paddingStart=$paddingStart, collapsedPaddingStart=$collapsedPaddingStart, " +
             "keepSubtitleAfterCollapse=$keepSubtitleAfterCollapse, " +
-            "animateSubTitleHiding=$animateSubTitleHiding, collapsedScale=$collapsedScale)"
+            "animateSubTitleHiding=$animateSubTitleHiding, collapsedScale=$collapsedScale, " +
+            "collapsedAlignment=$collapsedAlignment)"
 }
 
 /** Body spacing. */

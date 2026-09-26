@@ -46,6 +46,19 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     /** Scroll distance, in px, for the toolbar to leave the screen. 0 unless the mode exits. */
     var exitRangePx: Float by mutableFloatStateOf(0f)
 
+    /** How far the header may stretch past its expanded height, in px. 0 disables stretching. */
+    var stretchMaxPx: Float by mutableFloatStateOf(0f)
+
+    /** Current stretch past the expanded height, in px. Only non-zero while fully expanded. */
+    var stretchPx: Float by mutableFloatStateOf(0f)
+        private set
+
+    /** Distance a released stretch must reach to fire [onStretchTrigger]. */
+    var stretchTriggerPx: Float = 0f
+
+    /** Called on release once a stretch reached [stretchTriggerPx]. */
+    var onStretchTrigger: (() -> Unit)? = null
+
     val offsetPx: Float
         get() = fraction * collapseRangePx
 
@@ -61,21 +74,72 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     private val mutex = MutatorMutex()
 
     /** Consumes [delta] into the header, then the exit. Returns the amount actually consumed. */
-    override fun dispatchRawDelta(delta: Float): Float = dispatch(delta, allowHeaderExpand = true)
+    override fun dispatchRawDelta(delta: Float): Float = dispatch(delta, allowHeaderExpand = true, allowStretch = true)
 
     /** Like [dispatchRawDelta] but never expands the header; used while the body is not at its top. */
-    fun dispatchExitOnly(delta: Float): Float = dispatch(delta, allowHeaderExpand = false)
+    fun dispatchExitOnly(delta: Float): Float = dispatch(delta, allowHeaderExpand = false, allowStretch = false)
 
-    private fun dispatch(delta: Float, allowHeaderExpand: Boolean): Float {
+    /**
+     * Consumes [delta] with stretching gated by [allowStretch]. Stretch must follow the finger
+     * only: flings and platform overscroll bounces also arrive as nested scroll and would
+     * otherwise keep pulling after release.
+     */
+    fun dispatchRawDelta(delta: Float, allowStretch: Boolean): Float =
+        dispatch(delta, allowHeaderExpand = true, allowStretch = allowStretch)
+
+    private fun dispatch(delta: Float, allowHeaderExpand: Boolean, allowStretch: Boolean): Float {
         var remaining = delta
         if (remaining > 0f) {
+            remaining -= moveStretch(remaining)
             remaining -= moveCollapse(remaining)
             remaining -= moveExit(remaining)
         } else if (remaining < 0f) {
             remaining -= moveExit(remaining)
-            if (allowHeaderExpand) remaining -= moveCollapse(remaining)
+            if (allowHeaderExpand) {
+                remaining -= moveCollapse(remaining)
+                if (allowStretch) remaining -= moveStretch(remaining)
+            }
         }
         return delta - remaining
+    }
+
+    /** Stretch consumes with resistance: it moves by half the delta but reports it all consumed. */
+    private fun moveStretch(delta: Float): Float {
+        if (stretchMaxPx <= 0f) return 0f
+        if (delta < 0f && (fraction > 0f || exitFraction > 0f)) return 0f
+        val before = stretchPx
+        if (delta > 0f && before <= 0f) return 0f
+        val resistance = if (delta < 0f) ParallaxToolbarDefaults.StretchResistance else 1f
+        val after = (before - delta * resistance).coerceIn(0f, stretchMaxPx)
+        stretchPx = after
+        val moved = before - after
+        return if (delta < 0f) moved / resistance else moved
+    }
+
+    /** Springs a stretch back and fires the trigger when it was pulled far enough. */
+    suspend fun releaseStretch() {
+        val start = stretchPx
+        if (start <= 0f) return
+        val triggered = stretchTriggerPx > 0f && start >= stretchTriggerPx
+        scroll {
+            animate(initialValue = start, targetValue = 0f, animationSpec = spring()) { value, _ ->
+                stretchPx = value
+            }
+            stretchPx = 0f
+        }
+        if (triggered) onStretchTrigger?.invoke()
+    }
+
+    /** Same as [releaseStretch] from inside a running scroll scope. */
+    suspend fun releaseStretchIn() {
+        val start = stretchPx
+        if (start <= 0f) return
+        val triggered = stretchTriggerPx > 0f && start >= stretchTriggerPx
+        animate(initialValue = start, targetValue = 0f, animationSpec = spring()) { value, _ ->
+            stretchPx = value
+        }
+        stretchPx = 0f
+        if (triggered) onStretchTrigger?.invoke()
     }
 
     private fun moveCollapse(delta: Float): Float {
@@ -110,8 +174,8 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     override var isScrollInProgress: Boolean by mutableStateOf(false)
         private set
 
-    override val canScrollForward: Boolean get() = fraction < 1f || (exitRangePx > 0f && exitFraction < 1f)
-    override val canScrollBackward: Boolean get() = fraction > 0f || exitFraction > 0f
+    override val canScrollForward: Boolean get() = stretchPx > 0f || fraction < 1f || (exitRangePx > 0f && exitFraction < 1f)
+    override val canScrollBackward: Boolean get() = fraction > 0f || exitFraction > 0f || (stretchMaxPx > 0f && stretchPx < stretchMaxPx)
 
     /** Animates the header to [target] and brings the toolbar back. Jumps before the layout has measured. */
     suspend fun animateFractionTo(target: Float, animationSpec: AnimationSpec<Float> = spring()) {
@@ -185,13 +249,14 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     fun connection(mode: ScrollMode, snapOnRelease: Boolean): NestedScrollConnection = object : NestedScrollConnection {
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
             val delta = -available.y
+            val fromFinger = source == NestedScrollSource.UserInput
             val consumed = when {
                 // Scrolling up: the header (and then the toolbar) leaves before the body scrolls.
                 delta > 0f -> dispatchRawDelta(delta)
                 // Scrolling down: EnterAlways expands right away; EnterAlwaysCollapsed only brings
                 // the toolbar back; ExitUntilCollapsed waits for the body to reach its top.
                 delta < 0f -> when (mode) {
-                    ScrollMode.EnterAlways -> dispatchRawDelta(delta)
+                    ScrollMode.EnterAlways -> dispatchRawDelta(delta, allowStretch = fromFinger)
                     ScrollMode.EnterAlwaysCollapsed -> dispatchExitOnly(delta)
                     ScrollMode.ExitUntilCollapsed -> 0f
                 }
@@ -204,11 +269,12 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
             // Lazy lists leave sub-pixel remainders from rounding even while they can still scroll.
             // Only a real leftover means the body is at its top and the header should expand.
             if (available.y < PostScrollThresholdPx) return Offset.Zero
-            val used = dispatchRawDelta(-available.y)
+            val used = dispatchRawDelta(-available.y, allowStretch = source == NestedScrollSource.UserInput)
             return Offset(0f, -used)
         }
 
         override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+            releaseStretch()
             if (snapOnRelease) settle(velocityPx = -available.y)
             return Velocity.Zero
         }

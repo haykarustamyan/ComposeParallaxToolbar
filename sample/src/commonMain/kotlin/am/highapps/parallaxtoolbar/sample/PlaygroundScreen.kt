@@ -67,6 +67,9 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 enum class ContentKind { Regular, Lazy, Grid }
+enum class TitleAlign(val alignment: Alignment.Horizontal) {
+    Start(Alignment.Start), Center(Alignment.CenterHorizontally), End(Alignment.End)
+}
 enum class HeaderKind { Fixed, AspectRatio, Percentage }
 enum class ToolbarColor(val color: Color) {
     Black(Color.Black), Indigo(Color(0xFF3F51B5)), White(Color.White)
@@ -85,6 +88,10 @@ data class PlaygroundConfig(
     val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
     val fadeHeader: Boolean = true,
     val overlayAvatar: Boolean = false,
+    val stretch: Boolean = false,
+    val bottomTabs: Boolean = false,
+    val titleAlignment: TitleAlign = TitleAlign.Start,
+    val alwaysElevated: Boolean = false,
     val toolbarColor: ToolbarColor = ToolbarColor.Black,
     val elevation: Float = 0f,
     val subtitle: Boolean = true,
@@ -164,6 +171,7 @@ fun PlaygroundScreen() = PlaygroundHost("playground")
 
 @Composable
 private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
+    var refreshCount by remember { mutableStateOf(0) }
     val headerHeight = when (config.headerKind) {
         HeaderKind.Fixed -> HeaderHeight.Fixed(config.fixedHeightDp.dp)
         HeaderKind.AspectRatio -> HeaderHeight.AspectRatio(config.aspectRatio)
@@ -183,7 +191,7 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         subtitleContent = if (config.subtitle) {
             { collapsed ->
                 Text(
-                    text = "${config.content} · ${config.headerKind}",
+                    text = "${config.content} · ${config.headerKind}" + if (refreshCount > 0) " · refreshed $refreshCount×" else "",
                     color = if (collapsed) onToolbar.copy(alpha = 0.7f) else Color.White.copy(alpha = 0.85f),
                     fontSize = 14.sp
                 )
@@ -230,8 +238,22 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
             parallaxMultiplier = config.parallaxMultiplier,
             snapOnRelease = config.snapOnRelease,
             scrollMode = config.scrollMode,
-            fadeOnCollapse = config.fadeHeader
+            fadeOnCollapse = config.fadeHeader,
+            stretchEnabled = config.stretch
         ),
+        onStretchTrigger = { refreshCount++ },
+        bottomContent = if (config.bottomTabs) {
+            {
+                Row(
+                    Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    listOf("Posts", "Photos", "About").forEachIndexed { i, tab ->
+                        Text(tab, fontWeight = if (i == 0) FontWeight.Bold else FontWeight.Normal)
+                    }
+                }
+            }
+        } else null,
         overlayContent = if (config.overlayAvatar) {
             {
                 // Travels from the header's bottom-start into the toolbar's end, shrinking on the way.
@@ -252,13 +274,15 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
             targetColor = config.toolbarColor.color,
             elevation = config.elevation.dp,
-            height = config.toolbarHeight.dp
+            height = config.toolbarHeight.dp,
+            alwaysElevated = config.alwaysElevated
         ),
         titleConfig = ParallaxToolbarDefaults.titleConfig(
             collapsedPaddingStart = config.collapsedTitlePaddingStart.dp,
             keepSubtitleAfterCollapse = config.keepSubtitleAfterCollapse,
             animateSubTitleHiding = config.animateSubtitleHiding,
-            collapsedScale = config.collapsedTitleScale
+            collapsedScale = config.collapsedTitleScale,
+            collapsedAlignment = config.titleAlignment.alignment
         ),
         state = state,
         bodyConfig = ParallaxToolbarDefaults.bodyConfig(minBottomSpacerHeight = config.minBottomSpacer.dp),
@@ -359,6 +383,8 @@ private fun ConfigSheet(
         SwitchRow("Gradient overlay", config.gradient) { onChange(config.copy(gradient = it)) }
         SwitchRow("Fade header on collapse", config.fadeHeader) { onChange(config.copy(fadeHeader = it)) }
         SwitchRow("Overlay avatar (moveBetween)", config.overlayAvatar) { onChange(config.copy(overlayAvatar = it)) }
+        SwitchRow("Stretch on overscroll (pull to refresh)", config.stretch) { onChange(config.copy(stretch = it)) }
+        SwitchRow("Bottom tabs slot", config.bottomTabs) { onChange(config.copy(bottomTabs = it)) }
         SwitchRow("Start expanded", config.startExpanded) { onChange(config.copy(startExpanded = it)) }
         SwitchRow("Snap on release", config.snapOnRelease) { onChange(config.copy(snapOnRelease = it)) }
 
@@ -379,10 +405,12 @@ private fun ConfigSheet(
         SliderRow("Toolbar height: ${config.toolbarHeight.toInt()} dp", config.toolbarHeight, 48f..96f) {
             onChange(config.copy(toolbarHeight = it))
         }
+        SwitchRow("Always elevated", config.alwaysElevated) { onChange(config.copy(alwaysElevated = it)) }
         SwitchRow("Navigation icon", config.navigationIcon) { onChange(config.copy(navigationIcon = it)) }
         SwitchRow("Actions", config.actions) { onChange(config.copy(actions = it)) }
 
         Section("Title")
+        Choice(TitleAlign.entries, config.titleAlignment) { onChange(config.copy(titleAlignment = it)) }
         SliderRow("Collapsed start padding: ${config.collapsedTitlePaddingStart.toInt()} dp", config.collapsedTitlePaddingStart, 16f..96f) {
             onChange(config.copy(collapsedTitlePaddingStart = it))
         }

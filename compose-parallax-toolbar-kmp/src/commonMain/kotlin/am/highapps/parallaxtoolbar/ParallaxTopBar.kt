@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
@@ -56,8 +57,11 @@ internal fun ParallaxTopBar(
         targetValue = if (isCollapsed) toolbarConfig.targetColor else toolbarConfig.initialColor,
         animationSpec = toolbarConfig.animationSpec
     )
-    // A shadow under a transparent bar would draw a band across the header, so it follows collapse.
-    val elevation by animateDpAsState(targetValue = if (isCollapsed) toolbarConfig.elevation else 0.dp)
+    // A shadow under a transparent bar would draw a band across the header, so it follows
+    // collapse unless the caller asks for it always.
+    val elevation by animateDpAsState(
+        targetValue = if (isCollapsed || toolbarConfig.alwaysElevated) toolbarConfig.elevation else 0.dp
+    )
 
     Layout(
         modifier = modifier
@@ -94,8 +98,6 @@ internal fun ParallaxTopBar(
         // Title geometry in dp-derived px. Expanded values describe the block's top-left in the
         // header; collapsed values describe it in the bar. The block is placed collapsed.
         val paddingStart = titleConfig.paddingStart.toPx()
-        val collapsedPaddingStart =
-            if (navigation != null) titleConfig.collapsedPaddingStart.toPx() else paddingStart
         val titleMaxWidth = (width - navigationWidth - actionsWidth).coerceAtLeast(0)
         val titleConstraints = Constraints(maxWidth = titleMaxWidth)
         val title = measurables.first { it.layoutId == TitleSlot }.measure(titleConstraints)
@@ -104,6 +106,17 @@ internal fun ParallaxTopBar(
         val blockHeight = title.height + subtitleHeight
         val collapsedScale = titleConfig.collapsedScale
         val keepSubtitle = titleConfig.keepSubtitleAfterCollapse
+        // Collapsed start edge in LTR coordinates: next to the navigation icon, centered between
+        // the slots, or before the actions, per the configured alignment.
+        val isRtl = layoutDirection == LayoutDirection.Rtl
+        val scaledTitleWidth = title.width * collapsedScale
+        val startSlot = if (isRtl) actionsWidth else navigationWidth
+        val endSlot = if (isRtl) navigationWidth else actionsWidth
+        val collapsedPaddingStart = when (titleConfig.collapsedAlignment) {
+            Alignment.CenterHorizontally -> startSlot + ((width - startSlot - endSlot) - scaledTitleWidth) / 2f
+            Alignment.End -> width - endSlot - paddingStart - scaledTitleWidth
+            else -> if (navigation != null) titleConfig.collapsedPaddingStart.toPx() else paddingStart
+        }
 
         // Expanded: the block sits above the header's bottom edge, offset by paddingBottom. The
         // subtitle height counts twice here on purpose; it preserves the placement of 1.x.
@@ -113,8 +126,6 @@ internal fun ParallaxTopBar(
         // toolbar at its collapsed scale. The scale origin is the block's top-start corner.
         val centeredHeight = (if (keepSubtitle) blockHeight else title.height) * collapsedScale
         val collapsedTop = insetPx + (toolbarPx - centeredHeight) / 2f
-        val isRtl = layoutDirection == LayoutDirection.Rtl
-        val direction = if (isRtl) -1f else 1f
 
         layout(width, barHeight) {
             navigation?.let {
@@ -126,9 +137,12 @@ internal fun ParallaxTopBar(
                 it.placeRelative(x, insetPx + (toolbarPx - it.height) / 2)
             }
 
+            // Center and End alignments already account for the scaled width, so the layer scales
+            // about the start edge that placement chose; Start keeps the 1.x geometry.
             val collapsedX = if (isRtl) width - collapsedPaddingStart - title.width else collapsedPaddingStart
             val titleX = collapsedX.roundToInt()
             val titleY = collapsedTop.roundToInt()
+            val expandedStart = if (isRtl) width - paddingStart - title.width else paddingStart
 
             title.placeWithLayer(titleX, titleY) {
                 val fraction = headerState.fraction
@@ -136,8 +150,8 @@ internal fun ParallaxTopBar(
                 transformOrigin = TransformOrigin(if (isRtl) 1f else 0f, 0f)
                 scaleX = scale
                 scaleY = scale
-                translationX = direction * (paddingStart - collapsedPaddingStart) * (1f - fraction)
-                translationY = (expandedTop - collapsedTop) * (1f - fraction)
+                translationX = (expandedStart - collapsedX) * (1f - fraction)
+                translationY = (expandedTop - collapsedTop) * (1f - fraction) + headerState.stretchPx
             }
 
             subtitle?.placeWithLayer(titleX, titleY + title.height) {
@@ -146,9 +160,9 @@ internal fun ParallaxTopBar(
                 transformOrigin = TransformOrigin(if (isRtl) 1f else 0f, 0f)
                 scaleX = scale
                 scaleY = scale
-                translationX = direction * (paddingStart - collapsedPaddingStart) * (1f - fraction)
+                translationX = (expandedStart - collapsedX) * (1f - fraction)
                 // Follow the title's bottom edge as it scales about its top.
-                translationY = (expandedTop - collapsedTop) * (1f - fraction) + title.height * (scale - 1f)
+                translationY = (expandedTop - collapsedTop) * (1f - fraction) + title.height * (scale - 1f) + headerState.stretchPx
                 alpha = when {
                     keepSubtitle -> 1f
                     titleConfig.animateSubTitleHiding -> 1f - fraction

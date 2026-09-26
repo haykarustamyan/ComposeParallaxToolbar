@@ -41,6 +41,10 @@ public class ParallaxToolbarState internal constructor(
     public val toolbarExitFraction: Float
         get() = headerState.exitFraction
 
+    /** Current stretch past the expanded height, in px, while `stretchEnabled` and pulled down. */
+    public val stretchPx: Float
+        get() = headerState.stretchPx
+
     /** Collapses the header. The body keeps its own scroll position. */
     public suspend fun collapse(animated: Boolean = true) {
         if (animated) headerState.animateFractionTo(1f) else headerState.snapFractionTo(1f)

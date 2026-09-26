@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -882,5 +883,135 @@ class ComposeParallaxToolbarOverlayTest : UiTestBase() {
         // Still within the toolbar band once collapsed.
         kotlin.test.assertTrue(collapsedBounds.bottom <= info.topInsetPx + info.toolbarHeightPx + 1f)
         onNodeWithText("collapsed").assertIsDisplayed()
+    }
+}
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarExtrasTest : UiTestBase() {
+
+    @Test
+    fun stretch_pullsPastTop_thenSpringsBack_andFiresTriggerWhenFarEnough() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var triggers = 0
+        var maxStretchSeen = 0f
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp), stretchEnabled = true, stretchTriggerDistance = 40.dp
+                ),
+                onStretchTrigger = { triggers++ },
+                content = ParallaxContent.Regular {
+                    Column(Modifier.testTag("body")) { repeat(40) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } }
+                },
+                state = state
+            )
+        }
+        // A short pull on the body at its top: stretches a little, releases below the trigger.
+        // Touch blocks dispatch as a batch, so the pointer is held across two blocks to observe.
+        onNodeWithTag("body").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, 30f)); advanceEventTime(300)
+        }
+        waitForIdle()
+        maxStretchSeen = state.stretchPx
+        onNodeWithTag("body").performTouchInput { up() }
+        waitForIdle()
+
+        kotlin.test.assertTrue(maxStretchSeen > 0f, "stretched during the pull: $maxStretchSeen")
+        kotlin.test.assertEquals(0f, state.stretchPx, "sprang back")
+        kotlin.test.assertEquals(0, triggers)
+
+        // A long pull on the header itself passes the trigger distance.
+        onNodeWithTag("header").performTouchInput {
+            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, 200f)); moveBy(androidx.compose.ui.geometry.Offset(0f, 200f)); advanceEventTime(300); up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.stretchPx)
+        kotlin.test.assertEquals(1, triggers, "trigger fired once")
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+    }
+
+    @Test
+    fun bottomSlot_isPinnedUnderTheToolbar_andBodyStartsBelowIt() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                bottomContent = { Box(Modifier.fillMaxWidth().height(40.dp).background(Color.Green).testTag("tabs")) },
+                content = ParallaxContent.Regular {
+                    Column { repeat(60) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp).testTag("row$i")) } }
+                },
+                modifier = Modifier.testTag("layout"),
+                state = state
+            )
+        }
+        val info = state.layoutInfo
+        kotlin.test.assertTrue(info.bottomHeightPx > 0f)
+        val tabsExpanded = onNodeWithTag("tabs").fetchSemanticsNode().boundsInRoot
+        val row0Expanded = onNodeWithTag("row0").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertTrue(row0Expanded.top >= tabsExpanded.bottom - 1f, "body starts below the slot")
+        kotlin.test.assertEquals(info.topInsetPx + info.headerHeightPx, tabsExpanded.top, 1f)
+
+        repeat(4) { onNodeWithTag("layout").performTouchInput { swipeUp() } }
+        waitForIdle()
+        val tabsCollapsed = onNodeWithTag("tabs").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertEquals(info.topInsetPx + info.toolbarHeightPx, tabsCollapsed.top, 1f)
+        onNodeWithTag("tabs").assertIsDisplayed()
+    }
+
+    @Test
+    fun collapsedTitle_canBeCenteredOrEndAligned() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var alignment by androidx.compose.runtime.mutableStateOf(Alignment.CenterHorizontally as Alignment.Horizontal)
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Box(Modifier.size(60.dp, 20.dp).background(Color.Black).testTag("title")) },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                navigationIcon = { Box(Modifier.size(48.dp)) },
+                actions = { Box(Modifier.size(48.dp)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = alignment),
+                content = ParallaxContent.Regular { Column { repeat(60) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+                state = state
+            )
+        }
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        val width = state.layoutInfo.widthPx
+        val centered = onNodeWithTag("title").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertEquals(width / 2f, (centered.left + centered.right) / 2f, 2f)
+
+        alignment = Alignment.End
+        waitForIdle()
+        val ended = onNodeWithTag("title").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertTrue(ended.right > centered.right, "moved toward the end: $centered -> $ended")
+        kotlin.test.assertTrue(ended.right <= width - 48f + 1f, "stays before the actions")
+    }
+
+    @Test
+    fun relativeHeaderHeights_respectMaxHeight_andAlwaysElevatedRenders() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("t") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(0.9f, maxHeight = 150.dp),
+                toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(elevation = 4.dp, alwaysElevated = true),
+                content = ParallaxContent.Regular { Text("body") },
+                state = state
+            )
+        }
+        val density = state.layoutInfo.headerHeightPx / 150f
+        kotlin.test.assertTrue(density in 0.5f..5f, "capped at 150dp: ${state.layoutInfo.headerHeightPx}px")
+        kotlin.test.assertEquals(HeaderHeight.AspectRatio(1f, maxHeight = 10.dp).resolve(1000.dp, 1000.dp), 10.dp)
+        kotlin.test.assertEquals(HeaderHeight.AspectRatio(2f).resolve(100.dp, 1000.dp), 50.dp)
+        onNodeWithText("body").assertIsDisplayed()
     }
 }

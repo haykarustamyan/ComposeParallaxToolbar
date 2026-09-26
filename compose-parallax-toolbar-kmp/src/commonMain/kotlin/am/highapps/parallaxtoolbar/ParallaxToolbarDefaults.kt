@@ -35,6 +35,11 @@ public object ParallaxToolbarDefaults {
     // Body defaults
     public val BodyMinBottomSpacing: Dp = 0.dp
 
+    // Stretch defaults
+    public val StretchTriggerDistance: Dp = 100.dp
+    internal const val StretchResistance: Float = 0.5f
+    internal const val StretchMaxFactor: Float = 2f
+
     @Composable
     public fun headerConfig(
         height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
@@ -43,7 +48,9 @@ public object ParallaxToolbarDefaults {
         parallaxMultiplier: Float = HeaderParallaxMultiplier,
         snapOnRelease: Boolean = false,
         scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
-        fadeOnCollapse: Boolean = true
+        fadeOnCollapse: Boolean = true,
+        stretchEnabled: Boolean = false,
+        stretchTriggerDistance: Dp = StretchTriggerDistance
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
         gradient = gradient,
@@ -51,16 +58,19 @@ public object ParallaxToolbarDefaults {
         parallaxMultiplier = parallaxMultiplier,
         snapOnRelease = snapOnRelease,
         scrollMode = scrollMode,
-        fadeOnCollapse = fadeOnCollapse
+        fadeOnCollapse = fadeOnCollapse,
+        stretchEnabled = stretchEnabled,
+        stretchTriggerDistance = stretchTriggerDistance
     )
 
     @Composable
     public fun headerConfigWithAspectRatio(
         aspectRatio: Float = 16f / 9f,
         gradient: Brush? = null,
-        isExpandedWhenFirstDisplayed: Boolean = true
+        isExpandedWhenFirstDisplayed: Boolean = true,
+        maxHeight: Dp = Dp.Unspecified
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height = HeaderHeight.AspectRatio(aspectRatio),
+        height = HeaderHeight.AspectRatio(aspectRatio, maxHeight),
         gradient = gradient,
         isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
     )
@@ -69,9 +79,10 @@ public object ParallaxToolbarDefaults {
     public fun headerConfigWithPercentage(
         heightPercentage: Float = 0.4f,
         gradient: Brush? = null,
-        isExpandedWhenFirstDisplayed: Boolean = true
+        isExpandedWhenFirstDisplayed: Boolean = true,
+        maxHeight: Dp = Dp.Unspecified
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
-        height = HeaderHeight.Percentage(heightPercentage),
+        height = HeaderHeight.Percentage(heightPercentage, maxHeight),
         gradient = gradient,
         isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
     )
@@ -82,13 +93,15 @@ public object ParallaxToolbarDefaults {
         targetColor: Color = Color.Black,
         elevation: Dp = 0.dp,
         animationSpec: AnimationSpec<Color> = tween(durationMillis = 300),
-        height: Dp = ToolbarHeight
+        height: Dp = ToolbarHeight,
+        alwaysElevated: Boolean = false
     ): ParallaxToolbarConfig = ParallaxToolbarConfig(
         initialColor = initialColor,
         targetColor = targetColor,
         elevation = elevation,
         animationSpec = animationSpec,
-        height = height
+        height = height,
+        alwaysElevated = alwaysElevated
     )
 
     @Composable
@@ -98,14 +111,16 @@ public object ParallaxToolbarDefaults {
         collapsedPaddingStart: Dp = TitleCollapsedPaddingStart,
         keepSubtitleAfterCollapse: Boolean = false,
         animateSubTitleHiding: Boolean = true,
-        collapsedScale: Float = TitleCollapsedScale
+        collapsedScale: Float = TitleCollapsedScale,
+        collapsedAlignment: Alignment.Horizontal = Alignment.Start
     ): ParallaxTitleConfig = ParallaxTitleConfig(
         paddingBottom = paddingBottom,
         paddingStart = paddingStart,
         collapsedPaddingStart = collapsedPaddingStart,
         keepSubtitleAfterCollapse = keepSubtitleAfterCollapse,
         animateSubTitleHiding = animateSubTitleHiding,
-        collapsedScale = collapsedScale
+        collapsedScale = collapsedScale,
+        collapsedAlignment = collapsedAlignment
     )
 
     @Composable

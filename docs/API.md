@@ -26,7 +26,15 @@ Modifiers available on the scope:
 
 ## ParallaxToolbarLayoutInfo
 
-`state.layoutInfo`, measured geometry in pixels: `isMeasured`, `widthPx`, `heightPx`, `topInsetPx`, `headerHeightPx`, `toolbarHeightPx`, `collapseRangePx`, `headerOffsetPx`, `toolbarExitOffsetPx`, `currentHeaderBottomPx`.
+`state.layoutInfo`, measured geometry in pixels: `isMeasured`, `widthPx`, `heightPx`, `topInsetPx`, `headerHeightPx`, `toolbarHeightPx`, `bottomHeightPx`, `collapseRangePx`, `headerOffsetPx`, `toolbarExitOffsetPx`, `stretchPx`, `currentHeaderBottomPx`.
+
+## Additional slots and parameters
+
+| Parameter | Description |
+|---|---|
+| `overlayContent` | Layer above the body and toolbar, the size of the layout; use with `moveBetween` |
+| `bottomContent` | Row pinned under the toolbar; rides the header edge while expanded |
+| `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance` |
 
 ## ParallaxToolbarState
 

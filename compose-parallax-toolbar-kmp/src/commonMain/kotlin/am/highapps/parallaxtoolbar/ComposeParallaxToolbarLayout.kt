@@ -57,6 +57,12 @@ import androidx.compose.ui.unit.dp
  * @param overlayContent Optional layer drawn above the body and the toolbar, the size of the
  *   whole layout. Use it with [ParallaxToolbarScope.moveBetween] for elements that travel from
  *   the header into the toolbar, such as an avatar.
+ * @param bottomContent Optional row pinned under the toolbar, such as tabs or a search field. It
+ *   rides the header's bottom edge while expanded and stays below the toolbar once collapsed. Give
+ *   it a background; the body scrolls underneath it.
+ * @param onStretchTrigger Called when a stretch is released past
+ *   [ParallaxHeaderConfig.stretchTriggerDistance]; requires `stretchEnabled`. Typical use is
+ *   pull-to-refresh.
  * @param state Hoisted state to observe the collapse fraction or expand and collapse
  *   programmatically. It also owns the scroll states of both content kinds, unless
  *   [ParallaxContent.Lazy] carries its own list state.
@@ -87,6 +93,8 @@ public fun ComposeParallaxToolbarLayout(
     navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
     actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
     overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
+    bottomContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
+    onStretchTrigger: (() -> Unit)? = null,
     headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
@@ -103,6 +111,8 @@ public fun ComposeParallaxToolbarLayout(
             navigationIcon = navigationIcon,
             actions = actions,
             overlayContent = overlayContent,
+            bottomContent = bottomContent,
+            onStretchTrigger = onStretchTrigger,
             headerConfig = headerConfig,
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
@@ -120,6 +130,8 @@ public fun ComposeParallaxToolbarLayout(
             navigationIcon = navigationIcon,
             actions = actions,
             overlayContent = overlayContent,
+            bottomContent = bottomContent,
+            onStretchTrigger = onStretchTrigger,
             headerConfig = headerConfig,
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
@@ -141,6 +153,8 @@ public fun ComposeParallaxToolbarLayout(
             navigationIcon = navigationIcon,
             actions = actions,
             overlayContent = overlayContent,
+            bottomContent = bottomContent,
+            onStretchTrigger = onStretchTrigger,
             headerConfig = headerConfig,
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
@@ -175,6 +189,8 @@ public fun ComposeParallaxToolbarLayout(
     navigationIcon: (@Composable ParallaxToolbarScope.(collapsed: Boolean) -> Unit)? = null,
     actions: (@Composable ParallaxActionsScope.(collapsed: Boolean) -> Unit)? = null,
     overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
+    bottomContent: (@Composable ParallaxToolbarScope.() -> Unit)? = null,
+    onStretchTrigger: (() -> Unit)? = null,
     headerConfig: ParallaxHeaderConfig = ParallaxToolbarDefaults.headerConfig(),
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
@@ -198,6 +214,8 @@ public fun ComposeParallaxToolbarLayout(
         navigationIcon = navigationIcon,
         actions = actions,
         overlayContent = null,
+        bottomContent = null,
+        onStretchTrigger = null,
         headerConfig = headerConfig,
         toolbarConfig = toolbarConfig,
         titleConfig = titleConfig,
@@ -233,6 +251,8 @@ private fun ParallaxToolbarLayoutImpl(
     navigationIcon: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
     actions: (@Composable ParallaxActionsScope.(Boolean) -> Unit)?,
     overlayContent: (@Composable ParallaxToolbarScope.() -> Unit)?,
+    bottomContent: (@Composable ParallaxToolbarScope.() -> Unit)?,
+    onStretchTrigger: (() -> Unit)?,
     headerConfig: ParallaxHeaderConfig,
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
@@ -274,9 +294,13 @@ private fun ParallaxToolbarLayoutImpl(
         val insetPxF = with(density) { topInset.toPx() }
         // Only EnterAlwaysCollapsed lets the toolbar leave; it travels its own height plus the inset.
         val exitRangePx = if (headerConfig.scrollMode == ScrollMode.EnterAlwaysCollapsed) toolbarHeightPx + insetPxF else 0f
+        val stretchTriggerPx = with(density) { headerConfig.stretchTriggerDistance.toPx() }
         SideEffect {
             headerState.collapseRangePx = collapseRangePx
             headerState.exitRangePx = exitRangePx
+            headerState.stretchMaxPx = if (headerConfig.stretchEnabled) stretchTriggerPx * ParallaxToolbarDefaults.StretchMaxFactor else 0f
+            headerState.stretchTriggerPx = stretchTriggerPx
+            headerState.onStretchTrigger = onStretchTrigger
         }
 
         Layout(
@@ -347,6 +371,9 @@ private fun ParallaxToolbarLayoutImpl(
                     modifier = Modifier.layoutId(TopBarSlot)
                 )
 
+                if (bottomContent != null) {
+                    Box(Modifier.layoutId(BottomSlot)) { scope.bottomContent() }
+                }
                 if (overlayContent != null) {
                     Box(Modifier.layoutId(OverlaySlot)) { scope.overlayContent() }
                 }
@@ -364,6 +391,9 @@ private fun ParallaxToolbarLayoutImpl(
                 .measure(Constraints.fixedWidth(width))
             val overlay = measurables.firstOrNull { it.layoutId == OverlaySlot }
                 ?.measure(Constraints.fixed(width, height))
+            val bottom = measurables.firstOrNull { it.layoutId == BottomSlot }
+                ?.measure(Constraints.fixedWidth(width))
+            val bottomPx = bottom?.height ?: 0
 
             // Publish the geometry before placement so overlay elements can position themselves.
             val info = state.layoutInfo
@@ -372,12 +402,13 @@ private fun ParallaxToolbarLayoutImpl(
             info.topInsetPx = insetPx.toFloat()
             info.headerHeightPx = headerPx.toFloat()
             info.toolbarHeightPx = toolbarPx.toFloat()
+            info.bottomHeightPx = bottomPx.toFloat()
             info.isMeasured = true
             // The body gets the space below the collapsed toolbar, plus whatever the toolbar can
             // vacate by exiting. While the header is expanded it is pushed down and its tail is off
             // screen; it slides up as the header collapses and the toolbar exits.
             val exitPx = exitRangePx.roundToInt()
-            val bodyHeight = (height - insetPx - toolbarPx + exitPx).coerceAtLeast(0)
+            val bodyHeight = (height - insetPx - toolbarPx - bottomPx + exitPx).coerceAtLeast(0)
             val bodyPlaceable = measurables.first { it.layoutId == BodySlot }
                 .measure(Constraints.fixed(width, bodyHeight))
 
@@ -385,8 +416,12 @@ private fun ParallaxToolbarLayoutImpl(
                 header.placeRelativeWithLayer(0, 0) {
                     translationY = -headerState.exitOffsetPx
                 }
-                bodyPlaceable.placeRelativeWithLayer(0, insetPx + headerPx) {
-                    translationY = -headerState.offsetPx - headerState.exitOffsetPx
+                // The body and the bottom slot ride the header's bottom edge, including a stretch.
+                bodyPlaceable.placeRelativeWithLayer(0, insetPx + headerPx + bottomPx) {
+                    translationY = -headerState.offsetPx - headerState.exitOffsetPx + headerState.stretchPx
+                }
+                bottom?.placeRelativeWithLayer(0, insetPx + headerPx) {
+                    translationY = -headerState.offsetPx - headerState.exitOffsetPx + headerState.stretchPx
                 }
                 topBar.placeRelativeWithLayer(0, 0) {
                     translationY = -headerState.exitOffsetPx
@@ -401,6 +436,7 @@ private const val HeaderSlot = "header"
 private const val BodySlot = "body"
 private const val TopBarSlot = "topBar"
 private const val OverlaySlot = "overlay"
+private const val BottomSlot = "bottom"
 
 private fun PaddingValues.withExtraBottom(extra: Dp): PaddingValues =
     if (extra <= 0.dp) this else PaddingValues(
@@ -425,14 +461,17 @@ private class HeaderFlingBehavior(
             lastValue = value
             val consumed = scrollBy(delta)
             remaining = velocity
-            // Stop once the header hits an end or stops moving.
+            // Stop once the header hits an end or stops moving. A fling never stretches: once the
+            // header is fully expanded, a downward fling has nothing left to do.
+            val expandedFully = headerState.fraction <= 0f && headerState.exitFraction <= 0f
             if (kotlin.math.abs(delta - consumed) > 0.5f || !headerState.canScrollForward && delta > 0f ||
-                !headerState.canScrollBackward && delta < 0f
+                delta < 0f && expandedFully
             ) {
                 remaining = 0f
                 cancelAnimation()
             }
         }
+        headerState.releaseStretchIn()
         if (snapOnRelease) headerState.settleIn(this, velocityPx = initialVelocity)
         return remaining
     }

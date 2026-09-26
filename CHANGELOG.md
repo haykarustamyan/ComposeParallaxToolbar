@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 - **NEW**: the header collapses through nested scrolling. Any vertically scrollable composable can be the body via `ParallaxContent.Custom`, including `LazyVerticalGrid`, `LazyVerticalStaggeredGrid` and pagers. Dragging on the header itself collapses it.
 - **NEW**: every slot runs in a `ParallaxToolbarScope` exposing `collapseFraction`, `isCollapsed` and `state`; the `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
+- **NEW**: `bottomContent` slot pinned under the toolbar for tabs or search; overscroll stretch with `stretchEnabled`, `stretchTriggerDistance` and an `onStretchTrigger` callback for pull-to-refresh; `collapsedAlignment` for a centered or end-aligned collapsed title; `maxHeight` on `HeaderHeight.Percentage` and `AspectRatio`; `alwaysElevated` on the toolbar config.
 - **NEW**: per-element behaviors on the slot scope: `Modifier.parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`; an `overlayContent` slot above the body and toolbar for elements that travel into the toolbar; `fadeOnCollapse` on the header config; and `state.layoutInfo` with the measured geometry.
 - **NEW**: `ScrollMode` on the header config: `ExitUntilCollapsed` (default), `EnterAlways`, and `EnterAlwaysCollapsed`, which also slides the toolbar off screen. `state.toolbarExitFraction` reports the exit.
 - **NEW**: `snapOnRelease` on the header config settles a half-collapsed header to the nearer end.

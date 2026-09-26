@@ -50,7 +50,15 @@ public class ParallaxToolbarLayoutInfo internal constructor(private val headerSt
     public val toolbarExitOffsetPx: Float
         get() = headerState.exitOffsetPx
 
+    /** Current stretch past the expanded height, in px. */
+    public val stretchPx: Float
+        get() = headerState.stretchPx
+
+    /** Height of the pinned `bottomContent` slot, 0 when absent. */
+    public var bottomHeightPx: Float by mutableFloatStateOf(0f)
+        internal set
+
     /** Current bottom edge of the header, measured from the top of the layout. */
     public val currentHeaderBottomPx: Float
-        get() = topInsetPx + headerHeightPx - headerOffsetPx - toolbarExitOffsetPx
+        get() = topInsetPx + headerHeightPx - headerOffsetPx - toolbarExitOffsetPx + stretchPx
 }

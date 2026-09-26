@@ -535,6 +535,24 @@ inset, current header offset and bottom edge) for custom overlays.
 </details>
 
 <details>
+<summary><b>Bottom slot, stretch and title alignment</b></summary>
+
+- `bottomContent` pins a row under the toolbar, such as tabs or a search field. It rides the
+  header's bottom edge while expanded and stays below the toolbar once collapsed. Give it a
+  background; the body scrolls underneath.
+- `headerConfig(stretchEnabled = true)` lets a pull past the top stretch the header, zooming its
+  content and pushing the body down, then springing back. `onStretchTrigger` fires when the release
+  happens past `stretchTriggerDistance`, which is the usual hook for pull-to-refresh.
+- `titleConfig(collapsedAlignment = Alignment.CenterHorizontally)` centers the collapsed title
+  between the navigation icon and the actions, as iOS does; `Alignment.End` places it before the
+  actions.
+- `HeaderHeight.Percentage(0.4f, maxHeight = 320.dp)` and `HeaderHeight.AspectRatio(16f / 9f,
+  maxHeight = 320.dp)` cap relative heights on tablets and in landscape.
+- `toolbarConfig(alwaysElevated = true)` keeps the shadow while expanded.
+
+</details>
+
+<details>
 <summary><b>Programmatic control</b></summary>
 
 ```kotlin
