@@ -230,7 +230,7 @@ private fun ConfigSheet(config: PlaygroundConfig, onChange: (PlaygroundConfig) -
             HeaderKind.Fixed -> SliderRow("Fixed: ${config.fixedHeightDp.toInt()} dp", config.fixedHeightDp, 150f..500f) {
                 onChange(config.copy(fixedHeightDp = it))
             }
-            HeaderKind.AspectRatio -> SliderRow("Ratio: %.2f".format(config.aspectRatio), config.aspectRatio, 1f..3f) {
+            HeaderKind.AspectRatio -> SliderRow("Ratio: ${(config.aspectRatio * 100).toInt() / 100f}", config.aspectRatio, 1f..3f) {
                 onChange(config.copy(aspectRatio = it))
             }
             HeaderKind.Percentage -> SliderRow("Height: ${(config.percentage * 100).toInt()} %", config.percentage, 0.2f..0.7f) {

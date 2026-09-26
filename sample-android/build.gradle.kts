@@ -21,8 +21,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":compose-parallax-toolbar-kmp"))
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.extended)
+    implementation(project(":sample"))
     implementation(libs.androidx.activity.compose)
 }

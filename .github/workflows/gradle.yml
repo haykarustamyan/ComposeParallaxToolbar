@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: iosSimulatorArm64Test
+          - target: iosSimulatorArm64Test :sample:compileKotlinIosSimulatorArm64
             os: macos-latest
           - target: testAndroidHostTest koverVerify :sample-android:assembleDebug
             os: ubuntu-latest

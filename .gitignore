@@ -16,3 +16,5 @@ xcuserdata
 gradle.properties
 # Packaged XCFramework archives
 *.xcframework.zip
+# Xcode host app
+iosApp/build

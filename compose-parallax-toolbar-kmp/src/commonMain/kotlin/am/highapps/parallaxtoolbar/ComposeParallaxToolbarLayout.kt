@@ -433,13 +433,15 @@ fun ComposeParallaxToolbarLayout(
             }
 
         Box(modifier = modifier) {
+            // The body and title are pushed down by the status bar inset so the collapsed toolbar
+            // clears it. The header must cover that inset too, or a gap appears under it.
             Header(
                 scroll = scroll,
                 lazyListState = if (lazyContent != null) lazyListState else null,
                 headerHeightPx = headerHeightPx,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(actualHeaderHeight),
+                    .height(actualHeaderHeight + topInset),
                 content = headerContent,
                 gradientBrush = headerConfig.gradient,
                 initialColor = toolbarConfig.initialColor,

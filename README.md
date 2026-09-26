@@ -467,15 +467,28 @@ For detailed information on all components, parameters, and configuration option
 <details>
 <summary><b>Sample app</b></summary>
 
-The `sample-android` module is an interactive playground. Run it on a device or emulator and tap the
-settings button to switch content type, header height mode, toolbar colors, elevation, subtitle
-behavior, navigation icon, actions, and padding while the layout is on screen.
+The sample is a Compose Multiplatform playground shared by Android and iOS. Tap the settings
+button to switch content type, header height mode, toolbar colors, elevation, subtitle behavior,
+navigation icon, actions, and padding while the layout is on screen.
+
+- `sample` holds the shared playground UI and the fixed sample screens.
+- `sample-android` is the Android host app.
+- `iosApp` is the Xcode host project; it builds the shared framework through Gradle.
+
+Android:
 
 ```bash
 ./gradlew :sample-android:installDebug
 ```
 
-A fixed sample screen can be launched directly for comparison:
+iOS: open `iosApp/iosApp.xcodeproj` in Xcode and run, or from the terminal:
+
+```bash
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17' build
+```
+
+A fixed sample screen can be opened instead of the playground. On Android pass an intent extra,
+on iOS set the `SAMPLE_SCREEN` environment variable in the run scheme:
 
 ```bash
 adb shell am start -n am.highapps.parallaxtoolbar.sample/.MainActivity --es screen lazyPadding
@@ -552,6 +565,8 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 - **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
 - **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
 - **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
+- **FIXED**: A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title
+- **NEW**: Compose Multiplatform sample playground with Android and iOS host apps
 - **TESTS**: Compose UI tests now run on Android (Robolectric) and the iOS simulator, with a Kover line-coverage gate
 
 ### Version 1.3.0
