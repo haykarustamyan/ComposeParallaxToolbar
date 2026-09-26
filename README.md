@@ -465,6 +465,28 @@ ComposeParallaxToolbarLayout(
 For detailed information on all components, parameters, and configuration options, see the [API Documentation](docs/API.md).
 
 <details>
+<summary><b>Sample app</b></summary>
+
+The `sample-android` module is an interactive playground. Run it on a device or emulator and tap the
+settings button to switch content type, header height mode, toolbar colors, elevation, subtitle
+behavior, navigation icon, actions, and padding while the layout is on screen.
+
+```bash
+./gradlew :sample-android:installDebug
+```
+
+A fixed sample screen can be launched directly for comparison:
+
+```bash
+adb shell am start -n am.highapps.parallaxtoolbar.sample/.MainActivity --es screen lazyPadding
+```
+
+Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`, `lazySpacing`,
+`lazyScrollControl`, `scaffold`, `aspectRatio`, `percentage`, `square`, `compact`, `ultrawide`.
+
+</details>
+
+<details>
 <summary><b>Compatibility</b></summary>
 
 - **Kotlin**: 2.4.20

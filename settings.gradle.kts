@@ -27,3 +27,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ComposeParallaxToolbar"
 include(":compose-parallax-toolbar-kmp")
+include(":sample-android")
