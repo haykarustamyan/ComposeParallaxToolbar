@@ -467,9 +467,11 @@ For detailed information on all components, parameters, and configuration option
 <details>
 <summary><b>Sample app</b></summary>
 
-The sample is a Compose Multiplatform playground shared by Android and iOS. Tap the settings
-button to switch content type, header height mode, toolbar colors, elevation, subtitle behavior,
-navigation icon, actions, and padding while the layout is on screen.
+The sample is a Compose Multiplatform playground shared by Android and iOS. The configuration
+sheet opens on launch and can be reopened any time with the **Configure** button at the bottom
+right. Pick a screen at the top of the sheet: `playground` applies every setting below it live
+(content type, header height mode, toolbar colors, elevation, subtitle behavior, navigation icon,
+actions, padding); the other names show the fixed sample screens from the library.
 
 - `sample` holds the shared playground UI and the fixed sample screens.
 - `sample-android` is the Android host app.

@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +27,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -79,33 +82,46 @@ data class PlaygroundConfig(
     val itemCount: Int = 30
 )
 
+/**
+ * Hosts either the live playground or a fixed sample screen, with a settings button that opens
+ * the configuration sheet. The sheet opens by itself on first launch so the controls are found.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaygroundScreen() {
+fun PlaygroundHost(initialScreen: String = "playground") {
+    var screen by remember { mutableStateOf(initialScreen) }
     var config by remember { mutableStateOf(PlaygroundConfig()) }
-    var showSheet by remember { mutableStateOf(false) }
+    var showSheet by remember { mutableStateOf(initialScreen == "playground") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box(Modifier.fillMaxSize()) {
         // Scroll position lives inside the layout, so recreate it when the initial state changes.
-        key(config.content, config.startExpanded) {
-            Playground(config)
+        key(screen, config.content, config.startExpanded) {
+            if (screen == "playground") Playground(config) else FixedSampleScreen(screen)
         }
 
-        FloatingActionButton(
+        ExtendedFloatingActionButton(
             onClick = { showSheet = true },
+            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            text = { Text("Configure") },
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(16.dp)
-        ) {
-            Icon(Icons.Default.Settings, contentDescription = "Configure")
-        }
+        )
 
         if (showSheet) {
             ModalBottomSheet(onDismissRequest = { showSheet = false }, sheetState = sheetState) {
-                ConfigSheet(config) { config = it }
+                ConfigSheet(
+                    screen = screen,
+                    onScreenChange = { screen = it },
+                    config = config,
+                    onChange = { config = it }
+                )
             }
         }
     }
 }
+
+@Composable
+fun PlaygroundScreen() = PlaygroundHost("playground")
 
 @Composable
 private fun Playground(config: PlaygroundConfig) {
@@ -209,14 +225,32 @@ private fun SampleCard(index: Int, collapsed: Boolean) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun ConfigSheet(config: PlaygroundConfig, onChange: (PlaygroundConfig) -> Unit) {
+private fun ConfigSheet(
+    screen: String,
+    onScreenChange: (String) -> Unit,
+    config: PlaygroundConfig,
+    onChange: (PlaygroundConfig) -> Unit
+) {
     Column(
         Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text("Configuration", style = MaterialTheme.typography.titleLarge)
+        Text(
+            "Pick a screen. \"playground\" applies the settings below live; the others are the fixed samples from the library.",
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Section("Screen")
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            sampleScreenNames.forEach { name ->
+                FilterChip(selected = name == screen, onClick = { onScreenChange(name) }, label = { Text(name) })
+            }
+        }
+
+        if (screen != "playground") return@Column
 
         Section("Content")
         Choice(ContentKind.entries, config.content) { onChange(config.copy(content = it)) }
