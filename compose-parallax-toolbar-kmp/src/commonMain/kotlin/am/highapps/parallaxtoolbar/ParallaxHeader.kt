@@ -21,13 +21,11 @@ internal fun ParallaxHeader(
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    val alphaHeightFraction = ParallaxToolbarDefaults.HeaderAlphaHeightFraction
-
     Box(
         modifier = modifier.graphicsLayer {
-            val scrollOffset = collapseState.offsetPx
-            translationY = -scrollOffset * parallaxMultiplier
-            alpha = (1f - scrollOffset / (headerHeightPx * alphaHeightFraction)).coerceIn(0f, 1f)
+            translationY = -collapseState.offsetPx * parallaxMultiplier
+            // Fully faded exactly when the toolbar covers it, so nothing shows through the body.
+            alpha = 1f - collapseState.fraction
         }
     ) {
         content()

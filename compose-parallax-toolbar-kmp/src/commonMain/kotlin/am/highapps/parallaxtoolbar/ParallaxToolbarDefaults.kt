@@ -22,7 +22,6 @@ object ParallaxToolbarDefaults {
     // Header defaults
     val HeaderHeightDp: Dp = 450.dp
     const val HeaderParallaxMultiplier: Float = 0.5f
-    internal const val HeaderAlphaHeightFraction: Float = 1f
 
     // Toolbar defaults
     val ToolbarHeight: Dp = 64.dp
