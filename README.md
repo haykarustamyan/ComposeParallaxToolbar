@@ -525,7 +525,7 @@ For detailed information on all components, parameters, and configuration option
 ### Version 1.4.0
 
 - **UPDATED**: Kotlin 2.4.20, Compose Multiplatform 1.12.1, Material 3 1.9.0
-- **UPGRADED**: Gradle 9.8.0, Android Gradle Plugin 9.4.1, Maven Publish Plugin 0.37.0
+- **UPGRADED**: Gradle 9.7.0, Android Gradle Plugin 9.3.3, Maven Publish Plugin 0.37.0
 - **CHANGED**: Migrated to the `com.android.kotlin.multiplatform.library` plugin required by AGP 9
 - **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
 
