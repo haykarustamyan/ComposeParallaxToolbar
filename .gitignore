@@ -13,7 +13,6 @@ xcuserdata
 *.xcframework
 #So we don't accidentally commit our private keys
 *.gpg
-gradle.properties
 # Packaged XCFramework archives
 *.xcframework.zip
 # Xcode host app
