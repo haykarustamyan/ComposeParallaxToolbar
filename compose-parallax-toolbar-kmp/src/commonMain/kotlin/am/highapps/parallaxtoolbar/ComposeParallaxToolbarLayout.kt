@@ -1,34 +1,26 @@
 package am.highapps.parallaxtoolbar
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -45,8 +37,9 @@ import androidx.compose.ui.unit.dp
  * @param subtitleContent Optional subtitle under the title.
  * @param navigationIcon Optional leading toolbar slot.
  * @param actions Optional trailing toolbar slot.
- * @param scrollState Scroll state used by [ParallaxContent.Regular]. Lazy content uses the
- *   state carried by [ParallaxContent.Lazy].
+ * @param state Hoisted state to observe the collapse fraction or expand and collapse
+ *   programmatically. It also owns the scroll states of both content kinds, unless
+ *   [ParallaxContent.Lazy] carries its own list state.
  *
  * Example with a customized LazyColumn:
  * ```
@@ -77,7 +70,7 @@ fun ComposeParallaxToolbarLayout(
     toolbarConfig: ParallaxToolbarConfig = ParallaxToolbarDefaults.toolbarConfig(),
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
-    scrollState: ScrollState = rememberScrollState()
+    state: ParallaxToolbarState = rememberParallaxToolbarState()
 ) {
     when (content) {
         is ParallaxContent.Regular -> ParallaxToolbarLayoutImpl(
@@ -92,7 +85,8 @@ fun ComposeParallaxToolbarLayout(
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
             bodyConfig = bodyConfig,
-            body = ParallaxBodySpec.Regular(scrollState, content.content)
+            state = state,
+            body = ParallaxBodySpec.Regular(content.content)
         )
 
         is ParallaxContent.Lazy -> ParallaxToolbarLayoutImpl(
@@ -107,8 +101,9 @@ fun ComposeParallaxToolbarLayout(
             toolbarConfig = toolbarConfig,
             titleConfig = titleConfig,
             bodyConfig = bodyConfig,
+            state = state,
             body = ParallaxBodySpec.Lazy(
-                lazyListState = content.lazyListState ?: rememberLazyListState(),
+                lazyListState = content.lazyListState ?: state.lazyListState,
                 config = content.config,
                 content = content.content
             )
@@ -124,7 +119,7 @@ fun ComposeParallaxToolbarLayout(
     replaceWith = ReplaceWith(
         "ComposeParallaxToolbarLayout(titleContent, headerContent, ParallaxContent.Regular(content), " +
                 "modifier, contentPadding, subtitleContent, navigationIcon, actions, headerConfig, " +
-                "toolbarConfig, titleConfig, bodyConfig, scroll)"
+                "toolbarConfig, titleConfig, bodyConfig, rememberParallaxToolbarState(scroll, lazyListState))"
     )
 )
 @Composable
@@ -163,14 +158,13 @@ fun ComposeParallaxToolbarLayout(
         toolbarConfig = toolbarConfig,
         titleConfig = titleConfig,
         bodyConfig = bodyConfig,
-        scrollState = scroll
+        state = rememberParallaxToolbarState(scrollState = scroll, lazyListState = lazyListState)
     )
 }
 
 /** Resolved body: which scroll source drives the collapse and how to render the content. */
 private sealed class ParallaxBodySpec {
     class Regular(
-        val scrollState: ScrollState,
         val content: @Composable (Boolean) -> Unit
     ) : ParallaxBodySpec()
 
@@ -194,11 +188,12 @@ private fun ParallaxToolbarLayoutImpl(
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
     bodyConfig: ParallaxBodyConfig,
+    state: ParallaxToolbarState,
     body: ParallaxBodySpec
 ) {
     val density = LocalDensity.current
     val topInset = with(density) { WindowInsets.statusBars.getTop(this).toDp() }
-    val toolbarHeight = ParallaxToolbarDefaults.ToolbarHeight
+    val toolbarHeight = toolbarConfig.height
 
     BoxWithConstraints(modifier = modifier) {
         val headerHeight = headerConfig.height.resolve(
@@ -207,22 +202,20 @@ private fun ParallaxToolbarLayoutImpl(
         )
         val headerHeightPx = with(density) { headerHeight.toPx() }
         val toolbarHeightPx = with(density) { toolbarHeight.toPx() }
-        val maxWidthPx = with(density) { maxWidth.toPx() }
         val collapseRangePx = headerHeightPx - toolbarHeightPx
 
         val collapseState = rememberCollapseState(
-            scrollState = (body as? ParallaxBodySpec.Regular)?.scrollState ?: rememberScrollState(),
+            scrollState = state.scrollState,
             lazyListState = (body as? ParallaxBodySpec.Lazy)?.lazyListState,
             collapseRangePx = collapseRangePx
         )
         val isCollapsed by remember(collapseState) { derivedStateOf { collapseState.isCollapsed } }
 
-        LaunchedEffect(collapseState, headerConfig.isExpandedWhenFirstDisplayed) {
-            if (!headerConfig.isExpandedWhenFirstDisplayed) collapseState.collapse()
-        }
+        SideEffect { state.collapseState = collapseState }
 
-        var navIconWidthPx by remember { mutableStateOf(0f) }
-        var actionsWidthPx by remember { mutableStateOf(0f) }
+        LaunchedEffect(collapseState, headerConfig.isExpandedWhenFirstDisplayed) {
+            if (!headerConfig.isExpandedWhenFirstDisplayed) collapseState.collapse(animated = false)
+        }
 
         // The body and title are pushed down by the status bar inset so the collapsed toolbar
         // clears it. The body is padded rather than offset so its scroll range shrinks with it
@@ -231,6 +224,7 @@ private fun ParallaxToolbarLayoutImpl(
         ParallaxHeader(
             collapseState = collapseState,
             headerHeightPx = headerHeightPx,
+            parallaxMultiplier = headerConfig.parallaxMultiplier,
             gradientBrush = headerConfig.gradient,
             initialColor = toolbarConfig.initialColor,
             targetColor = toolbarConfig.targetColor,
@@ -240,7 +234,7 @@ private fun ParallaxToolbarLayoutImpl(
 
         when (body) {
             is ParallaxBodySpec.Regular -> ParallaxBody(
-                scroll = body.scrollState,
+                scroll = state.scrollState,
                 viewportHeight = maxHeight - topInset,
                 headerHeight = headerHeight,
                 toolbarHeight = toolbarHeight,
@@ -261,44 +255,15 @@ private fun ParallaxToolbarLayoutImpl(
             )
         }
 
-        ParallaxToolbar(
+        ParallaxTopBar(
             collapseState = collapseState,
-            initialColor = toolbarConfig.initialColor,
-            targetColor = toolbarConfig.targetColor,
-            colorAnimationSpec = toolbarConfig.animationSpec,
-            elevation = toolbarConfig.elevation,
-            navigationIcon = {
-                Box(
-                    modifier = Modifier
-                        .onGloballyPositioned { navIconWidthPx = it.size.width.toFloat() }
-                        .size(if (navigationIcon != null) Dp.Unspecified else 0.dp)
-                ) {
-                    navigationIcon?.invoke(isCollapsed)
-                }
-            },
-            actions = {
-                Row(
-                    modifier = Modifier.onGloballyPositioned { actionsWidthPx = it.size.width.toFloat() }
-                ) {
-                    actions?.invoke(this, isCollapsed)
-                }
-            }
-        )
-
-        ParallaxTitle(
-            collapseState = collapseState,
-            headerHeightPx = headerHeightPx,
-            toolbarHeightPx = toolbarHeightPx,
-            hasNavigationIcon = navigationIcon != null,
-            config = titleConfig,
-            titleFontScaleStart = ParallaxToolbarDefaults.TitleFontScaleStart,
-            titleFontScaleEnd = ParallaxToolbarDefaults.TitleFontScaleEnd,
-            modifier = Modifier
-                .offset(y = topInset)
-                .widthIn(
-                    min = 0.dp,
-                    max = with(density) { (maxWidthPx - navIconWidthPx - actionsWidthPx).toDp() }
-                ),
+            isCollapsed = isCollapsed,
+            topInset = topInset,
+            headerHeight = headerHeight,
+            toolbarConfig = toolbarConfig,
+            titleConfig = titleConfig,
+            navigationIcon = navigationIcon,
+            actions = actions,
             titleContent = titleContent,
             subtitleContent = subtitleContent
         )

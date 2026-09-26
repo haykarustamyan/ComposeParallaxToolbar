@@ -21,11 +21,11 @@ import androidx.compose.ui.unit.dp
 object ParallaxToolbarDefaults {
     // Header defaults
     val HeaderHeightDp: Dp = 450.dp
-    internal const val HeaderParallaxMultiplier: Float = 0.5f
+    const val HeaderParallaxMultiplier: Float = 0.5f
     internal const val HeaderAlphaHeightFraction: Float = 1f
 
     // Toolbar defaults
-    internal val ToolbarHeight: Dp = 64.dp
+    val ToolbarHeight: Dp = 64.dp
     val ToolbarMinWidth: Dp = 56.dp
     val ToolbarIconSize: Dp = 24.dp
     val ToolbarIconSpacing: Dp = 8.dp
@@ -34,8 +34,7 @@ object ParallaxToolbarDefaults {
     val TitlePaddingBottom: Dp = (-16).dp
     val TitlePaddingStart: Dp = 16.dp
     val TitleCollapsedPaddingStart: Dp = 64.dp
-    internal const val TitleFontScaleStart: Float = 1f
-    internal const val TitleFontScaleEnd: Float = 1f
+    const val TitleCollapsedScale: Float = 1f
 
     // Body defaults
     val BodyMinBottomSpacing: Dp = 0.dp
@@ -44,11 +43,13 @@ object ParallaxToolbarDefaults {
     fun headerConfig(
         height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
         gradient: Brush? = null,
-        isExpandedWhenFirstDisplayed: Boolean = true
+        isExpandedWhenFirstDisplayed: Boolean = true,
+        parallaxMultiplier: Float = HeaderParallaxMultiplier
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
         gradient = gradient,
-        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
+        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed,
+        parallaxMultiplier = parallaxMultiplier
     )
 
     @Composable
@@ -80,14 +81,16 @@ object ParallaxToolbarDefaults {
         elevation: Dp = 0.dp,
         iconSize: Dp = ToolbarIconSize,
         iconSpacing: Dp = ToolbarIconSpacing,
-        animationSpec: AnimationSpec<Color> = tween(durationMillis = 300)
+        animationSpec: AnimationSpec<Color> = tween(durationMillis = 300),
+        height: Dp = ToolbarHeight
     ): ParallaxToolbarConfig = ParallaxToolbarConfig(
         initialColor = initialColor,
         targetColor = targetColor,
         elevation = elevation,
         iconSize = iconSize,
         iconSpacing = iconSpacing,
-        animationSpec = animationSpec
+        animationSpec = animationSpec,
+        height = height
     )
 
     @Composable
@@ -96,13 +99,15 @@ object ParallaxToolbarDefaults {
         paddingStart: Dp = TitlePaddingStart,
         collapsedPaddingStart: Dp = TitleCollapsedPaddingStart,
         keepSubtitleAfterCollapse: Boolean = false,
-        animateSubTitleHiding: Boolean = true
+        animateSubTitleHiding: Boolean = true,
+        collapsedScale: Float = TitleCollapsedScale
     ): ParallaxTitleConfig = ParallaxTitleConfig(
         paddingBottom = paddingBottom,
         paddingStart = paddingStart,
         collapsedPaddingStart = collapsedPaddingStart,
         keepSubtitleAfterCollapse = keepSubtitleAfterCollapse,
-        animateSubTitleHiding = animateSubTitleHiding
+        animateSubTitleHiding = animateSubTitleHiding,
+        collapsedScale = collapsedScale
     )
 
     @Composable

@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
  * Single source of truth for how far the header has collapsed, regardless of whether the body
  * scrolls through a [ScrollState] or a [LazyListState]. Every property reads the underlying
  * snapshot state directly, so it can be read from composition, from `derivedStateOf`, or from a
- * `graphicsLayer` block and will observe scroll changes in each.
+ * layer block and will observe scroll changes in each.
  */
 @Stable
 internal class CollapseState private constructor(
@@ -41,12 +41,20 @@ internal class CollapseState private constructor(
     val isCollapsed: Boolean
         get() = offsetPx >= collapseRangePx
 
-    /** Scrolls the body so the layout starts collapsed. */
-    suspend fun collapse() {
+    suspend fun collapse(animated: Boolean) {
         if (lazyListState != null) {
-            lazyListState.scrollToItem(index = 1)
+            if (animated) lazyListState.animateScrollToItem(1) else lazyListState.scrollToItem(1)
         } else {
-            scrollState!!.scrollTo(collapseRangePx.toInt() + 1)
+            val target = collapseRangePx.toInt() + 1
+            if (animated) scrollState!!.animateScrollTo(target) else scrollState!!.scrollTo(target)
+        }
+    }
+
+    suspend fun expand(animated: Boolean) {
+        if (lazyListState != null) {
+            if (animated) lazyListState.animateScrollToItem(0) else lazyListState.scrollToItem(0)
+        } else {
+            if (animated) scrollState!!.animateScrollTo(0) else scrollState!!.scrollTo(0)
         }
     }
 

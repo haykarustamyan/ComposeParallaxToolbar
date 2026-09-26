@@ -4,6 +4,8 @@ import am.highapps.parallaxtoolbar.ComposeParallaxToolbarLayout
 import am.highapps.parallaxtoolbar.HeaderHeight
 import am.highapps.parallaxtoolbar.ParallaxContent
 import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
+import am.highapps.parallaxtoolbar.ParallaxToolbarState
+import am.highapps.parallaxtoolbar.rememberParallaxToolbarState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +25,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
@@ -36,6 +40,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -45,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +59,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 enum class ContentKind { Regular, Lazy }
 enum class HeaderKind { Fixed, AspectRatio, Percentage }
@@ -77,6 +84,9 @@ data class PlaygroundConfig(
     val navigationIcon: Boolean = true,
     val actions: Boolean = true,
     val collapsedTitlePaddingStart: Float = 64f,
+    val collapsedTitleScale: Float = 1f,
+    val parallaxMultiplier: Float = 0.5f,
+    val toolbarHeight: Float = 64f,
     val bottomContentPadding: Float = 0f,
     val minBottomSpacer: Float = 0f,
     val itemCount: Int = 30
@@ -93,11 +103,31 @@ fun PlaygroundHost(initialScreen: String = "playground") {
     var config by remember { mutableStateOf(PlaygroundConfig()) }
     var showSheet by remember { mutableStateOf(initialScreen == "playground") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
     Box(Modifier.fillMaxSize()) {
-        // Scroll position lives inside the layout, so recreate it when the initial state changes.
+        // Scroll position lives inside the state, so recreate it when the initial state changes.
         key(screen, config.content, config.startExpanded) {
-            if (screen == "playground") Playground(config) else FixedSampleScreen(screen)
+            val toolbarState = rememberParallaxToolbarState()
+            if (screen == "playground") Playground(config, toolbarState) else FixedSampleScreen(screen)
+
+            if (screen == "playground") {
+                Row(
+                    modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding().padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SmallFloatingActionButton(onClick = { scope.launch { toolbarState.expand() } }) {
+                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Expand")
+                    }
+                    SmallFloatingActionButton(onClick = { scope.launch { toolbarState.collapse() } }) {
+                        Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Collapse")
+                    }
+                    Text(
+                        "${(toolbarState.collapseFraction * 100).toInt()}%",
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+            }
         }
 
         ExtendedFloatingActionButton(
@@ -124,7 +154,7 @@ fun PlaygroundHost(initialScreen: String = "playground") {
 fun PlaygroundScreen() = PlaygroundHost("playground")
 
 @Composable
-private fun Playground(config: PlaygroundConfig) {
+private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
     val headerHeight = when (config.headerKind) {
         HeaderKind.Fixed -> HeaderHeight.Fixed(config.fixedHeightDp.dp)
         HeaderKind.AspectRatio -> HeaderHeight.AspectRatio(config.aspectRatio)
@@ -180,17 +210,21 @@ private fun Playground(config: PlaygroundConfig) {
             gradient = if (config.gradient) {
                 Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)))
             } else null,
-            isExpandedWhenFirstDisplayed = config.startExpanded
+            isExpandedWhenFirstDisplayed = config.startExpanded,
+            parallaxMultiplier = config.parallaxMultiplier
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
             targetColor = config.toolbarColor.color,
-            elevation = config.elevation.dp
+            elevation = config.elevation.dp,
+            height = config.toolbarHeight.dp
         ),
         titleConfig = ParallaxToolbarDefaults.titleConfig(
             collapsedPaddingStart = config.collapsedTitlePaddingStart.dp,
             keepSubtitleAfterCollapse = config.keepSubtitleAfterCollapse,
-            animateSubTitleHiding = config.animateSubtitleHiding
+            animateSubTitleHiding = config.animateSubtitleHiding,
+            collapsedScale = config.collapsedTitleScale
         ),
+        state = state,
         bodyConfig = ParallaxToolbarDefaults.bodyConfig(minBottomSpacerHeight = config.minBottomSpacer.dp),
         contentPadding = PaddingValues(bottom = config.bottomContentPadding.dp),
         content = when (config.content) {
@@ -271,6 +305,9 @@ private fun ConfigSheet(
                 onChange(config.copy(percentage = it))
             }
         }
+        SliderRow("Parallax multiplier: ${(config.parallaxMultiplier * 100).toInt() / 100f}", config.parallaxMultiplier, 0f..1f) {
+            onChange(config.copy(parallaxMultiplier = it))
+        }
         SwitchRow("Gradient overlay", config.gradient) { onChange(config.copy(gradient = it)) }
         SwitchRow("Start expanded", config.startExpanded) { onChange(config.copy(startExpanded = it)) }
 
@@ -279,12 +316,18 @@ private fun ConfigSheet(
         SliderRow("Elevation: ${config.elevation.toInt()} dp", config.elevation, 0f..12f) {
             onChange(config.copy(elevation = it))
         }
+        SliderRow("Toolbar height: ${config.toolbarHeight.toInt()} dp", config.toolbarHeight, 48f..96f) {
+            onChange(config.copy(toolbarHeight = it))
+        }
         SwitchRow("Navigation icon", config.navigationIcon) { onChange(config.copy(navigationIcon = it)) }
         SwitchRow("Actions", config.actions) { onChange(config.copy(actions = it)) }
 
         Section("Title")
         SliderRow("Collapsed start padding: ${config.collapsedTitlePaddingStart.toInt()} dp", config.collapsedTitlePaddingStart, 16f..96f) {
             onChange(config.copy(collapsedTitlePaddingStart = it))
+        }
+        SliderRow("Collapsed scale: ${(config.collapsedTitleScale * 100).toInt()} %", config.collapsedTitleScale, 0.5f..1f) {
+            onChange(config.copy(collapsedTitleScale = it))
         }
         SwitchRow("Subtitle", config.subtitle) { onChange(config.copy(subtitle = it)) }
         SwitchRow("Keep subtitle after collapse", config.keepSubtitleAfterCollapse) {

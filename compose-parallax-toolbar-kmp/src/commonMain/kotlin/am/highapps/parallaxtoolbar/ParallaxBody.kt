@@ -3,7 +3,6 @@ package am.highapps.parallaxtoolbar
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -17,21 +16,17 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Regular body: a header-sized spacer, the content, then a filler so short content can still
- * scroll far enough to collapse the toolbar.
+ * Regular body: a header-sized gap, the content, then a filler so short content can still scroll
+ * far enough to collapse the toolbar. Measured in a single pass: the filler is derived from the
+ * content's measured height inside the same layout.
  *
  * @param viewportHeight Height available to the scrolling column, i.e. the layout height minus
  *   the status bar inset it is padded by.
@@ -47,43 +42,39 @@ internal fun ParallaxBody(
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    var contentHeight by remember { mutableStateOf(0) }
     val layoutDirection = LocalLayoutDirection.current
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize().verticalScroll(scroll)
-    ) {
-        Spacer(Modifier.height(headerHeight))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = contentPadding.calculateStartPadding(layoutDirection),
-                    end = contentPadding.calculateEndPadding(layoutDirection)
-                )
-                .onGloballyPositioned { layoutCoordinates ->
-                    contentHeight = layoutCoordinates.size.height
-                }
-        ) {
-            content()
+    Layout(
+        modifier = modifier.fillMaxSize().verticalScroll(scroll),
+        content = {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = contentPadding.calculateStartPadding(layoutDirection),
+                        end = contentPadding.calculateEndPadding(layoutDirection)
+                    )
+            ) {
+                content()
+            }
         }
+    ) { measurables, constraints ->
+        val width = constraints.maxWidth
+        val contentPlaceable = measurables.first().measure(
+            Constraints(minWidth = width, maxWidth = width)
+        )
+        val headerPx = headerHeight.roundToPx()
+        val bottomPaddingPx = contentPadding.calculateBottomPadding().roundToPx()
 
-        // The column must be able to scroll by (headerHeight - toolbarHeight) for the toolbar to
-        // collapse. Its total height is header + content + filler + bottom padding, and its scroll
-        // range is that minus the viewport, so the filler needed is:
-        val contentHeightDp = with(LocalDensity.current) { contentHeight.toDp() }
-        val bottomPadding = contentPadding.calculateBottomPadding()
-        val filler = (viewportHeight - toolbarHeight - contentHeightDp - bottomPadding)
-            .coerceAtLeast(minBottomSpacerHeight)
-            .coerceAtLeast(0.dp)
+        // The column must be able to scroll by (header - toolbar) for the toolbar to collapse.
+        // Its scroll range is (header + content + filler + bottom padding) - viewport.
+        val filler = (viewportHeight.roundToPx() - toolbarHeight.roundToPx() -
+                contentPlaceable.height - bottomPaddingPx)
+            .coerceAtLeast(minBottomSpacerHeight.roundToPx())
+            .coerceAtLeast(0)
 
-        Spacer(Modifier.height(filler))
-
-        // Bottom padding as an extra spacer so content clears e.g. a Scaffold bottom bar.
-        if (bottomPadding > 0.dp) {
-            Spacer(Modifier.height(bottomPadding))
+        layout(width, headerPx + contentPlaceable.height + filler + bottomPaddingPx) {
+            contentPlaceable.placeRelative(0, headerPx)
         }
     }
 }

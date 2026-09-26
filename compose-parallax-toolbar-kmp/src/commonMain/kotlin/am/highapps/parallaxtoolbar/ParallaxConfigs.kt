@@ -17,15 +17,25 @@ import androidx.compose.ui.unit.dp
  * recomposes with the same values. Build them with the factories in [ParallaxToolbarDefaults].
  */
 
-/** Header appearance and initial state. */
+/**
+ * Header appearance and initial state.
+ *
+ * @param parallaxMultiplier How much of the scroll distance the header content moves by. 0f pins
+ *   it, 1f scrolls it with the body, 0.5f is the classic parallax.
+ */
 @Immutable
 data class ParallaxHeaderConfig(
     val height: HeaderHeight,
     val gradient: Brush?,
-    val isExpandedWhenFirstDisplayed: Boolean = true
+    val isExpandedWhenFirstDisplayed: Boolean = true,
+    val parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier
 )
 
-/** Toolbar colors, elevation and icon metrics. */
+/**
+ * Toolbar colors, elevation and metrics.
+ *
+ * @param height Height of the pinned toolbar, excluding the status bar inset.
+ */
 @Immutable
 data class ParallaxToolbarConfig(
     val initialColor: Color,
@@ -33,17 +43,24 @@ data class ParallaxToolbarConfig(
     val elevation: Dp,
     val iconSize: Dp,
     val iconSpacing: Dp,
-    val animationSpec: AnimationSpec<Color>
+    val animationSpec: AnimationSpec<Color>,
+    val height: Dp = ParallaxToolbarDefaults.ToolbarHeight
 )
 
-/** Title and subtitle placement and collapse behavior. */
+/**
+ * Title and subtitle placement and collapse behavior.
+ *
+ * @param collapsedScale Scale of the title block once collapsed, e.g. 0.8f to shrink it into the
+ *   toolbar. It scales about its start edge.
+ */
 @Immutable
 data class ParallaxTitleConfig(
     val paddingBottom: Dp,
     val paddingStart: Dp,
     val collapsedPaddingStart: Dp,
     val keepSubtitleAfterCollapse: Boolean,
-    val animateSubTitleHiding: Boolean
+    val animateSubTitleHiding: Boolean,
+    val collapsedScale: Float = 1f
 )
 
 /** Body spacing. */

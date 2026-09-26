@@ -32,7 +32,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.4.0")
+                implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0")
             }
         }
     }
@@ -51,7 +51,7 @@ Add the dependency to your module's build.gradle.kts file:
 
 ```kotlin
 dependencies {
-    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.4.0")
+    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0")
 }
 ```
 
@@ -59,7 +59,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:1.4.0'
+    implementation 'am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0'
 }
 ```
 </details>
@@ -459,6 +459,31 @@ ComposeParallaxToolbarLayout(
 For detailed information on all components, parameters, and configuration options, see the [API Documentation](docs/API.md).
 
 <details>
+<summary><b>Programmatic control</b></summary>
+
+```kotlin
+val state = rememberParallaxToolbarState()
+val scope = rememberCoroutineScope()
+
+ComposeParallaxToolbarLayout(
+    titleContent = { Text("Title") },
+    headerContent = { /* ... */ },
+    content = ParallaxContent.Regular { /* ... */ },
+    state = state
+)
+
+// Anywhere with access to `state`:
+Text("Collapsed ${(state.collapseFraction * 100).toInt()}%")
+Button(onClick = { scope.launch { state.collapse() } }) { Text("Collapse") }
+Button(onClick = { scope.launch { state.expand() } }) { Text("Expand") }
+```
+
+`state.scrollState` backs regular content and `state.lazyListState` backs lazy content, so
+they can be passed to other scroll-aware components.
+
+</details>
+
+<details>
 <summary><b>Sample app</b></summary>
 
 The sample is a Compose Multiplatform playground shared by Android and iOS. The configuration
@@ -553,7 +578,11 @@ Available names: `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCentered`
 <details>
 <summary><b>Changelog</b></summary>
 
-### Version 1.4.0
+### Version 2.0.0
+
+- **NEW**: `ParallaxToolbarState` and `rememberParallaxToolbarState()`: observe `collapseFraction` and `isCollapsed`, and call `collapse()` / `expand()` (animated or not). The `scrollState` parameter is replaced by `state`; the deprecated overload still accepts a `ScrollState`.
+- **NEW**: `parallaxMultiplier` on the header config, `height` on the toolbar config, and `collapsedScale` on the title config.
+- **CHANGED**: the toolbar and title are measured in one pass by a custom layout instead of position callbacks, removing the one-frame jump on first display and rotation. The toolbar no longer uses Material's `TopAppBar` internally; its look is unchanged.
 
 - **UPDATED**: Kotlin 2.4.20, Compose Multiplatform 1.12.1, Material 3 1.9.0
 - **UPGRADED**: Gradle 9.7.0, Android Gradle Plugin 9.3.3, Maven Publish Plugin 0.37.0

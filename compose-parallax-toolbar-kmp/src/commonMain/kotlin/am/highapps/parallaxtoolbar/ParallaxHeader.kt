@@ -14,13 +14,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 internal fun ParallaxHeader(
     collapseState: CollapseState,
     headerHeightPx: Float,
+    parallaxMultiplier: Float,
     gradientBrush: Brush?,
     initialColor: Color,
     targetColor: Color,
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    val parallaxMultiplier = ParallaxToolbarDefaults.HeaderParallaxMultiplier
     val alphaHeightFraction = ParallaxToolbarDefaults.HeaderAlphaHeightFraction
 
     Box(

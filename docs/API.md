@@ -3,6 +3,19 @@
 This document provides detailed API documentation for the ComposeParallaxToolbar Compose
 Multiplatform library. It covers the main composable, configuration classes, and utilities.
 
+## ParallaxToolbarState
+
+Hoisted state returned by `rememberParallaxToolbarState()` and passed to the `state` parameter.
+
+| Member | Description |
+|---|---|
+| `collapseFraction: Float` | 0f while expanded, 1f once collapsed |
+| `isCollapsed: Boolean` | Whether the toolbar is collapsed |
+| `suspend fun collapse(animated = true)` | Scroll the body until the toolbar is collapsed |
+| `suspend fun expand(animated = true)` | Scroll the body back to the top |
+| `scrollState` | `ScrollState` used by `ParallaxContent.Regular` |
+| `lazyListState` | `LazyListState` used by `ParallaxContent.Lazy` unless it carries its own |
+
 ## Table of Contents
 
 - [Main Composable](#main-composable)

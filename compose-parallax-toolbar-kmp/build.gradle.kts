@@ -120,7 +120,7 @@ mavenPublishing {
     coordinates(
         groupId = "am.highapps.parallaxtoolbar",
         artifactId = "compose-parallax-toolbar-kmp",
-        version = "1.4.0"
+        version = "2.0.0"
     )
 
     pom {

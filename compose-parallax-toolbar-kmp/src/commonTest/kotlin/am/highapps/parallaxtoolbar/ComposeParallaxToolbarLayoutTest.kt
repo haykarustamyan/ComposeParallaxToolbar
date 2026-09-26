@@ -25,6 +25,7 @@ import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
 import kotlin.test.Test
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalTestApi::class)
 class ComposeParallaxToolbarLayoutTest : UiTestBase() {
@@ -55,7 +56,7 @@ class ComposeParallaxToolbarLayoutTest : UiTestBase() {
                         }
                     }
                 },
-                scrollState = rememberScrollState()
+                state = rememberParallaxToolbarState(scrollState = rememberScrollState())
             )
         }
 
@@ -424,5 +425,86 @@ class ComposeParallaxToolbarRtlTest : UiTestBase() {
         waitForIdle()
         onNodeWithText("r-collapsed").assertIsDisplayed()
         onNodeWithText("l-collapsed").assertIsDisplayed()
+    }
+}
+
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarStateTest : UiTestBase() {
+
+    @Test
+    fun state_reportsFraction_andCollapsesAndExpandsProgrammatically() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp),
+                    parallaxMultiplier = 0.3f
+                ),
+                toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(height = 56.dp, elevation = 3.dp),
+                titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedScale = 0.8f),
+                subtitleContent = { Text("subtitle") },
+                content = ParallaxContent.Regular {
+                    Column { repeat(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) } }
+                },
+                state = state
+            )
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+        kotlin.test.assertFalse(state.isCollapsed)
+
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        onNodeWithText("collapsed").assertIsDisplayed()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        kotlin.test.assertTrue(state.isCollapsed)
+
+        runOnIdle { kotlinx.coroutines.runBlocking { state.expand(animated = false) } }
+        waitForIdle()
+        onNodeWithText("expanded").assertIsDisplayed()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+    }
+
+    @Test
+    fun lazyState_collapsesAndExpandsProgrammatically() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        lateinit var scope: kotlinx.coroutines.CoroutineScope
+        setContent {
+            state = rememberParallaxToolbarState()
+            scope = androidx.compose.runtime.rememberCoroutineScope()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                content = ParallaxContent.Lazy(content = { _ ->
+                    items(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
+                }),
+                state = state
+            )
+        }
+        // Animated variants need the frame clock to advance, so launch rather than block.
+        runOnIdle { scope.launch { state.collapse() } }
+        waitForIdle()
+        onNodeWithText("collapsed").assertIsDisplayed()
+        runOnIdle { scope.launch { state.expand() } }
+        waitForIdle()
+        onNodeWithText("expanded").assertIsDisplayed()
+    }
+
+    @Test
+    fun configs_haveDefaultsForNewFields() {
+        val toolbar = ParallaxToolbarConfig(
+            initialColor = Color.Transparent, targetColor = Color.Black, elevation = 0.dp,
+            iconSize = 24.dp, iconSpacing = 8.dp, animationSpec = androidx.compose.animation.core.tween()
+        )
+        val title = ParallaxTitleConfig(
+            paddingBottom = 0.dp, paddingStart = 16.dp, collapsedPaddingStart = 64.dp,
+            keepSubtitleAfterCollapse = false, animateSubTitleHiding = true
+        )
+        kotlin.test.assertEquals(ParallaxToolbarDefaults.ToolbarHeight, toolbar.height)
+        kotlin.test.assertEquals(ParallaxToolbarDefaults.TitleCollapsedScale, title.collapsedScale)
     }
 }
