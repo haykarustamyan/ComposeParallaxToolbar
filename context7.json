@@ -1,0 +1,18 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "ComposeParallaxToolbar",
+  "description": "Collapsing toolbar layout for Compose Multiplatform: parallax header, any scrollable body, scroll modes, pinned tabs, pull-to-refresh. Android, iOS, desktop and web.",
+  "folders": ["docs"],
+  "excludeFolders": ["sample", "sample-android", "sample-desktop", "sample-web", "iosApp", "raw", "scripts", ".github"],
+  "excludeFiles": ["AGENTS.md", "CONTRIBUTING.md", "SECURITY.md", "CODE_OF_CONDUCT.md", "CHANGELOG.md", "llms-full.txt"],
+  "rules": [
+    "Depend on am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp; the library has no Material dependency, bring your own design system.",
+    "Use the overload that takes content: ParallaxContent (Regular, Lazy or Custom); the 1.x overload with scroll and lazyContent is deprecated.",
+    "Hoist state with rememberParallaxToolbarState(); there is no scrollState parameter in 2.x.",
+    "Build configs with the ParallaxToolbarDefaults factories instead of constructing config classes by hand.",
+    "Pass Scaffold padding as contentPadding and never add status bar padding around the layout; it handles the window insets itself.",
+    "The layout needs a bounded height; never place it inside a vertically scrolling parent.",
+    "For per-frame effects read collapseFraction inside graphicsLayer or use the scope modifiers parallax, fadeOnCollapse, scaleOnCollapse, pin and moveBetween.",
+    "iOS apps need CADisableMinimumFrameDurationOnPhone set to true in Info.plist."
+  ]
+}
