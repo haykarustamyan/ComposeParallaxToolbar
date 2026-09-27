@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -95,5 +96,42 @@ class MouseWheelSnapTest : UiTestBase() {
         onNodeWithTag("header").performMouseInput { scroll(-1f) }
         waitForIdle()
         assertTrue(state.collapseFraction == 0f || state.collapseFraction == 1f, "settled after the header tick: ${state.collapseFraction}")
+    }
+}
+
+@OptIn(ExperimentalTestApi::class)
+class MouseWheelAtBoundsTest : UiTestBase() {
+
+    @Test
+    fun wheelOverAListAtItsTop_expandsACollapsedHeader() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Box(Modifier.height(20.dp)) },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                content = ParallaxContent.Lazy(content = { _ ->
+                    items(60) { Box(Modifier.fillMaxWidth().height(48.dp).testTag("row$it")) }
+                }),
+                state = state,
+            )
+        }
+        // Collapse without moving the list: the list is at its top and refuses an upward wheel.
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        assertEquals(0, state.lazyListState.firstVisibleItemIndex)
+        onNodeWithTag("row0").performMouseInput { repeat(3) { scroll(-1f) } }
+        waitForIdle()
+        val afterThree = state.collapseFraction
+        assertTrue(afterThree < 1f, "wheel over the list at its top moved the header: $afterThree")
+        onNodeWithTag("row0").performMouseInput { repeat(9) { scroll(-1f) } }
+        waitForIdle()
+        assertEquals(0f, state.collapseFraction, "enough ticks expand it fully")
+
+        // And the other way: short content cannot scroll down, yet the wheel still collapses.
+        onNodeWithTag("row0").performMouseInput { repeat(6) { scroll(1f) } }
+        waitForIdle()
+        assertTrue(state.collapseFraction > 0f, "wheel over the list collapsed the header")
     }
 }

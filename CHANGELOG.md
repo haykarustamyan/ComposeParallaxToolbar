@@ -62,6 +62,7 @@ need one edit or none.
 - Right-to-left layouts placed the navigation icon and actions on the wrong sides; centered and end-aligned collapsed titles were offset by the navigation icon width.
 - A collapsed title could run under the actions when the collapsed start padding was wider than the navigation icon.
 - Mouse wheel and trackpad scrolling on desktop and web could leave the header stretched, since they never fling; a stretch now follows a held pointer only.
+- With the header collapsed and the list at its top, a wheel tick over the list did nothing on desktop and web: Compose drops wheel events the list cannot use before nested scroll runs. The layout now catches them, and drags on the toolbar move the header as well.
 - `snapOnRelease` never fired for wheel and trackpad scrolling, which has no release; the header now settles once such input has been quiet for a moment.
 - A downward fling on an expanded header stretched it for one frame.
 - The collapsed header is hidden from screen readers whether or not it fades.

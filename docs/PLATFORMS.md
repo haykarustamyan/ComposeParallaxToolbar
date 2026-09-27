@@ -73,6 +73,11 @@ header through nested scroll, including expansion when scrolling back up. Draggi
 with the mouse works as on touch. A stretch follows a held pointer only, so the wheel never
 leaves the header stretched.
 
+**Wheel at the list's bounds.** Compose drops a wheel event that the list under the cursor
+cannot use, so a collapsed header over a list at its top would never see the tick that should
+expand it (CMP-10236). The layout catches those events itself, so wheeling anywhere over the
+screen moves the header. Drags on the toolbar move it too.
+
 **Wheel and trackpad have no fling.** Each tick is a short fixed step and nothing "releases", so
 the header can stop part way, where a touch fling would have carried it through. With
 `snapOnRelease` the header settles once wheel input has been quiet for a moment, the same way

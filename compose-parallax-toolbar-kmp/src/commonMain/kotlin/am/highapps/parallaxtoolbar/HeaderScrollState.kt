@@ -267,7 +267,8 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     private fun settleTargetPx(velocityPx: Float): Float? {
         val rests = restingOffsets()
         val current = totalOffsetPx
-        if (rests.any { kotlin.math.abs(it - current) < 0.5f }) return null
+        // Within a hair of a rest: land on it exactly rather than leaving a rounding remainder.
+        rests.firstOrNull { kotlin.math.abs(it - current) < 0.5f }?.let { return it }
         val below = rests.last { it < current }
         val above = rests.first { it > current }
         return when {
@@ -327,8 +328,10 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
 
         override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
             // Lazy lists leave sub-pixel remainders from rounding even while they can still scroll.
-            // Only a real leftover means the body is at its top and the header should expand.
-            if (available.y < PostScrollThresholdPx) return Offset.Zero
+            // Only a real leftover means the body is at its top and the header should expand. The
+            // remainders are claimed so no parent scrollable acts on them either.
+            if (kotlin.math.abs(available.y) < PostScrollThresholdPx) return Offset(0f, available.y)
+            if (available.y < 0f) return Offset.Zero
             if (source == NestedScrollSource.UserInput) noteWheelInput()
             val used = dispatchRawDelta(-available.y, allowStretch = source == NestedScrollSource.UserInput)
             return Offset(0f, -used)
@@ -343,7 +346,9 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
             cancelWheelSettle()
             releaseStretch()
             if (snapOnRelease) settle(velocityPx = -available.y)
-            return Velocity.Zero
+            // The header already took its share frame by frame; claim the rest so the root
+            // scrollable does not fling it with whatever velocity the body had left.
+            return available
         }
     }
 }

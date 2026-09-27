@@ -3,11 +3,13 @@ package am.highapps.parallaxtoolbar
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -328,6 +330,7 @@ private fun ParallaxToolbarLayoutImpl(
     val headerFling = remember(headerState, headerConfig.snapOnRelease) {
         HeaderFlingBehavior(headerState, headerConfig.snapOnRelease)
     }
+    val rootScroll = remember(headerState) { RootScrollState(headerState) }
 
     BoxWithConstraints(
         modifier = modifier
@@ -395,11 +398,25 @@ private fun ParallaxToolbarLayoutImpl(
         Layout(
             modifier = Modifier
                 .fillMaxSize()
-                // Scrolls that start in the body reach the header through nested scroll. The
-                // scrollable for drags on the header sits on the header itself, not here: a
-                // scrollable ancestor would also swallow whatever the body leaves unconsumed and
-                // bypass the mode rules in the connection.
-                .then(if (collapseEnabled) Modifier.nestedScroll(connection) else Modifier),
+                // Scrolls that start in the body reach the header through nested scroll, via the
+                // connection below. The scrollable here catches what never enters nested scroll:
+                // wheel ticks a body at its bounds refuses outright, and drags on the toolbar. Its
+                // state passes leftovers on through the same gated dispatch the connection uses,
+                // so it cannot bypass the mode rules or eat the platform overscroll.
+                .then(
+                    if (collapseEnabled) {
+                        Modifier
+                            .scrollable(
+                                state = rootScroll,
+                                orientation = Orientation.Vertical,
+                                reverseDirection = true,
+                                flingBehavior = headerFling,
+                            )
+                            .nestedScroll(connection)
+                    } else {
+                        Modifier
+                    },
+                ),
             content = {
                 // The body and title are pushed down by the status bar inset so the collapsed
                 // toolbar clears it; the header covers the inset too.
@@ -557,6 +574,27 @@ private fun PaddingValues.withExtraBottom(extra: Dp): PaddingValues =
     }
 
 /** Flings on the header itself decelerate the header frame by frame, then optionally settle it. */
+/**
+ * Scroll state for the layout root. Everything goes through [HeaderScrollState.dispatchRawDelta],
+ * which already ignores stretch without a pressed pointer; the connection claims the sub-pixel
+ * remainders lazy lists leave, so nothing else needs filtering here.
+ */
+private class RootScrollState(private val header: HeaderScrollState) : ScrollableState {
+    private val scope = object : ScrollScope {
+        override fun scrollBy(pixels: Float): Float = dispatchRawDelta(pixels)
+    }
+
+    override fun dispatchRawDelta(delta: Float): Float = header.dispatchRawDelta(delta)
+
+    override suspend fun scroll(scrollPriority: MutatePriority, block: suspend ScrollScope.() -> Unit) =
+        header.scroll(scrollPriority) { scope.block() }
+
+    override val isScrollInProgress: Boolean get() = header.isScrollInProgress
+    override val canScrollForward: Boolean
+        get() = header.fraction < 1f || (header.exitRangePx > 0f && header.exitFraction < 1f)
+    override val canScrollBackward: Boolean get() = header.fraction > 0f || header.exitFraction > 0f
+}
+
 private class HeaderFlingBehavior(
     private val headerState: HeaderScrollState,
     private val snapOnRelease: Boolean,
