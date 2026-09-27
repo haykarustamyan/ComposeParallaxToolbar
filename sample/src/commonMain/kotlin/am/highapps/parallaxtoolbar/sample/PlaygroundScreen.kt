@@ -7,6 +7,10 @@ import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
 import am.highapps.parallaxtoolbar.ParallaxToolbarState
 import am.highapps.parallaxtoolbar.ScrollMode
 import am.highapps.parallaxtoolbar.rememberParallaxToolbarState
+import am.highapps.parallaxtoolbar.sample.resources.Res
+import am.highapps.parallaxtoolbar.sample.resources.header_forest
+import am.highapps.parallaxtoolbar.sample.resources.header_mountains
+import am.highapps.parallaxtoolbar.sample.resources.header_river
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +44,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -72,7 +78,15 @@ enum class TitleAlign(val alignment: Alignment.Horizontal) {
 }
 enum class HeaderKind { Fixed, AspectRatio, Percentage }
 enum class ToolbarColor(val color: Color) {
-    Black(Color.Black), Indigo(Color(0xFF3F51B5)), White(Color.White)
+    Black(Color.Black), Indigo(Color(0xFF3F51B5)), White(Color.White),
+    /** Resolved to the theme's surface color at draw time. */
+    Surface(Color.Unspecified)
+}
+enum class HeaderImage(val res: org.jetbrains.compose.resources.DrawableResource?, val title: String, val caption: String) {
+    None(null, "Parallax Toolbar", "Gradient"),
+    Mountains(Res.drawable.header_mountains, "Isle of Skye", "Quiraing, Scotland"),
+    River(Res.drawable.header_river, "Alpine Valley", "Spring meltwater"),
+    Forest(Res.drawable.header_forest, "Yosemite Valley", "Merced River trail")
 }
 
 /** Every knob the library exposes, so each can be flipped while the layout is on screen. */
@@ -105,29 +119,78 @@ data class PlaygroundConfig(
     val toolbarHeight: Float = 64f,
     val bottomContentPadding: Float = 0f,
     val minBottomSpacer: Float = 0f,
-    val itemCount: Int = 30
+    val itemCount: Int = 30,
+    val darkTheme: Boolean = false,
+    val headerImage: HeaderImage = HeaderImage.None,
+    /** Presentation mode for recordings: captions instead of debug text, no floating controls. */
+    val showcase: Boolean = false
 )
 
 /**
  * Hosts either the live playground or a fixed sample screen, with a settings button that opens
  * the configuration sheet. The sheet opens by itself on first launch so the controls are found.
  */
+/** Named starting configurations, handy for demos and recordings. */
+val playgroundPresets: Map<String, PlaygroundConfig> = mapOf(
+    "default" to PlaygroundConfig(),
+    "grid-avatar" to PlaygroundConfig(content = ContentKind.Grid, overlayAvatar = true),
+    "enter-always-collapsed" to PlaygroundConfig(scrollMode = ScrollMode.EnterAlwaysCollapsed),
+    "tabs-stretch" to PlaygroundConfig(bottomTabs = true, stretch = true),
+    "centered-title" to PlaygroundConfig(
+        scrollMode = ScrollMode.EnterAlways, snapOnRelease = true,
+        titleAlignment = TitleAlign.Center, collapsedTitleScale = 0.85f, toolbarColor = ToolbarColor.White
+    ),
+    // Dark theme with photo headers, used for the README recordings.
+    "showcase-basic" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.Mountains, toolbarColor = ToolbarColor.Surface, elevation = 3f, itemCount = 20
+    ),
+    "showcase-grid-avatar" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.Forest, toolbarColor = ToolbarColor.Surface,
+        content = ContentKind.Grid, overlayAvatar = true, itemCount = 24
+    ),
+    "showcase-exit" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.River, toolbarColor = ToolbarColor.Surface,
+        scrollMode = ScrollMode.EnterAlwaysCollapsed, content = ContentKind.Lazy, itemCount = 40
+    ),
+    "showcase-tabs" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.Mountains, toolbarColor = ToolbarColor.Surface,
+        bottomTabs = true, stretch = true, itemCount = 20
+    ),
+    "showcase-exit-until" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.Forest, toolbarColor = ToolbarColor.Surface,
+        content = ContentKind.Lazy, itemCount = 40
+    ),
+    "showcase-enter-always" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.Mountains, toolbarColor = ToolbarColor.Surface,
+        scrollMode = ScrollMode.EnterAlways, content = ContentKind.Lazy, itemCount = 40
+    ),
+    "showcase-snap" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.River, toolbarColor = ToolbarColor.Surface,
+        snapOnRelease = true, itemCount = 20
+    ),
+    "showcase-centered" to PlaygroundConfig(
+        showcase = true, darkTheme = true, headerImage = HeaderImage.Forest, toolbarColor = ToolbarColor.Surface,
+        scrollMode = ScrollMode.EnterAlways, titleAlignment = TitleAlign.Center, collapsedTitleScale = 0.85f, itemCount = 30
+    )
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaygroundHost(initialScreen: String = "playground") {
+fun PlaygroundHost(initialScreen: String = "playground", preset: String = "default") {
     var screen by remember { mutableStateOf(initialScreen) }
-    var config by remember { mutableStateOf(PlaygroundConfig()) }
-    var showSheet by remember { mutableStateOf(initialScreen == "playground") }
+    var config by remember { mutableStateOf(playgroundPresets[preset] ?: PlaygroundConfig()) }
+    var showSheet by remember { mutableStateOf(initialScreen == "playground" && preset == "default") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
-    Box(Modifier.fillMaxSize()) {
+    MaterialTheme(colorScheme = if (config.darkTheme) darkColorScheme() else lightColorScheme()) {
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // Scroll position lives inside the state, so recreate it when the initial state changes.
         key(screen, config.content, config.startExpanded) {
             val toolbarState = rememberParallaxToolbarState()
             if (screen == "playground") Playground(config, toolbarState) else FixedSampleScreen(screen)
 
-            if (screen == "playground") {
+            if (screen == "playground" && !config.showcase) {
                 Row(
                     modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding().padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -146,7 +209,7 @@ fun PlaygroundHost(initialScreen: String = "playground") {
             }
         }
 
-        ExtendedFloatingActionButton(
+        if (!config.showcase) ExtendedFloatingActionButton(
             onClick = { showSheet = true },
             icon = { Icon(Icons.Default.Settings, contentDescription = null) },
             text = { Text("Configure") },
@@ -164,6 +227,7 @@ fun PlaygroundHost(initialScreen: String = "playground") {
             }
         }
     }
+    }
 }
 
 @Composable
@@ -177,12 +241,17 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         HeaderKind.AspectRatio -> HeaderHeight.AspectRatio(config.aspectRatio)
         HeaderKind.Percentage -> HeaderHeight.Percentage(config.percentage)
     }
-    val onToolbar = if (config.toolbarColor == ToolbarColor.White) Color.Black else Color.White
+    val toolbarTarget = if (config.toolbarColor == ToolbarColor.Surface) MaterialTheme.colorScheme.surface else config.toolbarColor.color
+    val onToolbar = when (config.toolbarColor) {
+        ToolbarColor.White -> Color.Black
+        ToolbarColor.Surface -> MaterialTheme.colorScheme.onSurface
+        else -> Color.White
+    }
 
     ComposeParallaxToolbarLayout(
         titleContent = { collapsed ->
             Text(
-                text = if (collapsed) "Collapsed" else "Parallax Toolbar",
+                text = if (config.showcase) config.headerImage.title else if (collapsed) "Collapsed" else "Parallax Toolbar",
                 color = if (collapsed) onToolbar else Color.White,
                 fontSize = if (collapsed) 20.sp else 28.sp,
                 fontWeight = FontWeight.Bold
@@ -191,7 +260,8 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         subtitleContent = if (config.subtitle) {
             { collapsed ->
                 Text(
-                    text = "${config.content} · ${config.headerKind}" + if (refreshCount > 0) " · refreshed $refreshCount×" else "",
+                    text = (if (config.showcase) config.headerImage.caption else "${config.content} · ${config.headerKind}") +
+                        if (refreshCount > 0) " · refreshed $refreshCount×" else "",
                     color = if (collapsed) onToolbar.copy(alpha = 0.7f) else Color.White.copy(alpha = 0.85f),
                     fontSize = 14.sp
                 )
@@ -200,16 +270,24 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         headerContent = {
             // The slot scope exposes collapseFraction; reading it in graphicsLayer keeps the
             // effect on the draw path so scrolling never recomposes the header.
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        val zoom = 1f + 0.15f * collapseFraction
-                        scaleX = zoom
-                        scaleY = zoom
-                    }
-                    .background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC))))
-            )
+            val zoomModifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    val zoom = 1f + 0.15f * collapseFraction
+                    scaleX = zoom
+                    scaleY = zoom
+                }
+            val image = config.headerImage.res
+            if (image != null) {
+                androidx.compose.foundation.Image(
+                    painter = org.jetbrains.compose.resources.painterResource(image),
+                    contentDescription = null,
+                    modifier = zoomModifier,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+            } else {
+                Box(zoomModifier.background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))))
+            }
         },
         navigationIcon = if (config.navigationIcon) {
             { collapsed ->
@@ -232,7 +310,7 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         headerConfig = ParallaxToolbarDefaults.headerConfig(
             height = headerHeight,
             gradient = if (config.gradient) {
-                Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)))
+                Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = if (config.headerImage == HeaderImage.None) 0.6f else 0.75f)))
             } else null,
             isExpandedWhenFirstDisplayed = config.startExpanded,
             parallaxMultiplier = config.parallaxMultiplier,
@@ -261,9 +339,9 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
                     Modifier
                         .size(72.dp)
                         .moveBetween(
-                            expanded = Alignment.BottomStart,
+                            expanded = Alignment.BottomEnd,
                             collapsed = Alignment.CenterEnd,
-                            expandedPadding = PaddingValues(start = 16.dp, bottom = 72.dp),
+                            expandedPadding = PaddingValues(end = 16.dp, bottom = 24.dp),
                             collapsedPadding = PaddingValues(end = 104.dp),
                             collapsedScale = 0.5f
                         )
@@ -272,7 +350,7 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
             }
         } else null,
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
-            targetColor = config.toolbarColor.color,
+            targetColor = toolbarTarget,
             elevation = config.elevation.dp,
             height = config.toolbarHeight.dp,
             alwaysElevated = config.alwaysElevated
@@ -290,12 +368,12 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
         content = when (config.content) {
             ContentKind.Regular -> ParallaxContent.Regular { collapsed ->
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    repeat(config.itemCount) { i -> SampleCard(i, collapsed) }
+                    repeat(config.itemCount) { i -> SampleCard(i, collapsed, config.showcase) }
                 }
             }
             ContentKind.Lazy -> ParallaxContent.Lazy(
                 content = { collapsed ->
-                    items(config.itemCount) { i -> SampleCard(i, collapsed) }
+                    items(config.itemCount) { i -> SampleCard(i, collapsed, config.showcase) }
                 },
                 config = ParallaxToolbarDefaults.lazyColumnConfig(
                     contentPadding = PaddingValues(16.dp),
@@ -311,22 +389,27 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(config.itemCount) { i -> SampleCard(i, collapsed) }
+                    items(config.itemCount) { i -> SampleCard(i, collapsed, config.showcase) }
                 }
             }
         }
     )
 }
 
+private val showcaseTitles = listOf("Morning at the ridge", "Sea stacks", "The old path", "Weather turns", "Lochside camp", "Down the glen")
+private val showcaseLines = listOf("4.2 km · 310 m ascent", "Best light after 6 pm", "Boggy after rain", "Wind picks up by noon", "Two hours from the road", "Return the same way")
+
 @Composable
-private fun SampleCard(index: Int, collapsed: Boolean) {
+private fun SampleCard(index: Int, collapsed: Boolean, showcase: Boolean = false) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
-            Text("Item ${index + 1}", fontWeight = FontWeight.SemiBold)
-            Text(
-                if (collapsed) "Toolbar is collapsed" else "Toolbar is expanded",
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (showcase) {
+                Text(showcaseTitles[index % showcaseTitles.size], fontWeight = FontWeight.SemiBold)
+                Text(showcaseLines[index % showcaseLines.size], style = MaterialTheme.typography.bodySmall)
+            } else {
+                Text("Item ${index + 1}", fontWeight = FontWeight.SemiBold)
+                Text(if (collapsed) "Toolbar is collapsed" else "Toolbar is expanded", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
@@ -357,6 +440,10 @@ private fun ConfigSheet(
         }
 
         if (screen != "playground") return@Column
+
+        Section("Appearance")
+        SwitchRow("Dark theme", config.darkTheme) { onChange(config.copy(darkTheme = it)) }
+        Choice(HeaderImage.entries, config.headerImage) { onChange(config.copy(headerImage = it)) }
 
         Section("Content")
         Choice(ContentKind.entries, config.content) { onChange(config.copy(content = it)) }

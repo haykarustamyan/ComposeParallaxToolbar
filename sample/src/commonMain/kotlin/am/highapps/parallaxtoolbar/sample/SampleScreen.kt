@@ -11,10 +11,8 @@ val sampleScreenNames = listOf(
 
 /** Shared entry point: the interactive playground, or one of the fixed sample screens by name. */
 @Composable
-fun SampleApp(screen: String = "playground") {
-    MaterialTheme {
-        PlaygroundHost(initialScreen = screen)
-    }
+fun SampleApp(screen: String = "playground", preset: String = "default") {
+    PlaygroundHost(initialScreen = screen, preset = preset)
 }
 
 /** Renders one fixed sample screen by name. */

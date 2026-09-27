@@ -5,8 +5,8 @@ import SampleShared
 /// to open a fixed sample screen instead, for example "lazyPadding".
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        let screen = ProcessInfo.processInfo.environment["SAMPLE_SCREEN"] ?? "playground"
-        return MainViewControllerKt.MainViewController(screen: screen)
+        let env = ProcessInfo.processInfo.environment
+        return MainViewControllerKt.MainViewController(screen: env["SAMPLE_SCREEN"] ?? "playground", preset: env["SAMPLE_PRESET"] ?? "default")
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

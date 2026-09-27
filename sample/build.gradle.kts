@@ -15,6 +15,11 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+        // Compose resources of a KMP library are packaged as Android assets; the new library
+        // plugin only does that when Android resources are enabled.
+        androidResources {
+            enable = true
+        }
     }
 
     listOf(iosArm64(), iosSimulatorArm64()).forEach {
@@ -42,6 +47,7 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.extended)
+            implementation(libs.compose.components.resources)
         }
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling)
@@ -50,5 +56,6 @@ kotlin {
 }
 
 compose.resources {
-    generateResClass = never
+    packageOfResClass = "am.highapps.parallaxtoolbar.sample.resources"
+    generateResClass = always
 }

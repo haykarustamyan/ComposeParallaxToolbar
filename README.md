@@ -1,39 +1,48 @@
+<div align="center">
+
 # ComposeParallaxToolbar
 
-[![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)](https://central.sonatype.com/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
-[![Kotlin](https://img.shields.io/badge/kotlin-2.4.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
-[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12.1-blue)](https://github.com/JetBrains/compose-multiplatform)
-[![Platforms](https://img.shields.io/badge/platforms-Android%20|%20iOS%20|%20Desktop%20|%20Web-green.svg)](#compatibility)
+**A collapsing toolbar with a parallax header for Compose Multiplatform.**<br>
+Android · iOS · Desktop · Web
+
+[![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp?label=Maven%20Central&color=4c8cff)](https://central.sonatype.com/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
+[![CI](https://github.com/haykarustamyan/ComposeParallaxToolbar/actions/workflows/gradle.yml/badge.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar/actions/workflows/gradle.yml)
+[![Docs](https://img.shields.io/badge/docs-site-2ea44f.svg)](https://haykarustamyan.github.io/ComposeParallaxToolbar/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7f52ff.svg?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12.1-4285f4.svg)](https://github.com/JetBrains/compose-multiplatform)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A collapsing toolbar with a parallax header for Compose Multiplatform. The header collapses as
-the body scrolls, the title glides into the toolbar, and every slot knows how far along it is.
-It depends only on Compose UI and Foundation, so it works with Material 2, Material 3 or your own
-design system, on Android, iOS, desktop and web.
+The header collapses as the body scrolls, the title glides into the toolbar, and every slot knows
+how far along it is. Depends only on Compose UI and Foundation, so it fits Material 2, Material 3
+or your own design system.
 
-![Parallax toolbar animation](https://github.com/haykarustamyan/ComposeParallaxToolbar/raw/main/raw/main/images/parallax_gif.gif)
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/hero-collapse.gif" width="300" alt="Collapse and expand"></td>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/hero-grid-avatar.gif" width="300" alt="Grid body with an avatar that travels into the toolbar"></td>
+  </tr>
+</table>
+
+</div>
 
 ## Features
 
-- **Any scrollable body.** A column, a `LazyColumn`, or anything else that scrolls: grids,
-  staggered grids, pagers. The header collapses through nested scrolling.
-- **Scroll modes.** Exit until collapsed, enter always, or enter always collapsed with the
-  toolbar sliding away. Optional snap on release.
-- **Header height** as a fixed size, an aspect ratio or a fraction of the screen, with a cap.
-- **Per-element behaviors.** Give any header element its own parallax, fade or scale, and glide
-  elements such as an avatar from the header into the toolbar.
-- **Bottom slot** pinned under the toolbar for tabs or a search field.
-- **Overscroll stretch** with a trigger callback for pull-to-refresh.
-- **Hoisted state** with the collapse fraction, `collapse()` and `expand()`, saved across
-  configuration changes and process death.
-- **Accessibility** built in: state announcements, expand and collapse actions, reading order,
-  and a heading for the title.
-- **Right-to-left** layouts, edge-to-edge insets and the iPhone status bar handled for you.
+| | |
+|---|---|
+| **Any scrollable body** | A column, a `LazyColumn`, or anything else that scrolls: grids, staggered grids, pagers. The header collapses through nested scrolling. |
+| **Scroll modes** | Exit until collapsed, enter always, or enter always collapsed with the toolbar sliding away. Optional snap on release. |
+| **Header height** | A fixed size, an aspect ratio or a fraction of the screen, each with a cap. |
+| **Per-element behaviors** | Give any header element its own parallax, fade or scale, and glide elements such as an avatar from the header into the toolbar. |
+| **Bottom slot** | Tabs or a search field pinned under the toolbar. |
+| **Overscroll stretch** | With a trigger callback for pull-to-refresh. |
+| **Hoisted state** | The collapse fraction, `collapse()` and `expand()`, saved across configuration changes and process death. |
+| **Accessibility** | State announcements, expand and collapse actions, reading order, a heading for the title. |
+| **Platforms** | Right-to-left layouts, edge-to-edge insets and the iPhone status bar handled for you. |
 
 ## Installation
 
-Add the dependency to the source set that holds your screens. In a Compose Multiplatform project
-that is `commonMain`; in an Android-only project it is the app module.
+Add the dependency to the source set that holds your screens: `commonMain` in a Compose
+Multiplatform project, the app module in an Android-only project.
 
 ```kotlin
 dependencies {
@@ -42,7 +51,7 @@ dependencies {
 ```
 
 iOS, desktop and web apps consume it through their shared Kotlin module; nothing is imported on
-the Swift or JavaScript side. See the [platform guide](docs/PLATFORMS.md) for the one iOS
+the Swift or JavaScript side. The [platform guide](docs/PLATFORMS.md) has the one iOS
 `Info.plist` key Compose needs.
 
 ## Quick start
@@ -50,6 +59,7 @@ the Swift or JavaScript side. See the [platform guide](docs/PLATFORMS.md) for th
 ```kotlin
 import am.highapps.parallaxtoolbar.ComposeParallaxToolbarLayout
 import am.highapps.parallaxtoolbar.ParallaxContent
+import am.highapps.parallaxtoolbar.ParallaxToolbarDefaults
 
 @Composable
 fun AlbumScreen(album: Album, onBack: () -> Unit, onShare: () -> Unit) {
@@ -74,8 +84,8 @@ fun AlbumScreen(album: Album, onBack: () -> Unit, onShare: () -> Unit) {
 }
 ```
 
-The Material calls are the app's choice; the library itself has no Material dependency. Every
-slot receives `collapsed` and runs in a `ParallaxToolbarScope`, which also exposes the continuous
+The Material calls are the app's choice; the library has no Material dependency. Every slot
+receives `collapsed` and runs in a `ParallaxToolbarScope`, which also exposes the continuous
 `collapseFraction`. Use `ParallaxContent.Regular` for a scrolling column, or
 `ParallaxContent.Custom` to bring your own scrollable:
 
@@ -117,6 +127,62 @@ ComposeParallaxToolbarLayout(
 
 The [API reference](docs/API.md) lists every parameter and default.
 
+## Scroll modes
+
+<table>
+  <tr>
+    <td width="33%" align="center" valign="top"><img src="raw/main/images/mode-exit-until-collapsed.gif" width="240" alt="Exit until collapsed"><br><sub><b>ExitUntilCollapsed</b> (default)</sub></td>
+    <td width="33%" align="center" valign="top"><img src="raw/main/images/mode-enter-always.gif" width="240" alt="Enter always"><br><sub><b>EnterAlways</b></sub></td>
+    <td width="33%" align="center" valign="top"><img src="raw/main/images/mode-enter-always-collapsed.gif" width="240" alt="Enter always collapsed"><br><sub><b>EnterAlwaysCollapsed</b></sub></td>
+  </tr>
+</table>
+
+Scrolling up always collapses the header first. What happens on the way back down is the mode:
+expand only once the body is at its top, expand immediately anywhere, or slide the toolbar away
+too and bring it back first.
+
+```kotlin
+headerConfig = ParallaxToolbarDefaults.headerConfig(scrollMode = ScrollMode.EnterAlwaysCollapsed)
+```
+
+## Snap and title alignment
+
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/snap.gif" width="240" alt="Snap on release"><br><sub><b>snapOnRelease</b></sub></td>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/centered-title.gif" width="240" alt="Centered collapsed title"><br><sub><b>collapsedAlignment</b> and <b>collapsedScale</b></sub></td>
+  </tr>
+</table>
+
+```kotlin
+headerConfig = ParallaxToolbarDefaults.headerConfig(snapOnRelease = true),
+titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = Alignment.CenterHorizontally, collapsedScale = 0.85f)
+```
+
+## Bottom slot, pull-to-refresh and overlay
+
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/tabs-stretch.gif" width="240" alt="Tabs pinned under the toolbar and overscroll stretch"><br><sub><b>bottomContent</b> and <b>stretchEnabled</b></sub></td>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/hero-grid-avatar.gif" width="240" alt="Overlay avatar moving into the toolbar"><br><sub><b>overlayContent</b> with <b>moveBetween</b></sub></td>
+  </tr>
+</table>
+
+`bottomContent` pins a row under the toolbar. It rides the header's bottom edge while expanded
+and stays put once collapsed; the body starts beneath it. `stretchEnabled` lets a pull past the
+top stretch the header; release springs it back and, past `stretchTriggerDistance`, calls
+`onStretchTrigger`. `overlayContent` sits above the body and the toolbar, so an element there can
+glide from the header into the toolbar with `moveBetween`.
+
+```kotlin
+bottomContent = { TabRow(/* ... */) },
+headerConfig = ParallaxToolbarDefaults.headerConfig(stretchEnabled = true),
+onStretchTrigger = { viewModel.refresh() },
+overlayContent = {
+    Avatar(Modifier.size(72.dp).moveBetween(expanded = Alignment.BottomEnd, collapsed = Alignment.CenterEnd, collapsedScale = 0.5f))
+}
+```
+
 ## State and effects
 
 ```kotlin
@@ -129,35 +195,30 @@ Text("${(state.collapseFraction * 100).toInt()} %")
 Button(onClick = { scope.launch { state.collapse() } }) { Text("Collapse") }
 ```
 
-Inside any slot the scope offers modifiers for per-element effects, and an `overlayContent` slot
-above everything hosts elements that travel into the toolbar:
+Inside any slot the scope offers modifiers for per-element effects:
 
 ```kotlin
 headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
 headerContent = {
     Image(cover, null, Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse())
-},
-overlayContent = {
-    Avatar(Modifier.size(72.dp).moveBetween(
-        expanded = Alignment.BottomStart, collapsed = Alignment.CenterEnd,
-        expandedPadding = PaddingValues(start = 16.dp, bottom = 72.dp),
-        collapsedPadding = PaddingValues(end = 104.dp), collapsedScale = 0.5f
-    ))
+    Text("Est. 1998", Modifier.align(Alignment.BottomEnd).scaleOnCollapse(0.6f).fadeOnCollapse())
 }
 ```
 
 ## Documentation
 
-- [API reference](docs/API.md): every parameter, config, state member and modifier.
-- [Recipes](docs/RECIPES.md): complete screens for common tasks, compiled on every CI run.
-- [Platform guide](docs/PLATFORMS.md): Android edge-to-edge and `Scaffold`, iOS hosting, desktop, web.
-- [Migrating from 1.x](docs/MIGRATION.md).
-- [Changelog](CHANGELOG.md).
+| | |
+|---|---|
+| [API reference](docs/API.md) | Every parameter, config, state member and modifier |
+| [Recipes](docs/RECIPES.md) | Complete screens for common tasks, compiled on every CI run |
+| [Platform guide](docs/PLATFORMS.md) | Android edge-to-edge and `Scaffold`, iOS hosting, desktop, web |
+| [Migrating from 1.x](docs/MIGRATION.md) | Every change and the upgrade steps |
+| [Changelog](CHANGELOG.md) | Release notes |
+| [Docs site](https://haykarustamyan.github.io/ComposeParallaxToolbar/) | Generated API docs and all guides |
 
 **Using an AI coding assistant?** Point it at [llms.txt](llms.txt), or drop
 [docs/agents/SKILL.md](docs/agents/SKILL.md) into your project's agent instructions. It holds the
-current signatures, the rules that matter, and the 1.x habits to avoid. [llms-full.txt](llms-full.txt)
-is every guide in one file.
+current signatures, the rules that matter, and the 1.x habits to avoid.
 
 ## Sample app
 
