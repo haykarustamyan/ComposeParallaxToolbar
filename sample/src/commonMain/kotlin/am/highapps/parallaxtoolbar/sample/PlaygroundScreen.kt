@@ -107,6 +107,8 @@ data class PlaygroundConfig(
     val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
     val fadeHeader: Boolean = true,
     val overlayAvatar: Boolean = false,
+    /** A chip row at the bottom of the header that stays in view with `Modifier.pin`. */
+    val pinnedChips: Boolean = false,
     val stretch: Boolean = false,
     val bottomTabs: Boolean = false,
     val titleAlignment: TitleAlign = TitleAlign.Start,
@@ -140,6 +142,7 @@ data class PlaygroundConfig(
 val playgroundPresets: Map<String, PlaygroundConfig> = mapOf(
     "default" to PlaygroundConfig(),
     "grid-avatar" to PlaygroundConfig(content = ContentKind.Grid, overlayAvatar = true),
+    "pin" to PlaygroundConfig(pinnedChips = true, fadeHeader = false, headerImage = HeaderImage.Mountains),
     "enter-always-collapsed" to PlaygroundConfig(scrollMode = ScrollMode.EnterAlwaysCollapsed),
     "tabs-stretch" to PlaygroundConfig(bottomTabs = true, stretch = true),
     "rtl" to PlaygroundConfig(rightToLeft = true, titleAlignment = TitleAlign.Center, collapsedTitleScale = 0.85f),
@@ -351,6 +354,23 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState) {
                 )
             } else {
                 Box(zoomModifier.background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))))
+            }
+            if (config.pinnedChips) {
+                // Sits above the title; pin keeps it still until the header's bottom edge reaches
+                // it, then it rides up and stops at the toolbar's top edge.
+                Box(Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(start = 16.dp, bottom = 96.dp)
+                            .pin(stopAtTop = true),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        listOf("Trails", "Lakes", "Summits").forEachIndexed { i, label ->
+                            FilterChip(selected = i == 0, onClick = {}, label = { Text(label) })
+                        }
+                    }
+                }
             }
         },
         navigationIcon = if (config.navigationIcon) {
@@ -566,6 +586,7 @@ private fun ConfigSheet(
         SwitchRow("Gradient overlay", config.gradient) { onChange(config.copy(gradient = it)) }
         SwitchRow("Fade header on collapse", config.fadeHeader) { onChange(config.copy(fadeHeader = it)) }
         SwitchRow("Overlay avatar (moveBetween)", config.overlayAvatar) { onChange(config.copy(overlayAvatar = it)) }
+        SwitchRow("Pinned chip row (pin)", config.pinnedChips) { onChange(config.copy(pinnedChips = it)) }
         SwitchRow("Stretch on overscroll (pull to refresh)", config.stretch) { onChange(config.copy(stretch = it)) }
         SwitchRow("Bottom tabs slot", config.bottomTabs) { onChange(config.copy(bottomTabs = it)) }
         SwitchRow("Start expanded", config.startExpanded) { onChange(config.copy(startExpanded = it)) }
