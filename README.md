@@ -227,6 +227,9 @@ current signatures, the rules that matter, and the 1.x habits to avoid.
 
 ## Sample app
 
+**[Try the playground in your browser](https://haykarustamyan.github.io/ComposeParallaxToolbar/playground/)**,
+no install needed; `?preset=pin`, `?preset=rtl` or `?preset=grid-avatar` open a feature directly.
+
 The `sample` module is an interactive playground shared by Android, iOS, desktop and web. It
 opens on a photo header with the library defaults; a bar at the bottom moves the header, shows
 the collapse progress and switches the scroll mode, and its gear opens a sheet with presets,

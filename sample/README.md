@@ -1,7 +1,9 @@
 # Sample playground
 
 `sample` is a Compose Multiplatform module with an interactive playground and the library's fixed
-sample screens. Four thin hosts run it:
+sample screens. The web build is hosted at
+[haykarustamyan.github.io/ComposeParallaxToolbar/playground](https://haykarustamyan.github.io/ComposeParallaxToolbar/playground/)
+and redeployed on every push to `main`. Four thin hosts run it locally:
 
 | Host | Run |
 |---|---|

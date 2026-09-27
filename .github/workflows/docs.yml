@@ -1,7 +1,8 @@
 name: Docs
 
-# Publishes the API docs (Dokka), the markdown guides and llms.txt to GitHub Pages on every push
-# to main, so agents and doc indexers have a stable URL. Enable Pages with source "GitHub Actions".
+# Publishes the API docs (Dokka), the markdown guides, llms.txt and the web playground to GitHub
+# Pages on every push to main, so agents and doc indexers have a stable URL and people can try
+# the library in the browser. Enable Pages with source "GitHub Actions".
 on:
   push:
     branches: [ "main" ]
@@ -34,8 +35,8 @@ jobs:
           git diff --exit-code -- docs/RECIPES.md llms.txt llms-full.txt || {
             echo "::error::docs/RECIPES.md, llms.txt or llms-full.txt is stale; run scripts/generate-docs.py and commit"; exit 1; }
 
-      - name: Dokka
-        run: ./gradlew :compose-parallax-toolbar-kmp:dokkaGeneratePublicationHtml
+      - name: Dokka and the web playground
+        run: ./gradlew :compose-parallax-toolbar-kmp:dokkaGeneratePublicationHtml :sample-web:wasmJsBrowserDistribution
 
       - name: Assemble site
         run: |
@@ -44,10 +45,15 @@ jobs:
           cp docs/*.md site/docs/
           mkdir -p site/docs/agents && cp docs/agents/SKILL.md site/docs/agents/
           cp llms.txt llms-full.txt CHANGELOG.md README.md site/
+          mkdir -p site/playground
+          cp -R sample-web/build/dist/wasmJs/productionExecutable/. site/playground/
           touch site/.nojekyll
           cat > site/index.html <<'HTML'
           <!doctype html><meta charset="utf-8"><title>ComposeParallaxToolbar</title>
           <h1>ComposeParallaxToolbar</h1>
+          <p><a href="playground/">Try the playground in your browser</a>: every option of the library as a live
+          switch or slider. Presets open directly, e.g. <a href="playground/?preset=pin">?preset=pin</a>,
+          <a href="playground/?preset=rtl">?preset=rtl</a>, <a href="playground/?preset=grid-avatar">?preset=grid-avatar</a>.</p>
           <ul>
             <li><a href="api/">API docs (Dokka)</a></li>
             <li><a href="docs/API.md">API reference (Markdown)</a></li>
