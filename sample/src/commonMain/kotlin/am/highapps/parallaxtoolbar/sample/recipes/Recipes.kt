@@ -251,7 +251,7 @@ fun ControlledScreen(rows: List<String>) {
 // end recipe
 
 @Composable
-private fun HeaderArtwork() {
+internal fun HeaderArtwork() {
     Box(Modifier.fillMaxSize().background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))))
 }
 

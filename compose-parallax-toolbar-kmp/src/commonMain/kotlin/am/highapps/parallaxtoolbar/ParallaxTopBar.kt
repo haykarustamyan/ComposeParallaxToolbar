@@ -45,6 +45,8 @@ internal fun ParallaxTopBar(
     headerState: HeaderScrollState,
     isCollapsed: Boolean,
     topInset: Dp,
+    leftInset: Dp,
+    rightInset: Dp,
     headerHeight: Dp,
     toolbarConfig: ParallaxToolbarConfig,
     titleConfig: ParallaxTitleConfig,
@@ -90,34 +92,48 @@ internal fun ParallaxTopBar(
         val toolbarPx = toolbarConfig.height.roundToPx()
         val barHeight = insetPx + toolbarPx
         val slotPadding = SlotHorizontalPadding.roundToPx()
-        val loose = Constraints(maxWidth = width, maxHeight = toolbarPx)
+        val isRtl = layoutDirection == LayoutDirection.Rtl
+        // Horizontal insets are physical; the start inset is the one on the navigation side.
+        val leftInsetPx = leftInset.roundToPx()
+        val rightInsetPx = rightInset.roundToPx()
+        val startInset = if (isRtl) rightInsetPx else leftInsetPx
+        val endInset = if (isRtl) leftInsetPx else rightInsetPx
+        val loose = Constraints(maxWidth = (width - leftInsetPx - rightInsetPx).coerceAtLeast(0), maxHeight = toolbarPx)
 
         val navigation = measurables.firstOrNull { it.layoutId == NavigationSlot }?.measure(loose)
         val actionsPlaceable = measurables.firstOrNull { it.layoutId == ActionsSlot }?.measure(loose)
-        val navigationWidth = navigation?.width ?: 0
-        val actionsWidth = actionsPlaceable?.width ?: 0
+        // Space the slots take at the start and end of the bar, insets and slot padding included.
+        val startSlot = startInset + (navigation?.let { it.width + slotPadding } ?: 0)
+        val endSlot = endInset + (actionsPlaceable?.let { it.width + slotPadding } ?: 0)
+        val freeWidth = (width - startSlot - endSlot).coerceAtLeast(0)
 
-        // Title geometry in dp-derived px. Expanded values describe the block's top-left in the
-        // header; collapsed values describe it in the bar. The block is placed collapsed.
-        val paddingStart = titleConfig.paddingStart.toPx()
-        val titleMaxWidth = (width - navigationWidth - actionsWidth).coerceAtLeast(0)
+        // Title geometry in dp-derived px, all measured from the start edge; placement mirrors
+        // them for RTL. Expanded values describe the block's top-start corner in the header;
+        // collapsed values describe it in the bar. The block is placed collapsed.
+        val paddingStart = startInset + titleConfig.paddingStart.toPx()
+        val collapsedScale = titleConfig.collapsedScale
+        val collapsedStart = if (navigation != null) startInset + titleConfig.collapsedPaddingStart.toPx() else paddingStart
+        // The title must fit between the slots once collapsed and scaled, or it would run under
+        // the actions; measure it to whichever bound is tighter.
+        val collapsedFit = when (titleConfig.collapsedAlignment) {
+            Alignment.CenterHorizontally -> freeWidth / collapsedScale
+            Alignment.End -> (freeWidth - titleConfig.paddingStart.toPx()) / collapsedScale
+            else -> (width - endSlot - collapsedStart) / collapsedScale
+        }
+        val titleMaxWidth = minOf(freeWidth.toFloat(), collapsedFit).roundToInt().coerceAtLeast(0)
         val titleConstraints = Constraints(maxWidth = titleMaxWidth)
         val title = measurables.first { it.layoutId == TitleSlot }.measure(titleConstraints)
         val subtitle = measurables.firstOrNull { it.layoutId == SubtitleSlot }?.measure(titleConstraints)
         val subtitleHeight = subtitle?.height ?: 0
         val blockHeight = title.height + subtitleHeight
-        val collapsedScale = titleConfig.collapsedScale
         val keepSubtitle = titleConfig.keepSubtitleAfterCollapse
-        // Collapsed start edge in LTR coordinates: next to the navigation icon, centered between
-        // the slots, or before the actions, per the configured alignment.
-        val isRtl = layoutDirection == LayoutDirection.Rtl
+        // Collapsed start edge: next to the navigation icon, centered between the slots, or
+        // before the actions, per the configured alignment.
         val scaledTitleWidth = title.width * collapsedScale
-        val startSlot = if (isRtl) actionsWidth else navigationWidth
-        val endSlot = if (isRtl) navigationWidth else actionsWidth
         val collapsedPaddingStart = when (titleConfig.collapsedAlignment) {
-            Alignment.CenterHorizontally -> startSlot + ((width - startSlot - endSlot) - scaledTitleWidth) / 2f
-            Alignment.End -> width - endSlot - paddingStart - scaledTitleWidth
-            else -> if (navigation != null) titleConfig.collapsedPaddingStart.toPx() else paddingStart
+            Alignment.CenterHorizontally -> startSlot + (freeWidth - scaledTitleWidth) / 2f
+            Alignment.End -> width - endSlot - titleConfig.paddingStart.toPx() - scaledTitleWidth
+            else -> collapsedStart
         }
 
         // Expanded: the block sits above the header's bottom edge, offset by paddingBottom. The
@@ -130,13 +146,14 @@ internal fun ParallaxTopBar(
         val collapsedTop = insetPx + (toolbarPx - centeredHeight) / 2f
 
         layout(width, barHeight) {
+            // Coordinates below are already mirrored for RTL, so place them as is.
             navigation?.let {
-                val x = if (isRtl) width - slotPadding - it.width else slotPadding
-                it.placeRelative(x, insetPx + (toolbarPx - it.height) / 2)
+                val x = if (isRtl) width - rightInsetPx - slotPadding - it.width else leftInsetPx + slotPadding
+                it.place(x, insetPx + (toolbarPx - it.height) / 2)
             }
             actionsPlaceable?.let {
-                val x = if (isRtl) slotPadding else width - slotPadding - it.width
-                it.placeRelative(x, insetPx + (toolbarPx - it.height) / 2)
+                val x = if (isRtl) leftInsetPx + slotPadding else width - rightInsetPx - slotPadding - it.width
+                it.place(x, insetPx + (toolbarPx - it.height) / 2)
             }
 
             // Center and End alignments already account for the scaled width, so the layer scales

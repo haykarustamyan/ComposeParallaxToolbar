@@ -1,5 +1,6 @@
 package am.highapps.parallaxtoolbar
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -45,14 +46,31 @@ public class ParallaxToolbarState internal constructor(
     public val stretchPx: Float
         get() = headerState.stretchPx
 
-    /** Collapses the header. The body keeps its own scroll position. */
-    public suspend fun collapse(animated: Boolean = true) {
-        if (animated) headerState.animateFractionTo(1f) else headerState.snapFractionTo(1f)
+    /**
+     * True while the header is being dragged, flung, snapped or animated by [collapse] and
+     * [expand]. False once it has come to rest.
+     */
+    public val isScrollInProgress: Boolean
+        get() = headerState.isScrollInProgress
+
+    /**
+     * Collapses the header. The body keeps its own scroll position.
+     *
+     * @param animationSpec Spec for the move; `null` uses the header config's `animationSpec`.
+     */
+    public suspend fun collapse(animated: Boolean = true, animationSpec: AnimationSpec<Float>? = null) {
+        if (animated) headerState.animateFractionTo(1f, animationSpec ?: headerState.animationSpec)
+        else headerState.snapFractionTo(1f)
     }
 
-    /** Expands the header. The body keeps its own scroll position. */
-    public suspend fun expand(animated: Boolean = true) {
-        if (animated) headerState.animateFractionTo(0f) else headerState.snapFractionTo(0f)
+    /**
+     * Expands the header and brings an exited toolbar back. The body keeps its own scroll position.
+     *
+     * @param animationSpec Spec for the move; `null` uses the header config's `animationSpec`.
+     */
+    public suspend fun expand(animated: Boolean = true, animationSpec: AnimationSpec<Float>? = null) {
+        if (animated) headerState.animateFractionTo(0f, animationSpec ?: headerState.animationSpec)
+        else headerState.snapFractionTo(0f)
     }
 }
 

@@ -59,6 +59,16 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     /** Called on release once a stretch reached [stretchTriggerPx]. */
     var onStretchTrigger: (() -> Unit)? = null
 
+    /** Spec for snaps, stretch releases and programmatic moves. Set by the layout. */
+    var animationSpec: AnimationSpec<Float> = spring()
+
+    /**
+     * Whether a pointer is currently pressed on the layout. A stretch must follow a held finger
+     * or mouse button: wheel and trackpad scrolling also arrive as user input but never fling, so
+     * nothing would release a stretch they started.
+     */
+    var isPointerPressed: Boolean = false
+
     val offsetPx: Float
         get() = fraction * collapseRangePx
 
@@ -74,7 +84,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     private val mutex = MutatorMutex()
 
     /** Consumes [delta] into the header, then the exit. Returns the amount actually consumed. */
-    override fun dispatchRawDelta(delta: Float): Float = dispatch(delta, allowHeaderExpand = true, allowStretch = true)
+    override fun dispatchRawDelta(delta: Float): Float = dispatch(delta, allowHeaderExpand = true, allowStretch = isPointerPressed)
 
     /** Like [dispatchRawDelta] but never expands the header; used while the body is not at its top. */
     fun dispatchExitOnly(delta: Float): Float = dispatch(delta, allowHeaderExpand = false, allowStretch = false)
@@ -85,7 +95,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
      * otherwise keep pulling after release.
      */
     fun dispatchRawDelta(delta: Float, allowStretch: Boolean): Float =
-        dispatch(delta, allowHeaderExpand = true, allowStretch = allowStretch)
+        dispatch(delta, allowHeaderExpand = true, allowStretch = allowStretch && isPointerPressed)
 
     private fun dispatch(delta: Float, allowHeaderExpand: Boolean, allowStretch: Boolean): Float {
         var remaining = delta
@@ -122,7 +132,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
         if (start <= 0f) return
         val triggered = stretchTriggerPx > 0f && start >= stretchTriggerPx
         scroll {
-            animate(initialValue = start, targetValue = 0f, animationSpec = spring()) { value, _ ->
+            animate(initialValue = start, targetValue = 0f, animationSpec = animationSpec) { value, _ ->
                 stretchPx = value
             }
             stretchPx = 0f
@@ -135,7 +145,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
         val start = stretchPx
         if (start <= 0f) return
         val triggered = stretchTriggerPx > 0f && start >= stretchTriggerPx
-        animate(initialValue = start, targetValue = 0f, animationSpec = spring()) { value, _ ->
+        animate(initialValue = start, targetValue = 0f, animationSpec = animationSpec) { value, _ ->
             stretchPx = value
         }
         stretchPx = 0f
@@ -178,7 +188,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     override val canScrollBackward: Boolean get() = fraction > 0f || exitFraction > 0f || (stretchMaxPx > 0f && stretchPx < stretchMaxPx)
 
     /** Animates the header to [target] and brings the toolbar back. Jumps before the layout has measured. */
-    suspend fun animateFractionTo(target: Float, animationSpec: AnimationSpec<Float> = spring()) {
+    suspend fun animateFractionTo(target: Float, animationSpec: AnimationSpec<Float> = this.animationSpec) {
         val to = target.coerceIn(0f, 1f)
         if (collapseRangePx <= 0f) { fraction = to; exitFraction = 0f; return }
         scroll {
@@ -235,7 +245,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
 
     private suspend fun settleWithin(scope: ScrollScope, targetPx: Float) {
         var current = totalOffsetPx
-        animate(initialValue = current, targetValue = targetPx, animationSpec = spring()) { value, _ ->
+        animate(initialValue = current, targetValue = targetPx, animationSpec = animationSpec) { value, _ ->
             scope.scrollBy(value - current)
             current = value
         }

@@ -254,3 +254,30 @@ PlaylistView(items: tracks).ignoresSafeArea()
 
 Add `CADisableMinimumFrameDurationOnPhone = true` to the app's `Info.plist`; Compose refuses to
 start on high refresh rate iPhones without it.
+
+## Desktop scrollbar
+
+Desktop users expect a scrollbar beside a long list. Use Custom content so the list and its scrollbar share one Box; the collapse still runs through nested scroll and the wheel.
+
+```kotlin
+@Composable
+fun DesktopListScreen(items: List<String>) {
+    val state = rememberParallaxToolbarState()
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Library") },
+        headerContent = { HeaderArtwork() },
+        state = state,
+        content = ParallaxContent.Custom {
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(state = state.lazyListState, modifier = Modifier.fillMaxSize()) {
+                    items(items) { ListItem(headlineContent = { Text(it) }) }
+                }
+                VerticalScrollbar(
+                    adapter = rememberScrollbarAdapter(state.lazyListState),
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+                )
+            }
+        }
+    )
+}
+```

@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
  *   `onStretchTrigger` for pull-to-refresh.
  * @param stretchTriggerDistance How far the header must be stretched when released for
  *   `onStretchTrigger` to fire.
+ * @param animationSpec Animation used when the header settles on its own: snaps, stretch
+ *   releases, and `collapse()`/`expand()` when they are not given a spec. Use a `snap()` or a
+ *   short `tween` to honor a reduced-motion setting.
  */
 @Immutable
 public class ParallaxHeaderConfig(
@@ -49,7 +52,8 @@ public class ParallaxHeaderConfig(
     public val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
     public val fadeOnCollapse: Boolean = true,
     public val stretchEnabled: Boolean = false,
-    public val stretchTriggerDistance: Dp = ParallaxToolbarDefaults.StretchTriggerDistance
+    public val stretchTriggerDistance: Dp = ParallaxToolbarDefaults.StretchTriggerDistance,
+    public val animationSpec: AnimationSpec<Float> = ParallaxToolbarDefaults.AnimationSpec
 ) {
     init {
         require(parallaxMultiplier.isFinite()) { "ParallaxHeaderConfig.parallaxMultiplier must be a finite number (0f pins the header, 0.5f is the classic parallax), was $parallaxMultiplier" }
@@ -65,10 +69,11 @@ public class ParallaxHeaderConfig(
         scrollMode: ScrollMode = this.scrollMode,
         fadeOnCollapse: Boolean = this.fadeOnCollapse,
         stretchEnabled: Boolean = this.stretchEnabled,
-        stretchTriggerDistance: Dp = this.stretchTriggerDistance
+        stretchTriggerDistance: Dp = this.stretchTriggerDistance,
+        animationSpec: AnimationSpec<Float> = this.animationSpec
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease, scrollMode,
-        fadeOnCollapse, stretchEnabled, stretchTriggerDistance
+        fadeOnCollapse, stretchEnabled, stretchTriggerDistance, animationSpec
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxHeaderConfig &&
@@ -80,7 +85,8 @@ public class ParallaxHeaderConfig(
             scrollMode == other.scrollMode &&
             fadeOnCollapse == other.fadeOnCollapse &&
             stretchEnabled == other.stretchEnabled &&
-            stretchTriggerDistance == other.stretchTriggerDistance
+            stretchTriggerDistance == other.stretchTriggerDistance &&
+            animationSpec == other.animationSpec
 
     override fun hashCode(): Int {
         var result = height.hashCode()
@@ -92,6 +98,7 @@ public class ParallaxHeaderConfig(
         result = 31 * result + fadeOnCollapse.hashCode()
         result = 31 * result + stretchEnabled.hashCode()
         result = 31 * result + stretchTriggerDistance.hashCode()
+        result = 31 * result + animationSpec.hashCode()
         return result
     }
 
@@ -99,7 +106,8 @@ public class ParallaxHeaderConfig(
             "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, " +
             "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease, " +
             "scrollMode=$scrollMode, fadeOnCollapse=$fadeOnCollapse, " +
-            "stretchEnabled=$stretchEnabled, stretchTriggerDistance=$stretchTriggerDistance)"
+            "stretchEnabled=$stretchEnabled, stretchTriggerDistance=$stretchTriggerDistance, " +
+            "animationSpec=$animationSpec)"
 }
 
 /**

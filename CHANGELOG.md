@@ -21,7 +21,9 @@ need one edit or none.
 - Overscroll stretch: `stretchEnabled` and `stretchTriggerDistance` on the header config, with an `onStretchTrigger` callback for pull-to-refresh.
 - Header config: `parallaxMultiplier` and `fadeOnCollapse`. Toolbar config: `height` and `alwaysElevated`. Title config: `collapsedScale` and `collapsedAlignment`. `maxHeight` on `HeaderHeight.Percentage` and `HeaderHeight.AspectRatio`.
 - Accessibility: state description with expand and collapse actions, reading order with the toolbar first, the title as a heading, and the faded header or exited toolbar hidden from screen readers. Strings come from `semanticsConfig`.
-- Invalid configuration values throw at construction with a message naming the field and the valid range.
+- Invalid configuration values throw at construction with a message naming the field and the valid range. A layout given unbounded height fails with a message that says so.
+- `windowInsets` parameter, defaulting to the system bars plus the display cutout on the top and sides. The horizontal insets keep the toolbar slots clear of a cutout in landscape; pass `WindowInsets(0)` for a layout that does not touch the window edge.
+- `animationSpec` on the header config for snaps, stretch releases and programmatic moves; `collapse()` and `expand()` accept a per-call spec. `state.isScrollInProgress` reports header motion.
 - Desktop (JVM) and web (Kotlin/Wasm) targets.
 - Sample playground shared by Android, iOS, desktop and web hosts; compiled recipes in `docs/RECIPES.md`; `llms.txt` and an agent skill file; a docs site on GitHub Pages.
 
@@ -53,6 +55,11 @@ need one edit or none.
 - Right-to-left layouts: content padding and the title's horizontal motion follow the layout direction.
 - Horizontal `contentPadding` was dropped for regular content.
 - Short regular content left extra blank space below it.
+- Right-to-left layouts placed the navigation icon and actions on the wrong sides; centered and end-aligned collapsed titles were offset by the navigation icon width.
+- A collapsed title could run under the actions when the collapsed start padding was wider than the navigation icon.
+- Mouse wheel and trackpad scrolling on desktop and web could leave the header stretched, since they never fling; a stretch now follows a held pointer only.
+- A downward fling on an expanded header stretched it for one frame.
+- The collapsed header is hidden from screen readers whether or not it fades.
 
 ## 1.3.0
 

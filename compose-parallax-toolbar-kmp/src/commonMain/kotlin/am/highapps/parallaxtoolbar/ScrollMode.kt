@@ -20,6 +20,10 @@ public enum class ScrollMode {
      * Scrolling up collapses the header and then slides the toolbar off screen too, giving the
      * body the whole viewport. Scrolling down brings the toolbar back immediately; the header
      * expands only once the body is back at its top.
+     *
+     * The body is measured to the viewport with the toolbar gone, so its last stretch is reachable
+     * once the toolbar has exited. Pair with `snapOnRelease` if a half-exited toolbar should
+     * never rest on screen.
      */
     EnterAlwaysCollapsed
 }

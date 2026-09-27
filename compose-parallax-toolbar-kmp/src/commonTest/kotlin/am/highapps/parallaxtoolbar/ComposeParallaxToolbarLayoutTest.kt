@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
@@ -1109,5 +1110,172 @@ class ParallaxValidationTest {
         // Valid edges still construct.
         HeaderHeight.Percentage(1f); HeaderHeight.Fixed(0.dp); HeaderHeight.AspectRatio(0.1f, maxHeight = 0.dp)
         ParallaxTitleConfig(0.dp, 0.dp, 0.dp, false, true, collapsedScale = 2f)
+    }
+}
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarGeometryTest : UiTestBase() {
+
+    @Test
+    fun centeredTitle_isCenteredBetweenSlots_inRtl_withNavigationOnly() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl
+            ) {
+                state = rememberParallaxToolbarState()
+                ComposeParallaxToolbarLayout(
+                    titleContent = { Box(Modifier.size(60.dp, 20.dp).background(Color.Black).testTag("title")) },
+                    headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                    navigationIcon = { Box(Modifier.size(48.dp).testTag("nav")) },
+                    headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                    titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = Alignment.CenterHorizontally),
+                    content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                    windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
+                    state = state
+                )
+            }
+        }
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        val nav = onNodeWithTag("nav").fetchSemanticsNode().boundsInRoot
+        val title = onNodeWithTag("title").fetchSemanticsNode().boundsInRoot
+        // In RTL the navigation icon sits on the right; the free region is everything left of it.
+        kotlin.test.assertEquals(state.layoutInfo.widthPx, nav.right + 4f * density.density, 1f)
+        kotlin.test.assertEquals(nav.left / 2f, (title.left + title.right) / 2f, 2f)
+    }
+
+    @Test
+    fun longTitle_staysClearOfActions_whenCollapsed() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Box(Modifier.fillMaxWidth().height(20.dp).background(Color.Black).testTag("title")) },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                navigationIcon = { Box(Modifier.size(24.dp)) },
+                actions = { Box(Modifier.size(48.dp).testTag("actions")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
+                state = state
+            )
+        }
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        val title = onNodeWithTag("title").fetchSemanticsNode().boundsInRoot
+        val actions = onNodeWithTag("actions").fetchSemanticsNode().boundsInRoot
+        // The collapsed start padding (64dp) is wider than the 24dp icon; the title must still end
+        // before the actions instead of running under them.
+        kotlin.test.assertEquals(64f * density.density, title.left, 1f)
+        kotlin.test.assertTrue(title.right <= actions.left + 1f, "title $title ends before actions $actions")
+    }
+
+    @Test
+    fun windowInsets_pushTheToolbarSlotsInside_andCanBeZeroed() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Box(Modifier.size(60.dp, 20.dp).background(Color.Black).testTag("title")) },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                navigationIcon = { Box(Modifier.size(48.dp).testTag("nav")) },
+                actions = { Box(Modifier.size(48.dp).testTag("actions")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(left = 20.dp, top = 30.dp, right = 10.dp),
+                state = state
+            )
+        }
+        val d = density.density
+        kotlin.test.assertEquals(30f * d, state.layoutInfo.topInsetPx, 0.5f)
+        val nav = onNodeWithTag("nav").fetchSemanticsNode().boundsInRoot
+        val actions = onNodeWithTag("actions").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertEquals((20f + 4f) * d, nav.left, 1f)
+        kotlin.test.assertEquals(state.layoutInfo.widthPx - (10f + 4f) * d, actions.right, 1f)
+        kotlin.test.assertEquals(30f * d + (64f - 48f) / 2f * d, nav.top, 1f)
+        // The expanded title starts after the left inset too.
+        val title = onNodeWithTag("title").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertEquals((20f + 16f) * d, title.left, 1f)
+    }
+
+    @Test
+    fun unboundedHeight_failsWithAClearMessage() = runComposeUiTest {
+        val error = kotlin.runCatching {
+            setContent {
+                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                    ComposeParallaxToolbarLayout(
+                        titleContent = { Text("t") },
+                        headerContent = { Box(Modifier.fillMaxSize()) },
+                        content = ParallaxContent.Regular { Text("body") }
+                    )
+                }
+            }
+            waitForIdle()
+        }.exceptionOrNull()
+        val messages = generateSequence(error) { it.cause }.mapNotNull { it.message }.toList()
+        kotlin.test.assertTrue(
+            messages.any { "needs a bounded height" in it },
+            "expected the bounded-height message, got $messages"
+        )
+    }
+
+    @Test
+    fun collapsedHeader_isHiddenFromAccessibility_evenWithoutFade() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("t") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp), fadeOnCollapse = false),
+                content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                state = state
+            )
+        }
+        val hidden = androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility)
+        kotlin.test.assertTrue(onAllNodes(hidden, useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        kotlin.test.assertEquals(1, onAllNodes(hidden, useUnmergedTree = true).fetchSemanticsNodes().size, "covered header hidden")
+    }
+
+    @Test
+    fun collapse_honorsAnimationSpec_andReportsProgress() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        lateinit var scope: kotlinx.coroutines.CoroutineScope
+        var progressSeen = false
+        setContent {
+            state = rememberParallaxToolbarState()
+            scope = androidx.compose.runtime.rememberCoroutineScope()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("t") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp),
+                    animationSpec = androidx.compose.animation.core.tween(durationMillis = 400)
+                ),
+                content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                state = state
+            )
+        }
+        kotlin.test.assertFalse(state.isScrollInProgress)
+        mainClock.autoAdvance = false
+        runOnIdle { scope.launch { state.collapse() } }
+        mainClock.advanceTimeBy(200)
+        progressSeen = state.isScrollInProgress
+        val midway = state.collapseFraction
+        mainClock.advanceTimeBy(400)
+        mainClock.autoAdvance = true
+        waitForIdle()
+        kotlin.test.assertTrue(progressSeen, "in progress midway")
+        kotlin.test.assertTrue(midway > 0f && midway < 1f, "tween is partway at 200ms: $midway")
+        kotlin.test.assertTrue(state.isCollapsed)
+        kotlin.test.assertFalse(state.isScrollInProgress)
+
+        // A per-call spec overrides the config: snap() finishes without frames.
+        runOnIdle { scope.launch { state.expand(animationSpec = androidx.compose.animation.core.snap()) } }
+        mainClock.advanceTimeByFrame()
+        kotlin.test.assertEquals(0f, state.collapseFraction)
     }
 }

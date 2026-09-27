@@ -24,6 +24,7 @@ fun ComposeParallaxToolbarLayout(
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
     semanticsConfig: ParallaxSemanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
+    windowInsets: WindowInsets = ParallaxToolbarDefaults.windowInsets,
     state: ParallaxToolbarState = rememberParallaxToolbarState()
 )
 ```
@@ -42,6 +43,7 @@ fun ComposeParallaxToolbarLayout(
 | `bottomContent` | Optional row pinned under the toolbar: tabs, a search field. Rides the header's bottom edge while expanded; the body starts beneath it. Give it a background. |
 | `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance`. Needs `stretchEnabled`. |
 | `headerConfig`, `toolbarConfig`, `titleConfig`, `bodyConfig`, `semanticsConfig` | See [Configuration](#configuration). |
+| `windowInsets` | Insets the toolbar stays inside of. The top inset sits above the toolbar, under the header; the horizontal insets keep the navigation icon, actions and title clear of a display cutout. Default: system bars plus cutout, top and sides, as Material's top app bar. Pass `WindowInsets(0)` when the layout does not touch the window edge, such as in a dialog, a bottom sheet or a split pane. |
 | `state` | See [ParallaxToolbarState](#parallaxtoolbarstate). |
 
 Every slot lambda runs with a [ParallaxToolbarScope](#parallaxtoolbarscope) receiver and receives
@@ -92,8 +94,9 @@ fun rememberParallaxToolbarState(
 | `isCollapsed: Boolean` | `collapseFraction >= 1f`. |
 | `toolbarExitFraction: Float` | 0f on screen, 1f slid away. Moves only in `ScrollMode.EnterAlwaysCollapsed`. |
 | `stretchPx: Float` | Current stretch past the expanded height while pulled down, in px. |
-| `suspend fun collapse(animated = true)` | Collapses the header. The body keeps its scroll position. |
-| `suspend fun expand(animated = true)` | Expands the header and brings an exited toolbar back. |
+| `isScrollInProgress: Boolean` | True while the header is dragged, flung, snapping or animating. |
+| `suspend fun collapse(animated = true, animationSpec = null)` | Collapses the header. The body keeps its scroll position. A null spec uses the header config's `animationSpec`. |
+| `suspend fun expand(animated = true, animationSpec = null)` | Expands the header and brings an exited toolbar back. |
 | `scrollState`, `lazyListState` | The scroll states backing `Regular` and `Lazy` content. |
 | `layoutInfo` | See [ParallaxToolbarLayoutInfo](#parallaxtoolbarlayoutinfo). |
 
@@ -127,7 +130,7 @@ and reads inside `graphicsLayer { }` or `drawBehind { }`, stay on the draw path.
 | Property | Description |
 |---|---|
 | `widthPx`, `heightPx` | Size of the layout. |
-| `topInsetPx` | Status bar inset the toolbar and body are pushed down by. |
+| `topInsetPx` | Top window inset the toolbar and body are pushed down by. |
 | `headerHeightPx` | Expanded header height, excluding the inset. |
 | `toolbarHeightPx` | Toolbar height, excluding the inset. |
 | `bottomHeightPx` | Height of `bottomContent`, 0 when absent. |
@@ -144,6 +147,10 @@ and reads inside `graphicsLayer { }` or `drawBehind { }`, stay on the draw path.
 | `ExitUntilCollapsed` (default) | collapses the header; toolbar stays | expands only once the body is at its top |
 | `EnterAlways` | collapses the header; toolbar stays | expands immediately, wherever the body is |
 | `EnterAlwaysCollapsed` | collapses the header, then the toolbar slides away | the toolbar returns immediately; the header expands at the top |
+
+In `EnterAlwaysCollapsed` the body is measured to the viewport with the toolbar gone, so its last
+stretch is reachable once the toolbar has exited. Pair with `snapOnRelease` if a half-exited
+toolbar should never rest on screen.
 
 ## HeaderHeight
 
@@ -178,6 +185,7 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
 | `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
 | `stretchTriggerDistance` | `100.dp` | Stretch required at release for `onStretchTrigger` to fire. |
+| `animationSpec` | `spring()` | Used when the header settles on its own: snaps, stretch releases and `collapse()`/`expand()` without a spec. Use `snap()` or a short `tween` to honor a reduced-motion setting. |
 
 ### ParallaxToolbarConfig
 
@@ -232,10 +240,13 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 
 The root node announces the state description and offers the standard expand and collapse
 semantic actions. Reading order is toolbar, header, bottom slot, overlay, body. The title is a
-heading. The faded header, and an exited toolbar, are hidden from accessibility.
+heading. The collapsed header, which the body and toolbar cover, and an exited toolbar are hidden
+from accessibility.
 
 ## ParallaxToolbarDefaults
 
 Constants: `HeaderHeightDp = 450.dp`, `HeaderParallaxMultiplier = 0.5f`, `ToolbarHeight = 64.dp`,
 `TitlePaddingBottom = (-16).dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
-`TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`.
+`TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`,
+`AnimationSpec = spring()`. `windowInsets` is the default inset set: system bars plus display
+cutout, top and sides.

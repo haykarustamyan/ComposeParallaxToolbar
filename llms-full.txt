@@ -65,9 +65,10 @@ ComposeParallaxToolbarLayout(
 5. Programmatic control: `val state = rememberParallaxToolbarState()`; `state.collapseFraction`, `state.isCollapsed`, `scope.launch { state.collapse() }`, `state.expand()`. The body keeps its own scroll position; use `state.scrollState` or `state.lazyListState` to scroll it.
 6. Inside any slot, `collapseFraction`, `isCollapsed`, `state` and `layoutInfo` are available from the scope. Read `collapseFraction` inside `graphicsLayer { }` for per-frame effects, not in composition.
 7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
-8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset.
-9. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
-10. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
+8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset. If the layout does not touch the window edge (dialog, bottom sheet, split pane), pass `windowInsets = WindowInsets(0)`. The layout needs a bounded height: never place it in a vertically scrolling parent.
+9. Animation: `headerConfig(animationSpec = ...)` sets the spring used for snaps, stretch releases and `collapse()`/`expand()`; both also accept a per-call `animationSpec`. `state.isScrollInProgress` is true while the header moves.
+10. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
+11. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
 
 ## Mistakes to avoid (1.x habits)
 
@@ -113,6 +114,7 @@ fun ComposeParallaxToolbarLayout(
     titleConfig: ParallaxTitleConfig = ParallaxToolbarDefaults.titleConfig(),
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
     semanticsConfig: ParallaxSemanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
+    windowInsets: WindowInsets = ParallaxToolbarDefaults.windowInsets,
     state: ParallaxToolbarState = rememberParallaxToolbarState()
 )
 ```
@@ -131,6 +133,7 @@ fun ComposeParallaxToolbarLayout(
 | `bottomContent` | Optional row pinned under the toolbar: tabs, a search field. Rides the header's bottom edge while expanded; the body starts beneath it. Give it a background. |
 | `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance`. Needs `stretchEnabled`. |
 | `headerConfig`, `toolbarConfig`, `titleConfig`, `bodyConfig`, `semanticsConfig` | See [Configuration](#configuration). |
+| `windowInsets` | Insets the toolbar stays inside of. The top inset sits above the toolbar, under the header; the horizontal insets keep the navigation icon, actions and title clear of a display cutout. Default: system bars plus cutout, top and sides, as Material's top app bar. Pass `WindowInsets(0)` when the layout does not touch the window edge, such as in a dialog, a bottom sheet or a split pane. |
 | `state` | See [ParallaxToolbarState](#parallaxtoolbarstate). |
 
 Every slot lambda runs with a [ParallaxToolbarScope](#parallaxtoolbarscope) receiver and receives
@@ -181,8 +184,9 @@ fun rememberParallaxToolbarState(
 | `isCollapsed: Boolean` | `collapseFraction >= 1f`. |
 | `toolbarExitFraction: Float` | 0f on screen, 1f slid away. Moves only in `ScrollMode.EnterAlwaysCollapsed`. |
 | `stretchPx: Float` | Current stretch past the expanded height while pulled down, in px. |
-| `suspend fun collapse(animated = true)` | Collapses the header. The body keeps its scroll position. |
-| `suspend fun expand(animated = true)` | Expands the header and brings an exited toolbar back. |
+| `isScrollInProgress: Boolean` | True while the header is dragged, flung, snapping or animating. |
+| `suspend fun collapse(animated = true, animationSpec = null)` | Collapses the header. The body keeps its scroll position. A null spec uses the header config's `animationSpec`. |
+| `suspend fun expand(animated = true, animationSpec = null)` | Expands the header and brings an exited toolbar back. |
 | `scrollState`, `lazyListState` | The scroll states backing `Regular` and `Lazy` content. |
 | `layoutInfo` | See [ParallaxToolbarLayoutInfo](#parallaxtoolbarlayoutinfo). |
 
@@ -216,7 +220,7 @@ and reads inside `graphicsLayer { }` or `drawBehind { }`, stay on the draw path.
 | Property | Description |
 |---|---|
 | `widthPx`, `heightPx` | Size of the layout. |
-| `topInsetPx` | Status bar inset the toolbar and body are pushed down by. |
+| `topInsetPx` | Top window inset the toolbar and body are pushed down by. |
 | `headerHeightPx` | Expanded header height, excluding the inset. |
 | `toolbarHeightPx` | Toolbar height, excluding the inset. |
 | `bottomHeightPx` | Height of `bottomContent`, 0 when absent. |
@@ -233,6 +237,10 @@ and reads inside `graphicsLayer { }` or `drawBehind { }`, stay on the draw path.
 | `ExitUntilCollapsed` (default) | collapses the header; toolbar stays | expands only once the body is at its top |
 | `EnterAlways` | collapses the header; toolbar stays | expands immediately, wherever the body is |
 | `EnterAlwaysCollapsed` | collapses the header, then the toolbar slides away | the toolbar returns immediately; the header expands at the top |
+
+In `EnterAlwaysCollapsed` the body is measured to the viewport with the toolbar gone, so its last
+stretch is reachable once the toolbar has exited. Pair with `snapOnRelease` if a half-exited
+toolbar should never rest on screen.
 
 ## HeaderHeight
 
@@ -267,6 +275,7 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
 | `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
 | `stretchTriggerDistance` | `100.dp` | Stretch required at release for `onStretchTrigger` to fire. |
+| `animationSpec` | `spring()` | Used when the header settles on its own: snaps, stretch releases and `collapse()`/`expand()` without a spec. Use `snap()` or a short `tween` to honor a reduced-motion setting. |
 
 ### ParallaxToolbarConfig
 
@@ -321,13 +330,16 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 
 The root node announces the state description and offers the standard expand and collapse
 semantic actions. Reading order is toolbar, header, bottom slot, overlay, body. The title is a
-heading. The faded header, and an exited toolbar, are hidden from accessibility.
+heading. The collapsed header, which the body and toolbar cover, and an exited toolbar are hidden
+from accessibility.
 
 ## ParallaxToolbarDefaults
 
 Constants: `HeaderHeightDp = 450.dp`, `HeaderParallaxMultiplier = 0.5f`, `ToolbarHeight = 64.dp`,
 `TitlePaddingBottom = (-16).dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
-`TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`.
+`TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`,
+`AnimationSpec = spring()`. `windowInsets` is the default inset set: system bars plus display
+cutout, top and sides.
 
 
 ---
@@ -590,6 +602,33 @@ PlaylistView(items: tracks).ignoresSafeArea()
 Add `CADisableMinimumFrameDurationOnPhone = true` to the app's `Info.plist`; Compose refuses to
 start on high refresh rate iPhones without it.
 
+## Desktop scrollbar
+
+Desktop users expect a scrollbar beside a long list. Use Custom content so the list and its scrollbar share one Box; the collapse still runs through nested scroll and the wheel.
+
+```kotlin
+@Composable
+fun DesktopListScreen(items: List<String>) {
+    val state = rememberParallaxToolbarState()
+    ComposeParallaxToolbarLayout(
+        titleContent = { Text("Library") },
+        headerContent = { HeaderArtwork() },
+        state = state,
+        content = ParallaxContent.Custom {
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(state = state.lazyListState, modifier = Modifier.fillMaxSize()) {
+                    items(items) { ListItem(headlineContent = { Text(it) }) }
+                }
+                VerticalScrollbar(
+                    adapter = rememberScrollbarAdapter(state.lazyListState),
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+                )
+            }
+        }
+    )
+}
+```
+
 
 ---
 
@@ -600,8 +639,9 @@ The library is pure common Compose code. This page covers what differs per host.
 
 ## Android
 
-**Edge-to-edge.** The layout reads the status bar inset itself: the header covers the inset, the
-toolbar and body are pushed below it. Call `enableEdgeToEdge()` in your activity and do not add a
+**Edge-to-edge.** The layout reads the window insets itself: the header covers the status bar,
+the toolbar and body are pushed below it, and in landscape the navigation icon, actions and title
+stay clear of a display cutout. Call `enableEdgeToEdge()` in your activity and do not add a
 status bar padding of your own around the layout. Status bar icon color is your app's concern;
 switch it when `collapsed` flips if the toolbar colors need it.
 
@@ -665,7 +705,12 @@ are supported; Compose Multiplatform no longer publishes the Intel simulator tar
 
 Add the dependency to the `jvm` source set or `commonMain`. Mouse wheel scrolling drives the
 header through nested scroll, including expansion when scrolling back up. Dragging the header
-with the mouse works as on touch.
+with the mouse works as on touch. A stretch follows a held pointer only, so the wheel never
+leaves the header stretched.
+
+**Scrollbar.** Put the list and a `VerticalScrollbar` in one `Box` as `ParallaxContent.Custom`;
+the state's `lazyListState` or `scrollState` feeds the adapter. See the
+[Desktop scrollbar](RECIPES.md#desktop-scrollbar) recipe.
 
 ## Web
 
@@ -675,9 +720,16 @@ window restarts the Compose viewport, which is standard Compose for Web behavior
 
 ## Insets and the toolbar height
 
-The status bar inset is read from `WindowInsets.statusBars` on every platform and is zero on
-desktop and web. `toolbarConfig(height = ...)` sets the toolbar height excluding that inset;
-`state.layoutInfo` exposes the resolved values in pixels if you need them.
+The `windowInsets` parameter defaults to the system bars plus the display cutout, top and sides,
+the same set Material's top app bar uses. It is zero on desktop and web. The top inset sits
+under the header and above the toolbar; the horizontal insets inset the toolbar slots. Pass
+`WindowInsets(0)` when the layout does not touch the window edge, for example in a dialog, a
+bottom sheet or a split pane, or your own set to pick different bars. `toolbarConfig(height = ...)`
+sets the toolbar height excluding the top inset; `state.layoutInfo` exposes the resolved values
+in pixels if you need them.
+
+The layout needs a bounded height. It fills the space it is given and scrolls its body inside
+it, so it cannot sit in a vertically scrolling parent; give it a fixed height or a weight there.
 
 
 ---
@@ -756,7 +808,9 @@ need one edit or none.
 - Overscroll stretch: `stretchEnabled` and `stretchTriggerDistance` on the header config, with an `onStretchTrigger` callback for pull-to-refresh.
 - Header config: `parallaxMultiplier` and `fadeOnCollapse`. Toolbar config: `height` and `alwaysElevated`. Title config: `collapsedScale` and `collapsedAlignment`. `maxHeight` on `HeaderHeight.Percentage` and `HeaderHeight.AspectRatio`.
 - Accessibility: state description with expand and collapse actions, reading order with the toolbar first, the title as a heading, and the faded header or exited toolbar hidden from screen readers. Strings come from `semanticsConfig`.
-- Invalid configuration values throw at construction with a message naming the field and the valid range.
+- Invalid configuration values throw at construction with a message naming the field and the valid range. A layout given unbounded height fails with a message that says so.
+- `windowInsets` parameter, defaulting to the system bars plus the display cutout on the top and sides. The horizontal insets keep the toolbar slots clear of a cutout in landscape; pass `WindowInsets(0)` for a layout that does not touch the window edge.
+- `animationSpec` on the header config for snaps, stretch releases and programmatic moves; `collapse()` and `expand()` accept a per-call spec. `state.isScrollInProgress` reports header motion.
 - Desktop (JVM) and web (Kotlin/Wasm) targets.
 - Sample playground shared by Android, iOS, desktop and web hosts; compiled recipes in `docs/RECIPES.md`; `llms.txt` and an agent skill file; a docs site on GitHub Pages.
 
@@ -788,6 +842,11 @@ need one edit or none.
 - Right-to-left layouts: content padding and the title's horizontal motion follow the layout direction.
 - Horizontal `contentPadding` was dropped for regular content.
 - Short regular content left extra blank space below it.
+- Right-to-left layouts placed the navigation icon and actions on the wrong sides; centered and end-aligned collapsed titles were offset by the navigation icon width.
+- A collapsed title could run under the actions when the collapsed start padding was wider than the navigation icon.
+- Mouse wheel and trackpad scrolling on desktop and web could leave the header stretched, since they never fling; a stretch now follows a held pointer only.
+- A downward fling on an expanded header stretched it for one frame.
+- The collapsed header is hidden from screen readers whether or not it fades.
 
 ## 1.3.0
 

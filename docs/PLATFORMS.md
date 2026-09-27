@@ -4,8 +4,9 @@ The library is pure common Compose code. This page covers what differs per host.
 
 ## Android
 
-**Edge-to-edge.** The layout reads the status bar inset itself: the header covers the inset, the
-toolbar and body are pushed below it. Call `enableEdgeToEdge()` in your activity and do not add a
+**Edge-to-edge.** The layout reads the window insets itself: the header covers the status bar,
+the toolbar and body are pushed below it, and in landscape the navigation icon, actions and title
+stay clear of a display cutout. Call `enableEdgeToEdge()` in your activity and do not add a
 status bar padding of your own around the layout. Status bar icon color is your app's concern;
 switch it when `collapsed` flips if the toolbar colors need it.
 
@@ -69,7 +70,12 @@ are supported; Compose Multiplatform no longer publishes the Intel simulator tar
 
 Add the dependency to the `jvm` source set or `commonMain`. Mouse wheel scrolling drives the
 header through nested scroll, including expansion when scrolling back up. Dragging the header
-with the mouse works as on touch.
+with the mouse works as on touch. A stretch follows a held pointer only, so the wheel never
+leaves the header stretched.
+
+**Scrollbar.** Put the list and a `VerticalScrollbar` in one `Box` as `ParallaxContent.Custom`;
+the state's `lazyListState` or `scrollState` feeds the adapter. See the
+[Desktop scrollbar](RECIPES.md#desktop-scrollbar) recipe.
 
 ## Web
 
@@ -79,6 +85,13 @@ window restarts the Compose viewport, which is standard Compose for Web behavior
 
 ## Insets and the toolbar height
 
-The status bar inset is read from `WindowInsets.statusBars` on every platform and is zero on
-desktop and web. `toolbarConfig(height = ...)` sets the toolbar height excluding that inset;
-`state.layoutInfo` exposes the resolved values in pixels if you need them.
+The `windowInsets` parameter defaults to the system bars plus the display cutout, top and sides,
+the same set Material's top app bar uses. It is zero on desktop and web. The top inset sits
+under the header and above the toolbar; the horizontal insets inset the toolbar slots. Pass
+`WindowInsets(0)` when the layout does not touch the window edge, for example in a dialog, a
+bottom sheet or a split pane, or your own set to pick different bars. `toolbarConfig(height = ...)`
+sets the toolbar height excluding the top inset; `state.layoutInfo` exposes the resolved values
+in pixels if you need them.
+
+The layout needs a bounded height. It fills the space it is given and scrolls its body inside
+it, so it cannot sit in a vertically scrolling parent; give it a fixed height or a weight there.

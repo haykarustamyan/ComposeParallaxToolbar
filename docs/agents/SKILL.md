@@ -41,9 +41,10 @@ ComposeParallaxToolbarLayout(
 5. Programmatic control: `val state = rememberParallaxToolbarState()`; `state.collapseFraction`, `state.isCollapsed`, `scope.launch { state.collapse() }`, `state.expand()`. The body keeps its own scroll position; use `state.scrollState` or `state.lazyListState` to scroll it.
 6. Inside any slot, `collapseFraction`, `isCollapsed`, `state` and `layoutInfo` are available from the scope. Read `collapseFraction` inside `graphicsLayer { }` for per-frame effects, not in composition.
 7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
-8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset.
-9. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
-10. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
+8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset. If the layout does not touch the window edge (dialog, bottom sheet, split pane), pass `windowInsets = WindowInsets(0)`. The layout needs a bounded height: never place it in a vertically scrolling parent.
+9. Animation: `headerConfig(animationSpec = ...)` sets the spring used for snaps, stretch releases and `collapse()`/`expand()`; both also accept a per-call `animationSpec`. `state.isScrollInProgress` is true while the header moves.
+10. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
+11. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
 
 ## Mistakes to avoid (1.x habits)
 

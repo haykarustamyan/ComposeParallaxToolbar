@@ -7,6 +7,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 RECIPE_SOURCES = [
     ROOT / "sample/src/commonMain/kotlin/am/highapps/parallaxtoolbar/sample/recipes/Recipes.kt",
     ROOT / "sample/src/iosMain/kotlin/am/highapps/parallaxtoolbar/sample/recipes/IosHosting.kt",
+    ROOT / "sample/src/desktopMain/kotlin/am/highapps/parallaxtoolbar/sample/recipes/DesktopScrollbar.kt",
 ]
 SWIFT_HOST = '''struct PlaylistView: UIViewControllerRepresentable {
     let items: [String]

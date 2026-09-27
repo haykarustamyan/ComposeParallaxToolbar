@@ -1,6 +1,13 @@
 package am.highapps.parallaxtoolbar
 
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -40,6 +47,18 @@ public object ParallaxToolbarDefaults {
     internal const val StretchResistance: Float = 0.5f
     internal const val StretchMaxFactor: Float = 2f
 
+    /** Spec used for snaps, stretch releases and `collapse()`/`expand()` unless overridden. */
+    public val AnimationSpec: AnimationSpec<Float> = spring()
+
+    /**
+     * Insets the toolbar and body stay inside of by default: the top system bar plus the display
+     * cutout, on the top and both sides. The same set Material's top app bar uses. Zero on desktop
+     * and web.
+     */
+    public val windowInsets: WindowInsets
+        @Composable get() = WindowInsets.systemBars.union(WindowInsets.displayCutout)
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+
     @Composable
     public fun headerConfig(
         height: HeaderHeight = HeaderHeight.Fixed(HeaderHeightDp),
@@ -50,7 +69,8 @@ public object ParallaxToolbarDefaults {
         scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
         fadeOnCollapse: Boolean = true,
         stretchEnabled: Boolean = false,
-        stretchTriggerDistance: Dp = StretchTriggerDistance
+        stretchTriggerDistance: Dp = StretchTriggerDistance,
+        animationSpec: AnimationSpec<Float> = AnimationSpec
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
         gradient = gradient,
@@ -60,7 +80,8 @@ public object ParallaxToolbarDefaults {
         scrollMode = scrollMode,
         fadeOnCollapse = fadeOnCollapse,
         stretchEnabled = stretchEnabled,
-        stretchTriggerDistance = stretchTriggerDistance
+        stretchTriggerDistance = stretchTriggerDistance,
+        animationSpec = animationSpec
     )
 
     @Composable
