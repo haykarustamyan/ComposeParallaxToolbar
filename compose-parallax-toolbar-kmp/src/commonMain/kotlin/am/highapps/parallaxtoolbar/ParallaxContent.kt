@@ -27,7 +27,7 @@ public sealed class ParallaxContent {
     public data class Lazy(
         val content: LazyListScope.(Boolean) -> Unit,
         val config: LazyColumnConfig = LazyColumnConfig(),
-        val lazyListState: LazyListState? = null
+        val lazyListState: LazyListState? = null,
     ) : ParallaxContent()
 
     /**

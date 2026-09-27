@@ -1,17 +1,18 @@
 package am.highapps.parallaxtoolbar
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -22,16 +23,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
-import kotlin.test.Test
 import kotlinx.coroutines.launch
+import kotlin.test.Test
 
 /** Material-free stand-ins so the library tests only depend on Foundation. */
 @Composable
@@ -71,7 +72,7 @@ class ComposeParallaxToolbarLayoutTest : UiTestBase() {
                         }
                     }
                 },
-                state = rememberParallaxToolbarState(scrollState = rememberScrollState())
+                state = rememberParallaxToolbarState(scrollState = rememberScrollState()),
             )
         }
 
@@ -103,9 +104,9 @@ class ComposeParallaxToolbarLayoutTest : UiTestBase() {
                             Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp))
                         }
                     },
-                    lazyListState = listState
+                    lazyListState = listState,
                 ),
-                modifier = Modifier.testTag("layout")
+                modifier = Modifier.testTag("layout"),
             )
         }
 
@@ -133,7 +134,7 @@ class ComposeParallaxToolbarLayoutTest : UiTestBase() {
                             Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp))
                         }
                     }
-                }
+                },
             )
         }
         waitForIdle()
@@ -149,14 +150,14 @@ class ComposeParallaxToolbarLayoutTest : UiTestBase() {
                     headerContent = { Header() },
                     headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(16f / 9f),
                     content = ParallaxContent.Regular { Text("a-body") },
-                    modifier = Modifier.height(300.dp)
+                    modifier = Modifier.height(300.dp),
                 )
                 ComposeParallaxToolbarLayout(
                     titleContent = { Text("percent") },
                     headerContent = { Header() },
                     headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(0.4f),
                     content = ParallaxContent.Regular { Text("p-body") },
-                    modifier = Modifier.height(300.dp)
+                    modifier = Modifier.height(300.dp),
                 )
             }
         }
@@ -191,17 +192,17 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                 actions = { Text("action") },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
                     height = HeaderHeight.Fixed(300.dp),
-                    gradient = androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color.Black))
+                    gradient = androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color.Black)),
                 ),
                 toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(
                     initialColor = Color.Transparent,
                     targetColor = Color.Green,
-                    elevation = 4.dp
+                    elevation = 4.dp,
                 ),
                 titleConfig = ParallaxToolbarDefaults.titleConfig(keepSubtitleAfterCollapse = true),
                 bodyConfig = ParallaxToolbarDefaults.bodyConfig(minBottomSpacerHeight = 24.dp),
                 content = ParallaxContent.Regular { Rows(60) },
-                modifier = Modifier.testTag("layout")
+                modifier = Modifier.testTag("layout"),
             )
         }
         onNodeWithText("expanded").assertIsDisplayed()
@@ -225,7 +226,7 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                 subtitleContent = { Text("subtitle") },
                 titleConfig = ParallaxToolbarDefaults.titleConfig(animateSubTitleHiding = false),
                 content = ParallaxContent.Regular { Rows(60) },
-                modifier = Modifier.testTag("layout")
+                modifier = Modifier.testTag("layout"),
             )
         }
         onNodeWithText("subtitle").assertIsDisplayed()
@@ -242,7 +243,7 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(120.dp)),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp),
-                content = ParallaxContent.Regular { Rows(2) }
+                content = ParallaxContent.Regular { Rows(2) },
             )
         }
         onNodeWithText("Row 0").assertIsDisplayed()
@@ -257,7 +258,10 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(120.dp)),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                    start = 4.dp, top = 4.dp, end = 4.dp, bottom = 40.dp
+                    start = 4.dp,
+                    top = 4.dp,
+                    end = 4.dp,
+                    bottom = 40.dp,
                 ),
                 bodyConfig = ParallaxToolbarDefaults.bodyConfig(minBottomSpacerHeight = 16.dp),
                 content = ParallaxContent.Lazy(
@@ -266,9 +270,9 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(8.dp),
                         verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp),
                         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-                        userScrollEnabled = true
-                    )
-                )
+                        userScrollEnabled = true,
+                    ),
+                ),
             )
         }
         onNodeWithText("Row 0").assertIsDisplayed()
@@ -284,7 +288,7 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 content = { _ -> },
                 lazyContent = { _ -> items(50) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) } },
-                modifier = Modifier.testTag("layout")
+                modifier = Modifier.testTag("layout"),
             )
         }
         onNodeWithText("Row 0").assertIsDisplayed()
@@ -300,7 +304,7 @@ class ComposeParallaxToolbarConfigTest : UiTestBase() {
             ComposeParallaxToolbarLayout(
                 titleContent = { Title(it) },
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
-                content = { _ -> Rows(5) }
+                content = { _ -> Rows(5) },
             )
         }
         onNodeWithText("expanded").assertIsDisplayed()
@@ -323,7 +327,7 @@ class ComposeParallaxToolbarTitleTest : UiTestBase() {
                 content = ParallaxContent.Regular {
                     Column { repeat(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) } }
                 },
-                modifier = Modifier.testTag("layout")
+                modifier = Modifier.testTag("layout"),
             )
         }
         onNodeWithText("subtitle").assertIsDisplayed()
@@ -349,7 +353,7 @@ class ComposeParallaxToolbarRecompositionTest : UiTestBase() {
                     headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                     headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(100.dp)),
                     content = ParallaxContent.Regular { Text("u-body") },
-                    modifier = Modifier.height(200.dp)
+                    modifier = Modifier.height(200.dp),
                 )
                 @Suppress("DEPRECATION")
                 ComposeParallaxToolbarLayout(
@@ -357,7 +361,7 @@ class ComposeParallaxToolbarRecompositionTest : UiTestBase() {
                     headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                     headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(100.dp)),
                     content = { Text("l-body") },
-                    modifier = Modifier.height(200.dp)
+                    modifier = Modifier.height(200.dp),
                 )
             }
         }
@@ -385,7 +389,7 @@ class ComposeParallaxToolbarLazyStartTest : UiTestBase() {
                 headerConfig = ParallaxToolbarDefaults.headerConfig(isExpandedWhenFirstDisplayed = false),
                 content = ParallaxContent.Lazy(content = { _ ->
                     items(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
-                })
+                }),
             )
         }
         waitForIdle()
@@ -400,7 +404,7 @@ class ComposeParallaxToolbarRtlTest : UiTestBase() {
     private fun Rtl(content: @Composable () -> Unit) {
         androidx.compose.runtime.CompositionLocalProvider(
             androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl,
-            content = content
+            content = content,
         )
     }
 
@@ -418,7 +422,7 @@ class ComposeParallaxToolbarRtlTest : UiTestBase() {
                         content = ParallaxContent.Regular {
                             Column { repeat(40) { i -> Text("R$i", modifier = Modifier.fillMaxWidth().height(48.dp)) } }
                         },
-                        modifier = Modifier.weight(1f).testTag("regular")
+                        modifier = Modifier.weight(1f).testTag("regular"),
                     )
                     ComposeParallaxToolbarLayout(
                         titleContent = { Text(if (it) "l-collapsed" else "l-expanded") },
@@ -428,7 +432,7 @@ class ComposeParallaxToolbarRtlTest : UiTestBase() {
                         content = ParallaxContent.Lazy(content = { _ ->
                             items(40) { i -> Text("L$i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
                         }),
-                        modifier = Modifier.weight(1f).testTag("lazy")
+                        modifier = Modifier.weight(1f).testTag("lazy"),
                     )
                 }
             }
@@ -443,7 +447,6 @@ class ComposeParallaxToolbarRtlTest : UiTestBase() {
     }
 }
 
-
 @OptIn(ExperimentalTestApi::class)
 class ComposeParallaxToolbarStateTest : UiTestBase() {
 
@@ -457,7 +460,7 @@ class ComposeParallaxToolbarStateTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
                     height = HeaderHeight.Fixed(200.dp),
-                    parallaxMultiplier = 0.3f
+                    parallaxMultiplier = 0.3f,
                 ),
                 toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(height = 56.dp, elevation = 3.dp),
                 titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedScale = 0.8f),
@@ -465,7 +468,7 @@ class ComposeParallaxToolbarStateTest : UiTestBase() {
                 content = ParallaxContent.Regular {
                     Column { repeat(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) } }
                 },
-                state = state
+                state = state,
             )
         }
         waitForIdle()
@@ -497,7 +500,7 @@ class ComposeParallaxToolbarStateTest : UiTestBase() {
                 content = ParallaxContent.Lazy(content = { _ ->
                     items(60) { i -> Text("Row $i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
                 }),
-                state = state
+                state = state,
             )
         }
         // Animated variants need the frame clock to advance, so launch rather than block.
@@ -512,12 +515,17 @@ class ComposeParallaxToolbarStateTest : UiTestBase() {
     @Test
     fun configs_haveDefaultsForNewFields() {
         val toolbar = ParallaxToolbarConfig(
-            initialColor = Color.Transparent, targetColor = Color.Black, elevation = 0.dp,
-            animationSpec = androidx.compose.animation.core.tween()
+            initialColor = Color.Transparent,
+            targetColor = Color.Black,
+            elevation = 0.dp,
+            animationSpec = androidx.compose.animation.core.tween(),
         )
         val title = ParallaxTitleConfig(
-            paddingBottom = 0.dp, paddingStart = 16.dp, collapsedPaddingStart = 64.dp,
-            keepSubtitleAfterCollapse = false, animateSubTitleHiding = true
+            paddingBottom = 0.dp,
+            paddingStart = 16.dp,
+            collapsedPaddingStart = 64.dp,
+            keepSubtitleAfterCollapse = false,
+            animateSubTitleHiding = true,
         )
         kotlin.test.assertEquals(ParallaxToolbarDefaults.ToolbarHeight, toolbar.height)
         kotlin.test.assertEquals(ParallaxToolbarDefaults.TitleCollapsedScale, title.collapsedScale)
@@ -561,7 +569,6 @@ class ParallaxConfigEqualityTest {
     }
 }
 
-
 @OptIn(ExperimentalTestApi::class)
 class ComposeParallaxToolbarCustomContentTest : UiTestBase() {
 
@@ -577,12 +584,12 @@ class ComposeParallaxToolbarCustomContentTest : UiTestBase() {
                 content = ParallaxContent.Custom { collapsed ->
                     androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                         columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize().testTag("grid")
+                        modifier = Modifier.fillMaxSize().testTag("grid"),
                     ) {
                         items(120) { i -> Text("Cell $i", modifier = Modifier.fillMaxWidth().height(48.dp)) }
                     }
                 },
-                state = state
+                state = state,
             )
         }
         onNodeWithText("expanded").assertIsDisplayed()
@@ -610,10 +617,10 @@ class ComposeParallaxToolbarCustomContentTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
                     height = HeaderHeight.Fixed(300.dp),
-                    snapOnRelease = true
+                    snapOnRelease = true,
                 ),
                 content = ParallaxContent.Regular { Column { repeat(3) { i -> Text("Row $i") } } },
-                state = state
+                state = state,
             )
         }
         // A short, slow drag on the header itself leaves it part way; snap settles it fully.
@@ -626,7 +633,6 @@ class ComposeParallaxToolbarCustomContentTest : UiTestBase() {
         waitForIdle()
         kotlin.test.assertTrue(state.collapseFraction == 0f || state.collapseFraction == 1f, "fraction=${state.collapseFraction}")
     }
-
 }
 
 @OptIn(ExperimentalTestApi::class)
@@ -641,23 +647,32 @@ class ComposeParallaxToolbarSnapTest : UiTestBase() {
             content = ParallaxContent.Regular {
                 Column(Modifier.testTag("body")) { repeat(rows) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } }
             },
-            state = state
+            state = state,
         )
     }
 
     @Test
     fun headerDrag_releasedWithoutVelocity_settlesToNearestEnd() = runComposeUiTest {
         lateinit var state: ParallaxToolbarState
-        setContent { state = rememberParallaxToolbarState(); Snapping(state, rows = 3) }
+        setContent {
+            state = rememberParallaxToolbarState()
+            Snapping(state, rows = 3)
+        }
         // Small drag, then a pause so the release velocity is zero: only settle() can finish it.
         onNodeWithTag("header").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -40f)); advanceEventTime(400); up()
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -40f))
+            advanceEventTime(400)
+            up()
         }
         waitForIdle()
         kotlin.test.assertEquals(0f, state.collapseFraction)
 
         onNodeWithTag("header").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -200f)); advanceEventTime(400); up()
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -200f))
+            advanceEventTime(400)
+            up()
         }
         waitForIdle()
         kotlin.test.assertEquals(1f, state.collapseFraction)
@@ -666,7 +681,10 @@ class ComposeParallaxToolbarSnapTest : UiTestBase() {
     @Test
     fun bodyFling_withShortContent_settlesInTheFlingDirection() = runComposeUiTest {
         lateinit var state: ParallaxToolbarState
-        setContent { state = rememberParallaxToolbarState(); Snapping(state, rows = 2) }
+        setContent {
+            state = rememberParallaxToolbarState()
+            Snapping(state, rows = 2)
+        }
         // A short upward fling on the body: it cannot scroll, so the velocity reaches the header.
         onNodeWithTag("body").performTouchInput { swipeUp(startY = centerY + 20f, endY = centerY - 20f, durationMillis = 50) }
         waitForIdle()
@@ -678,7 +696,10 @@ class ComposeParallaxToolbarSnapTest : UiTestBase() {
 
         // Zero-velocity release on the body takes the nearest end.
         onNodeWithTag("body").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -200f)); advanceEventTime(400); up()
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -200f))
+            advanceEventTime(400)
+            up()
         }
         waitForIdle()
         kotlin.test.assertEquals(1f, state.collapseFraction)
@@ -708,7 +729,7 @@ class ComposeParallaxToolbarScopeTest : UiTestBase() {
                     Text("a")
                 },
                 content = ParallaxContent.Regular { Column { Text("body ${state.isCollapsed}") } },
-                state = state
+                state = state,
             )
         }
         onNodeWithText("title 0 false").assertIsDisplayed()
@@ -740,7 +761,7 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
                 items(300) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) }
             }),
             modifier = Modifier.testTag("layout"),
-            state = state
+            state = state,
         )
     }
 
@@ -752,7 +773,10 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
     /** A short downward drag: far too small to reach the list top. */
     private fun androidx.compose.ui.test.ComposeUiTest.nudgeDown() {
         onNodeWithTag("layout").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, 80f)); moveBy(androidx.compose.ui.geometry.Offset(0f, 80f)); up()
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 80f))
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 80f))
+            up()
         }
         waitForIdle()
     }
@@ -760,7 +784,10 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
     @Test
     fun exitUntilCollapsed_expandsOnlyAtTop() = runComposeUiTest {
         lateinit var state: ParallaxToolbarState
-        setContent { state = rememberParallaxToolbarState(); Modes(ScrollMode.ExitUntilCollapsed, state) }
+        setContent {
+            state = rememberParallaxToolbarState()
+            Modes(ScrollMode.ExitUntilCollapsed, state)
+        }
         scrollFarDown()
         kotlin.test.assertEquals(1f, state.collapseFraction)
         kotlin.test.assertEquals(0f, state.toolbarExitFraction)
@@ -771,7 +798,10 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
     @Test
     fun enterAlways_expandsAnywhere() = runComposeUiTest {
         lateinit var state: ParallaxToolbarState
-        setContent { state = rememberParallaxToolbarState(); Modes(ScrollMode.EnterAlways, state) }
+        setContent {
+            state = rememberParallaxToolbarState()
+            Modes(ScrollMode.EnterAlways, state)
+        }
         scrollFarDown()
         kotlin.test.assertEquals(1f, state.collapseFraction)
         kotlin.test.assertEquals(0f, state.toolbarExitFraction)
@@ -783,7 +813,10 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
     @Test
     fun enterAlwaysCollapsed_hidesToolbar_thenBringsItBackFirst() = runComposeUiTest {
         lateinit var state: ParallaxToolbarState
-        setContent { state = rememberParallaxToolbarState(); Modes(ScrollMode.EnterAlwaysCollapsed, state) }
+        setContent {
+            state = rememberParallaxToolbarState()
+            Modes(ScrollMode.EnterAlwaysCollapsed, state)
+        }
         scrollFarDown()
         kotlin.test.assertEquals(1f, state.collapseFraction)
         kotlin.test.assertEquals(1f, state.toolbarExitFraction, "toolbar left the screen")
@@ -812,16 +845,22 @@ class ComposeParallaxToolbarScrollModeTest : UiTestBase() {
                 titleContent = { Text(if (it) "collapsed" else "expanded") },
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
-                    height = HeaderHeight.Fixed(200.dp), scrollMode = ScrollMode.EnterAlwaysCollapsed, snapOnRelease = true
+                    height = HeaderHeight.Fixed(200.dp),
+                    scrollMode = ScrollMode.EnterAlwaysCollapsed,
+                    snapOnRelease = true,
                 ),
                 content = ParallaxContent.Regular { Column { repeat(2) { i -> Text("Row $i") } } },
                 modifier = Modifier.testTag("layout"),
-                state = state
+                state = state,
             )
         }
         // Collapse the header fully and push a little into the exit, then release without velocity.
         onNodeWithTag("layout").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, -400f)); moveBy(androidx.compose.ui.geometry.Offset(0f, -20f)); advanceEventTime(400); up()
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -400f))
+            moveBy(androidx.compose.ui.geometry.Offset(0f, -20f))
+            advanceEventTime(400)
+            up()
         }
         waitForIdle()
         kotlin.test.assertEquals(1f, state.collapseFraction)
@@ -851,17 +890,19 @@ class ComposeParallaxToolbarOverlayTest : UiTestBase() {
                                 expanded = androidx.compose.ui.Alignment.BottomCenter,
                                 collapsed = androidx.compose.ui.Alignment.CenterEnd,
                                 collapsedPadding = androidx.compose.foundation.layout.PaddingValues(end = 8.dp),
-                                collapsedScale = 0.5f
+                                collapsedScale = 0.5f,
                             )
                             .background(Color.Red)
-                            .testTag("avatar")
+                            .testTag("avatar"),
                     )
                 },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
-                    height = HeaderHeight.Fixed(200.dp), parallaxMultiplier = 0f, fadeOnCollapse = false
+                    height = HeaderHeight.Fixed(200.dp),
+                    parallaxMultiplier = 0f,
+                    fadeOnCollapse = false,
                 ),
                 content = ParallaxContent.Regular { Column { repeat(60) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
-                state = state
+                state = state,
             )
         }
         waitForIdle()
@@ -903,19 +944,23 @@ class ComposeParallaxToolbarExtrasTest : UiTestBase() {
                 titleContent = { Text(if (it) "collapsed" else "expanded") },
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
-                    height = HeaderHeight.Fixed(200.dp), stretchEnabled = true, stretchTriggerDistance = 40.dp
+                    height = HeaderHeight.Fixed(200.dp),
+                    stretchEnabled = true,
+                    stretchTriggerDistance = 40.dp,
                 ),
                 onStretchTrigger = { triggers++ },
                 content = ParallaxContent.Regular {
                     Column(Modifier.testTag("body")) { repeat(40) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } }
                 },
-                state = state
+                state = state,
             )
         }
         // A short pull on the body at its top: stretches a little, releases below the trigger.
         // Touch blocks dispatch as a batch, so the pointer is held across two blocks to observe.
         onNodeWithTag("body").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, 30f)); advanceEventTime(300)
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 30f))
+            advanceEventTime(300)
         }
         waitForIdle()
         maxStretchSeen = state.stretchPx
@@ -928,7 +973,11 @@ class ComposeParallaxToolbarExtrasTest : UiTestBase() {
 
         // A long pull on the header itself passes the trigger distance.
         onNodeWithTag("header").performTouchInput {
-            down(center); moveBy(androidx.compose.ui.geometry.Offset(0f, 200f)); moveBy(androidx.compose.ui.geometry.Offset(0f, 200f)); advanceEventTime(300); up()
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 200f))
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 200f))
+            advanceEventTime(300)
+            up()
         }
         waitForIdle()
         kotlin.test.assertEquals(0f, state.stretchPx)
@@ -950,7 +999,7 @@ class ComposeParallaxToolbarExtrasTest : UiTestBase() {
                     Column { repeat(60) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp).testTag("row$i")) } }
                 },
                 modifier = Modifier.testTag("layout"),
-                state = state
+                state = state,
             )
         }
         val info = state.layoutInfo
@@ -981,7 +1030,7 @@ class ComposeParallaxToolbarExtrasTest : UiTestBase() {
                 headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
                 titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = alignment),
                 content = ParallaxContent.Regular { Column { repeat(60) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
-                state = state
+                state = state,
             )
         }
         runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
@@ -1008,7 +1057,7 @@ class ComposeParallaxToolbarExtrasTest : UiTestBase() {
                 headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(0.9f, maxHeight = 150.dp),
                 toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(elevation = 4.dp, alwaysElevated = true),
                 content = ParallaxContent.Regular { Text("body") },
-                state = state
+                state = state,
             )
         }
         val density = state.layoutInfo.headerHeightPx / 150f
@@ -1032,30 +1081,46 @@ class ComposeParallaxToolbarSemanticsTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("headerBox")) },
                 navigationIcon = { Text("<") },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
-                    height = HeaderHeight.Fixed(200.dp), scrollMode = ScrollMode.EnterAlwaysCollapsed
+                    height = HeaderHeight.Fixed(200.dp),
+                    scrollMode = ScrollMode.EnterAlwaysCollapsed,
                 ),
                 semanticsConfig = ParallaxToolbarDefaults.semanticsConfig(
-                    expandedStateDescription = "Open", collapsedStateDescription = "Closed",
-                    expandActionLabel = "Open it", collapseActionLabel = "Close it"
+                    expandedStateDescription = "Open",
+                    collapsedStateDescription = "Closed",
+                    expandActionLabel = "Open it",
+                    collapseActionLabel = "Close it",
                 ),
-                content = ParallaxContent.Lazy(content = { _ -> items(300) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } }),
+                content = ParallaxContent.Lazy(content = { _ ->
+                    items(300) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) }
+                }),
                 modifier = Modifier.testTag("layout"),
-                state = state
+                state = state,
             )
         }
         val root = onNodeWithTag("layout")
         root.assert(androidx.compose.ui.test.hasStateDescription("Open"))
         root.assert(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsActions.Collapse))
-        root.assert(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.IsTraversalGroup))
+        root.assert(
+            androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.IsTraversalGroup),
+        )
 
         // The title is a heading; the header is announced while visible.
         onNodeWithText("expanded", useUnmergedTree = true).assertExists()
         kotlin.test.assertTrue(
-            onAllNodes(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.Heading), useUnmergedTree = true)
-                .fetchSemanticsNodes().isNotEmpty(), "title is a heading"
+            onAllNodes(
+                androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.Heading),
+                useUnmergedTree = true,
+            )
+                .fetchSemanticsNodes().isNotEmpty(),
+            "title is a heading",
         )
-        val headerHidden = androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility)
-        kotlin.test.assertTrue(onAllNodes(headerHidden, useUnmergedTree = true).fetchSemanticsNodes().isEmpty(), "nothing hidden while expanded")
+        val headerHidden = androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(
+            androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility,
+        )
+        kotlin.test.assertTrue(
+            onAllNodes(headerHidden, useUnmergedTree = true).fetchSemanticsNodes().isEmpty(),
+            "nothing hidden while expanded",
+        )
 
         // The collapse action works and flips the state; the faded header is then hidden.
         root.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.Collapse)
@@ -1100,15 +1165,25 @@ class ParallaxValidationTest {
         failsWith("AspectRatio ratio must be a positive") { HeaderHeight.AspectRatio(Float.NaN) }
         failsWith("maxHeight must be 0.dp or more") { HeaderHeight.Percentage(0.5f, maxHeight = (-1).dp) }
         failsWith("Fixed height must be 0.dp or more") { HeaderHeight.Fixed((-10).dp) }
-        failsWith("parallaxMultiplier must be a finite") { ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, parallaxMultiplier = Float.NaN) }
-        failsWith("stretchTriggerDistance must be greater") { ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, stretchTriggerDistance = 0.dp) }
-        failsWith("height must be greater than 0.dp") { ParallaxToolbarConfig(Color.Black, Color.Black, 0.dp, androidx.compose.animation.core.snap(), height = 0.dp) }
-        failsWith("elevation must be 0.dp or more") { ParallaxToolbarConfig(Color.Black, Color.Black, (-1).dp, androidx.compose.animation.core.snap()) }
+        failsWith("parallaxMultiplier must be a finite") {
+            ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, parallaxMultiplier = Float.NaN)
+        }
+        failsWith("stretchTriggerDistance must be greater") {
+            ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, stretchTriggerDistance = 0.dp)
+        }
+        failsWith("height must be greater than 0.dp") {
+            ParallaxToolbarConfig(Color.Black, Color.Black, 0.dp, androidx.compose.animation.core.snap(), height = 0.dp)
+        }
+        failsWith("elevation must be 0.dp or more") {
+            ParallaxToolbarConfig(Color.Black, Color.Black, (-1).dp, androidx.compose.animation.core.snap())
+        }
         failsWith("collapsedScale must be a positive") { ParallaxTitleConfig(0.dp, 0.dp, 0.dp, false, true, collapsedScale = 0f) }
         failsWith("minBottomSpacerHeight must be 0.dp or more") { ParallaxBodyConfig((-4).dp) }
 
         // Valid edges still construct.
-        HeaderHeight.Percentage(1f); HeaderHeight.Fixed(0.dp); HeaderHeight.AspectRatio(0.1f, maxHeight = 0.dp)
+        HeaderHeight.Percentage(1f)
+        HeaderHeight.Fixed(0.dp)
+        HeaderHeight.AspectRatio(0.1f, maxHeight = 0.dp)
         ParallaxTitleConfig(0.dp, 0.dp, 0.dp, false, true, collapsedScale = 2f)
     }
 }
@@ -1121,7 +1196,7 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
         lateinit var state: ParallaxToolbarState
         setContent {
             androidx.compose.runtime.CompositionLocalProvider(
-                androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl
+                androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl,
             ) {
                 state = rememberParallaxToolbarState()
                 ComposeParallaxToolbarLayout(
@@ -1132,7 +1207,7 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
                     titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = Alignment.CenterHorizontally),
                     content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
                     windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
-                    state = state
+                    state = state,
                 )
             }
         }
@@ -1158,7 +1233,7 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
                 headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
                 content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
                 windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
-                state = state
+                state = state,
             )
         }
         runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
@@ -1184,7 +1259,7 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
                 headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
                 content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
                 windowInsets = androidx.compose.foundation.layout.WindowInsets(left = 20.dp, top = 30.dp, right = 10.dp),
-                state = state
+                state = state,
             )
         }
         val d = density.density
@@ -1207,7 +1282,7 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
                     ComposeParallaxToolbarLayout(
                         titleContent = { Text("t") },
                         headerContent = { Box(Modifier.fillMaxSize()) },
-                        content = ParallaxContent.Regular { Text("body") }
+                        content = ParallaxContent.Regular { Text("body") },
                     )
                 }
             }
@@ -1216,7 +1291,7 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
         val messages = generateSequence(error) { it.cause }.mapNotNull { it.message }.toList()
         kotlin.test.assertTrue(
             messages.any { "needs a bounded height" in it },
-            "expected the bounded-height message, got $messages"
+            "expected the bounded-height message, got $messages",
         )
     }
 
@@ -1230,10 +1305,12 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp), fadeOnCollapse = false),
                 content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
-                state = state
+                state = state,
             )
         }
-        val hidden = androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility)
+        val hidden = androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(
+            androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility,
+        )
         kotlin.test.assertTrue(onAllNodes(hidden, useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
         runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
         waitForIdle()
@@ -1253,10 +1330,10 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
                 headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
                 headerConfig = ParallaxToolbarDefaults.headerConfig(
                     height = HeaderHeight.Fixed(200.dp),
-                    animationSpec = androidx.compose.animation.core.tween(durationMillis = 400)
+                    animationSpec = androidx.compose.animation.core.tween(durationMillis = 400),
                 ),
                 content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
-                state = state
+                state = state,
             )
         }
         kotlin.test.assertFalse(state.isScrollInProgress)
@@ -1277,5 +1354,130 @@ class ComposeParallaxToolbarGeometryTest : UiTestBase() {
         runOnIdle { scope.launch { state.expand(animationSpec = androidx.compose.animation.core.snap()) } }
         mainClock.advanceTimeByFrame()
         kotlin.test.assertEquals(0f, state.collapseFraction)
+    }
+}
+
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarPinTest : UiTestBase() {
+
+    @Test
+    fun pinnedElement_staysPut_thenRidesTheHeaderBottom_andCanStopAtTop() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var stopAtTop by androidx.compose.runtime.mutableStateOf(false)
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("t") },
+                headerContent = {
+                    Box(Modifier.fillMaxSize()) {
+                        // An 80dp block sitting 20dp above the header's bottom edge.
+                        Box(
+                            Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp)
+                                .fillMaxWidth().height(80.dp).pin(stopAtTop = stopAtTop).testTag("chips"),
+                        )
+                    }
+                },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp),
+                    parallaxMultiplier = 0.5f,
+                    fadeOnCollapse = false,
+                ),
+                toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(height = 56.dp),
+                content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
+                state = state,
+            )
+        }
+        val d = density.density
+        val restBottom = onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.bottom
+        kotlin.test.assertEquals(180f * d, restBottom, 1f)
+
+        // Header bottom moves from 200dp to 190dp: not yet touching the chips, which stay put
+        // despite the parallax that moves the rest of the header.
+        runOnIdle { state.headerState.snapFractionTo(10f / 144f) }
+        waitForIdle()
+        kotlin.test.assertEquals(restBottom, onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.bottom, 1f)
+
+        // Header bottom at 120dp: the chips ride it.
+        runOnIdle { state.headerState.snapFractionTo(80f / 144f) }
+        waitForIdle()
+        kotlin.test.assertEquals(120f * d, onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.bottom, 1f)
+
+        // Fully collapsed: bottom at the toolbar's bottom edge, 56dp, so the top is off screen.
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        kotlin.test.assertEquals(56f * d, onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.bottom, 1f)
+        kotlin.test.assertEquals(-24f * d, onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.top, 1f)
+
+        // stopAtTop: the top never passes the toolbar's top edge (0 here), so the bottom rests at 80dp.
+        stopAtTop = true
+        waitForIdle()
+        kotlin.test.assertEquals(0f, onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.top, 1f)
+        kotlin.test.assertEquals(80f * d, onNodeWithTag("chips").fetchSemanticsNode().boundsInRoot.bottom, 1f)
+    }
+
+    @Test
+    fun snapThreshold_decidesWhereAPlainReleaseSettles() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var threshold by androidx.compose.runtime.mutableStateOf(0.5f)
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("t") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp),
+                    snapOnRelease = true,
+                    snapThreshold = threshold,
+                ),
+                content = ParallaxContent.Regular { Column { repeat(60) { Box(Modifier.height(48.dp)) } } },
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
+                state = state,
+            )
+        }
+        val range = state.layoutInfo.collapseRangePx
+
+        // A slow drag of 70% of the range; touch slop eats some, leaving the header near 57% collapsed.
+        fun dragSlowly() = onNodeWithTag("header").performTouchInput {
+            down(center)
+            repeat(10) { moveBy(androidx.compose.ui.geometry.Offset(0f, -range * 0.07f), 100) }
+            up()
+        }
+        dragSlowly()
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction, "past 0.5 settles collapsed")
+
+        runOnIdle { kotlinx.coroutines.runBlocking { state.expand(animated = false) } }
+        threshold = 0.75f
+        waitForIdle()
+        dragSlowly()
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction, "below 0.75 settles expanded")
+    }
+
+    @Test
+    fun collapseEnabledFalse_locksTheHeader_butNotTheBodyOrProgrammaticMoves() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("t") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                content = ParallaxContent.Regular {
+                    Column(Modifier.testTag("body")) { repeat(60) { Box(Modifier.fillMaxWidth().height(48.dp)) } }
+                },
+                collapseEnabled = false,
+                state = state,
+            )
+        }
+        repeat(3) { onNodeWithTag("body").performTouchInput { swipeUp() } }
+        onNodeWithTag("header").performTouchInput { swipeUp() }
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction, "header locked")
+        kotlin.test.assertTrue(state.scrollState.value > 0, "body still scrolls")
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction, "programmatic moves still work")
     }
 }

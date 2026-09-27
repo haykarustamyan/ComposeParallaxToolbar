@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.LayoutCoordinates
 
 /**
  * Measured geometry of a [ComposeParallaxToolbarLayout], in pixels, updated on every layout pass.
@@ -53,6 +54,9 @@ public class ParallaxToolbarLayoutInfo internal constructor(private val headerSt
     /** Current stretch past the expanded height, in px. */
     public val stretchPx: Float
         get() = headerState.stretchPx
+
+    /** Coordinates of the header slot, inside its parallax layer, for [ParallaxToolbarScope.pin]. */
+    internal var headerCoordinates: LayoutCoordinates? by mutableStateOf(null)
 
     /** Height of the pinned `bottomContent` slot, 0 when absent. */
     public var bottomHeightPx: Float by mutableFloatStateOf(0f)

@@ -26,13 +26,13 @@ internal fun ParallaxBody(
     scroll: ScrollState,
     contentPadding: PaddingValues,
     modifier: Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scroll)
-            .padding(contentPadding)
+            .padding(contentPadding),
     ) {
         content()
     }
@@ -45,18 +45,18 @@ internal fun ParallaxLazyBody(
     config: LazyColumnConfig,
     contentPadding: PaddingValues,
     modifier: Modifier,
-    lazyContent: LazyListScope.() -> Unit
+    lazyContent: LazyListScope.() -> Unit,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val mergedContentPadding = PaddingValues(
         start = config.contentPadding.calculateStartPadding(layoutDirection) +
-                contentPadding.calculateStartPadding(layoutDirection),
+            contentPadding.calculateStartPadding(layoutDirection),
         top = config.contentPadding.calculateTopPadding() +
-                contentPadding.calculateTopPadding(),
+            contentPadding.calculateTopPadding(),
         end = config.contentPadding.calculateEndPadding(layoutDirection) +
-                contentPadding.calculateEndPadding(layoutDirection),
+            contentPadding.calculateEndPadding(layoutDirection),
         bottom = config.contentPadding.calculateBottomPadding() +
-                contentPadding.calculateBottomPadding()
+            contentPadding.calculateBottomPadding(),
     )
 
     LazyColumn(
@@ -68,6 +68,6 @@ internal fun ParallaxLazyBody(
         flingBehavior = config.flingBehavior ?: ScrollableDefaults.flingBehavior(),
         userScrollEnabled = config.userScrollEnabled,
         overscrollEffect = config.overscrollEffect,
-        content = lazyContent
+        content = lazyContent,
     )
 }

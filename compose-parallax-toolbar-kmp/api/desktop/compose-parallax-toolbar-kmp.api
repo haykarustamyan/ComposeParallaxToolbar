@@ -1,5 +1,5 @@
 public final class am/highapps/parallaxtoolbar/ComposeParallaxToolbarLayoutKt {
-	public static final fun ComposeParallaxToolbarLayout (Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Lam/highapps/parallaxtoolbar/ParallaxContent;Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;Lam/highapps/parallaxtoolbar/ParallaxToolbarConfig;Lam/highapps/parallaxtoolbar/ParallaxTitleConfig;Lam/highapps/parallaxtoolbar/ParallaxBodyConfig;Lam/highapps/parallaxtoolbar/ParallaxSemanticsConfig;Landroidx/compose/foundation/layout/WindowInsets;Lam/highapps/parallaxtoolbar/ParallaxToolbarState;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ComposeParallaxToolbarLayout (Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Lam/highapps/parallaxtoolbar/ParallaxContent;Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;Lam/highapps/parallaxtoolbar/ParallaxToolbarConfig;Lam/highapps/parallaxtoolbar/ParallaxTitleConfig;Lam/highapps/parallaxtoolbar/ParallaxBodyConfig;Lam/highapps/parallaxtoolbar/ParallaxSemanticsConfig;Landroidx/compose/foundation/layout/WindowInsets;ZLam/highapps/parallaxtoolbar/ParallaxToolbarState;Landroidx/compose/runtime/Composer;III)V
 	public static final fun ComposeParallaxToolbarLayout (Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;Lam/highapps/parallaxtoolbar/ParallaxToolbarConfig;Lam/highapps/parallaxtoolbar/ParallaxTitleConfig;Lam/highapps/parallaxtoolbar/ParallaxBodyConfig;Landroidx/compose/foundation/ScrollState;Lkotlin/jvm/functions/Function2;Landroidx/compose/foundation/lazy/LazyListState;Lam/highapps/parallaxtoolbar/LazyColumnConfig;Landroidx/compose/runtime/Composer;III)V
 }
 
@@ -77,6 +77,7 @@ public final class am/highapps/parallaxtoolbar/ParallaxActionsScope$DefaultImpls
 	public static fun isCollapsed (Lam/highapps/parallaxtoolbar/ParallaxActionsScope;)Z
 	public static fun moveBetween (Lam/highapps/parallaxtoolbar/ParallaxActionsScope;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/Alignment;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/PaddingValues;F)Landroidx/compose/ui/Modifier;
 	public static fun parallax (Lam/highapps/parallaxtoolbar/ParallaxActionsScope;Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+	public static fun pin (Lam/highapps/parallaxtoolbar/ParallaxActionsScope;Landroidx/compose/ui/Modifier;Z)Landroidx/compose/ui/Modifier;
 	public static fun scaleOnCollapse-L8ZKh-E (Lam/highapps/parallaxtoolbar/ParallaxActionsScope;Landroidx/compose/ui/Modifier;FJ)Landroidx/compose/ui/Modifier;
 }
 
@@ -138,10 +139,10 @@ public final class am/highapps/parallaxtoolbar/ParallaxContent$Regular : am/high
 
 public final class am/highapps/parallaxtoolbar/ParallaxHeaderConfig {
 	public static final field $stable I
-	public synthetic fun <init> (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun copy-wuNwYSA (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
-	public static synthetic fun copy-wuNwYSA$default (Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;ILjava/lang/Object;)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
+	public synthetic fun <init> (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;FILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun copy-4GbNoi8 (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;F)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
+	public static synthetic fun copy-4GbNoi8$default (Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;FILjava/lang/Object;)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAnimationSpec ()Landroidx/compose/animation/core/AnimationSpec;
 	public final fun getFadeOnCollapse ()Z
@@ -150,6 +151,7 @@ public final class am/highapps/parallaxtoolbar/ParallaxHeaderConfig {
 	public final fun getParallaxMultiplier ()F
 	public final fun getScrollMode ()Lam/highapps/parallaxtoolbar/ScrollMode;
 	public final fun getSnapOnRelease ()Z
+	public final fun getSnapThreshold ()F
 	public final fun getStretchEnabled ()Z
 	public final fun getStretchTriggerDistance-D9Ej5fM ()F
 	public fun hashCode ()I
@@ -212,6 +214,7 @@ public final class am/highapps/parallaxtoolbar/ParallaxToolbarDefaults {
 	public static final field $stable I
 	public static final field HeaderParallaxMultiplier F
 	public static final field INSTANCE Lam/highapps/parallaxtoolbar/ParallaxToolbarDefaults;
+	public static final field SnapThreshold F
 	public static final field TitleCollapsedScale F
 	public final fun bodyConfig-kHDZbjc (FLandroidx/compose/runtime/Composer;II)Lam/highapps/parallaxtoolbar/ParallaxBodyConfig;
 	public final fun getAnimationSpec ()Landroidx/compose/animation/core/AnimationSpec;
@@ -223,7 +226,7 @@ public final class am/highapps/parallaxtoolbar/ParallaxToolbarDefaults {
 	public final fun getTitlePaddingStart-D9Ej5fM ()F
 	public final fun getToolbarHeight-D9Ej5fM ()F
 	public final fun getWindowInsets (Landroidx/compose/runtime/Composer;I)Landroidx/compose/foundation/layout/WindowInsets;
-	public final fun headerConfig-rqE1x30 (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;Landroidx/compose/runtime/Composer;III)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
+	public final fun headerConfig-Wu8B24Y (Lam/highapps/parallaxtoolbar/HeaderHeight;Landroidx/compose/ui/graphics/Brush;ZFZLam/highapps/parallaxtoolbar/ScrollMode;ZZFLandroidx/compose/animation/core/AnimationSpec;FLandroidx/compose/runtime/Composer;III)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
 	public final fun headerConfigWithAspectRatio--jt2gSs (FLandroidx/compose/ui/graphics/Brush;ZFLandroidx/compose/runtime/Composer;II)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
 	public final fun headerConfigWithPercentage--jt2gSs (FLandroidx/compose/ui/graphics/Brush;ZFLandroidx/compose/runtime/Composer;II)Lam/highapps/parallaxtoolbar/ParallaxHeaderConfig;
 	public final fun lazyColumnConfig (Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/Arrangement$Vertical;Landroidx/compose/ui/Alignment$Horizontal;Landroidx/compose/foundation/gestures/FlingBehavior;ZLandroidx/compose/foundation/OverscrollEffect;Landroidx/compose/runtime/Composer;II)Lam/highapps/parallaxtoolbar/LazyColumnConfig;
@@ -259,6 +262,8 @@ public abstract interface class am/highapps/parallaxtoolbar/ParallaxToolbarScope
 	public static synthetic fun moveBetween$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/Alignment;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/PaddingValues;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 	public fun parallax (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
 	public static synthetic fun parallax$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+	public fun pin (Landroidx/compose/ui/Modifier;Z)Landroidx/compose/ui/Modifier;
+	public static synthetic fun pin$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;ZILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 	public fun scaleOnCollapse-L8ZKh-E (Landroidx/compose/ui/Modifier;FJ)Landroidx/compose/ui/Modifier;
 	public static synthetic fun scaleOnCollapse-L8ZKh-E$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;FJILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 }
@@ -273,6 +278,8 @@ public final class am/highapps/parallaxtoolbar/ParallaxToolbarScope$DefaultImpls
 	public static synthetic fun moveBetween$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/Alignment;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/layout/PaddingValues;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 	public static fun parallax (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
 	public static synthetic fun parallax$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+	public static fun pin (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;Z)Landroidx/compose/ui/Modifier;
+	public static synthetic fun pin$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;ZILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 	public static fun scaleOnCollapse-L8ZKh-E (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;FJ)Landroidx/compose/ui/Modifier;
 	public static synthetic fun scaleOnCollapse-L8ZKh-E$default (Lam/highapps/parallaxtoolbar/ParallaxToolbarScope;Landroidx/compose/ui/Modifier;FJILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 }

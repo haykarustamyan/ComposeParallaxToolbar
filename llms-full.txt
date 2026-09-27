@@ -61,10 +61,10 @@ ComposeParallaxToolbarLayout(
 1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size.
 2. Configure through `ParallaxToolbarDefaults.headerConfig / toolbarConfig / titleConfig / bodyConfig / lazyColumnConfig / semanticsConfig`. Do not construct config classes by hand unless you need to.
 3. Header height: `HeaderHeight.Fixed(dp)`, `HeaderHeight.AspectRatio(ratio, maxHeight)`, `HeaderHeight.Percentage(fraction 0..1, maxHeight)`; or the `headerConfigWithAspectRatio` / `headerConfigWithPercentage` factories.
-4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true)`.
+4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true, snapThreshold = 0.5f)`. `collapseEnabled = false` on the layout locks the header for loading or editing states.
 5. Programmatic control: `val state = rememberParallaxToolbarState()`; `state.collapseFraction`, `state.isCollapsed`, `scope.launch { state.collapse() }`, `state.expand()`. The body keeps its own scroll position; use `state.scrollState` or `state.lazyListState` to scroll it.
 6. Inside any slot, `collapseFraction`, `isCollapsed`, `state` and `layoutInfo` are available from the scope. Read `collapseFraction` inside `graphicsLayer { }` for per-frame effects, not in composition.
-7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
+7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`, `.pin(stopAtTop)` for an element that stays put until the header's bottom edge reaches it. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
 8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset. If the layout does not touch the window edge (dialog, bottom sheet, split pane), pass `windowInsets = WindowInsets(0)`. The layout needs a bounded height: never place it in a vertically scrolling parent.
 9. Animation: `headerConfig(animationSpec = ...)` sets the spring used for snaps, stretch releases and `collapse()`/`expand()`; both also accept a per-call `animationSpec`. `state.isScrollInProgress` is true while the header moves.
 10. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
@@ -115,6 +115,7 @@ fun ComposeParallaxToolbarLayout(
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
     semanticsConfig: ParallaxSemanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
     windowInsets: WindowInsets = ParallaxToolbarDefaults.windowInsets,
+    collapseEnabled: Boolean = true,
     state: ParallaxToolbarState = rememberParallaxToolbarState()
 )
 ```
@@ -134,6 +135,7 @@ fun ComposeParallaxToolbarLayout(
 | `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance`. Needs `stretchEnabled`. |
 | `headerConfig`, `toolbarConfig`, `titleConfig`, `bodyConfig`, `semanticsConfig` | See [Configuration](#configuration). |
 | `windowInsets` | Insets the toolbar stays inside of. The top inset sits above the toolbar, under the header; the horizontal insets keep the navigation icon, actions and title clear of a display cutout. Default: system bars plus cutout, top and sides, as Material's top app bar. Pass `WindowInsets(0)` when the layout does not touch the window edge, such as in a dialog, a bottom sheet or a split pane. |
+| `collapseEnabled` | `false` locks the header: scrolling and dragging no longer move it, the body still scrolls, and `collapse()`/`expand()` still work. For loading, empty or editing states. |
 | `state` | See [ParallaxToolbarState](#parallaxtoolbarstate). |
 
 Every slot lambda runs with a [ParallaxToolbarScope](#parallaxtoolbarscope) receiver and receives
@@ -206,6 +208,7 @@ Receiver of every slot.
 | `Modifier.parallax(ratio = 0.5f)` | Moves the element up by `ratio` of the collapse distance. |
 | `Modifier.fadeOnCollapse(expandedAlpha = 1f, collapsedAlpha = 0f)` | Interpolates alpha with the collapse. |
 | `Modifier.scaleOnCollapse(collapsedScale, origin = TransformOrigin.Center)` | Scales toward `collapsedScale`. |
+| `Modifier.pin(stopAtTop = false)` | Keeps a header element still until the header's bottom edge reaches it, then rides that edge up. With `stopAtTop` it stops at the toolbar's top edge. Ignores `parallaxMultiplier`; pair with `fadeOnCollapse = false`. Header content ends under the toolbar, so use `moveBetween` in `overlayContent` for elements that must stay visible once collapsed. |
 | `Modifier.moveBetween(expanded, collapsed, expandedPadding, collapsedPadding, collapsedScale = 1f)` | Glides the element from an alignment in the header area to an alignment in the toolbar area, scaling on the way. For `overlayContent`. Put it outside any `size` modifier. |
 
 Reading `collapseFraction` in composition recomposes that slot on every scroll frame. The modifiers,
@@ -270,7 +273,8 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `gradient` | `null` | Brush drawn over the header. When null, a vertical gradient from the toolbar's initial color to its target color covers the lower quarter. |
 | `isExpandedWhenFirstDisplayed` | `true` | Start collapsed when false. |
 | `parallaxMultiplier` | `0.5f` | How much of the collapse distance the header content moves by. 0f pins it. |
-| `snapOnRelease` | `false` | Settle a partly collapsed header to the nearer resting position when a drag or fling ends. |
+| `snapOnRelease` | `false` | Settle a partly collapsed header to a resting position when a drag or fling ends. A fling settles in its direction; a plain release settles by `snapThreshold`. |
+| `snapThreshold` | `0.5f` | Collapse progress at or past which a plain release settles collapsed. `0.5f` is the nearer position; `0.75f` favors expanded. Applies to the toolbar exit in `EnterAlwaysCollapsed` too. |
 | `scrollMode` | `ExitUntilCollapsed` | See [ScrollMode](#scrollmode). |
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
 | `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
@@ -338,7 +342,7 @@ from accessibility.
 Constants: `HeaderHeightDp = 450.dp`, `HeaderParallaxMultiplier = 0.5f`, `ToolbarHeight = 64.dp`,
 `TitlePaddingBottom = (-16).dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
 `TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`,
-`AnimationSpec = spring()`. `windowInsets` is the default inset set: system bars plus display
+`AnimationSpec = spring()`, `SnapThreshold = 0.5f`. `windowInsets` is the default inset set: system bars plus display
 cutout, top and sides.
 
 
@@ -364,7 +368,7 @@ fun BasicListScreen(items: List<String>, onBack: () -> Unit) {
             Text(
                 text = "Playlist",
                 color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
-                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineMedium
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineMedium,
             )
         },
         subtitleContent = { collapsed -> if (!collapsed) Text("${items.size} tracks", color = Color.White) },
@@ -380,8 +384,8 @@ fun BasicListScreen(items: List<String>, onBack: () -> Unit) {
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 3.dp),
         content = ParallaxContent.Lazy(
             content = { _ -> items(items.size) { i -> ListItem(headlineContent = { Text(items[i]) }) } },
-            config = ParallaxToolbarDefaults.lazyColumnConfig(contentPadding = PaddingValues(vertical = 8.dp))
-        )
+            config = ParallaxToolbarDefaults.lazyColumnConfig(contentPadding = PaddingValues(vertical = 8.dp)),
+        ),
     )
 }
 ```
@@ -403,11 +407,11 @@ fun PhotoGridScreen(photos: List<Int>) {
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(photos) { seed -> Box(Modifier.aspectRatio(1f).background(swatch(seed))) }
             }
-        }
+        },
     )
 }
 ```
@@ -421,8 +425,11 @@ The avatar lives in overlayContent, above the body, and glides into the toolbar.
 fun ProfileScreen(name: String, posts: List<String>) {
     ComposeParallaxToolbarLayout(
         titleContent = { collapsed ->
-            Text(name, color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
-                style = MaterialTheme.typography.headlineSmall)
+            Text(
+                name,
+                color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = MaterialTheme.typography.headlineSmall,
+            )
         },
         headerContent = {
             Box(Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse().background(swatch(7)))
@@ -436,16 +443,18 @@ fun ProfileScreen(name: String, posts: List<String>) {
                         collapsed = Alignment.CenterEnd,
                         expandedPadding = PaddingValues(start = 16.dp, bottom = 56.dp),
                         collapsedPadding = PaddingValues(end = 16.dp),
-                        collapsedScale = 0.5f
+                        collapsedScale = 0.5f,
                     )
-                    .background(Color(0xFFFFC107), CircleShape)
+                    .background(Color(0xFFFFC107), CircleShape),
             )
         },
         headerConfig = ParallaxToolbarDefaults.headerConfig(
-            height = HeaderHeight.Fixed(280.dp), parallaxMultiplier = 0f, fadeOnCollapse = false
+            height = HeaderHeight.Fixed(280.dp),
+            parallaxMultiplier = 0f,
+            fadeOnCollapse = false,
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface),
-        content = ParallaxContent.Lazy(content = { _ -> items(posts.size) { i -> ListItem(headlineContent = { Text(posts[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(posts.size) { i -> ListItem(headlineContent = { Text(posts[i]) }) } }),
     )
 }
 ```
@@ -470,7 +479,7 @@ fun TabbedScreen(sections: List<String>) {
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface),
         content = ParallaxContent.Lazy(content = { _ ->
             items(40) { i -> ListItem(headlineContent = { Text("${sections[selected]} item ${i + 1}") }) }
-        })
+        }),
     )
 }
 ```
@@ -488,10 +497,10 @@ fun RefreshableFeedScreen(feed: List<String>, onRefresh: () -> Unit) {
         headerConfig = ParallaxToolbarDefaults.headerConfig(
             height = HeaderHeight.Percentage(0.35f, maxHeight = 300.dp),
             stretchEnabled = true,
-            stretchTriggerDistance = 96.dp
+            stretchTriggerDistance = 96.dp,
         ),
         onStretchTrigger = onRefresh,
-        content = ParallaxContent.Lazy(content = { _ -> items(feed.size) { i -> ListItem(headlineContent = { Text(feed[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(feed.size) { i -> ListItem(headlineContent = { Text(feed[i]) }) } }),
     )
 }
 ```
@@ -511,15 +520,17 @@ fun ScaffoldScreen(rows: List<String>) {
                     NavigationBarItem(selected = tab == i, onClick = { tab = i }, icon = {}, label = { Text(label) })
                 }
             }
-        }
+        },
     ) { padding ->
         ComposeParallaxToolbarLayout(
             titleContent = { Text("Home", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
             headerContent = { HeaderArtwork() },
             contentPadding = padding,
             content = ParallaxContent.Regular { _ ->
-                rows.forEach { Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) { Text(it, Modifier.padding(16.dp)) } }
-            }
+                rows.forEach {
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) { Text(it, Modifier.padding(16.dp)) }
+                }
+            },
         )
     }
 }
@@ -534,16 +545,21 @@ The collapsed title is centered and the header returns on any downward scroll.
 fun SettingsStyleScreen(rows: List<String>) {
     ComposeParallaxToolbarLayout(
         titleContent = { collapsed ->
-            Text("Settings", color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
-                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineLarge)
+            Text(
+                "Settings",
+                color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineLarge,
+            )
         },
         headerContent = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) },
         headerConfig = ParallaxToolbarDefaults.headerConfig(
-            height = HeaderHeight.Fixed(160.dp), scrollMode = ScrollMode.EnterAlways, snapOnRelease = true
+            height = HeaderHeight.Fixed(160.dp),
+            scrollMode = ScrollMode.EnterAlways,
+            snapOnRelease = true,
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 2.dp),
         titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = Alignment.CenterHorizontally, collapsedScale = 0.85f),
-        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } }),
     )
 }
 ```
@@ -569,7 +585,7 @@ fun ControlledScreen(rows: List<String>) {
             }
         },
         state = state,
-        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } }),
     )
 }
 ```
@@ -621,10 +637,10 @@ fun DesktopListScreen(items: List<String>) {
                 }
                 VerticalScrollbar(
                     adapter = rememberScrollbarAdapter(state.lazyListState),
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
                 )
             }
-        }
+        },
     )
 }
 ```
@@ -804,6 +820,8 @@ need one edit or none.
 - `ParallaxToolbarState` from `rememberParallaxToolbarState()`: `collapseFraction`, `isCollapsed`, `collapse()`, `expand()`, `layoutInfo`, and the scroll states for both content kinds. The collapse fraction is saved across configuration changes and process death.
 - `ParallaxToolbarScope` as the receiver of every slot, with `collapseFraction`, `isCollapsed`, `state`, `layoutInfo` and the per-element modifiers `parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`. The `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
 - `overlayContent` slot above the body and toolbar, for elements that travel into the toolbar.
+- `Modifier.pin()` for header elements that stay in view until the header's bottom edge reaches them, such as a chip row.
+- `snapThreshold` on the header config decides where a plain release settles; `collapseEnabled` on the layout locks the header while the body keeps scrolling.
 - `bottomContent` slot pinned under the toolbar, for tabs or a search field.
 - Overscroll stretch: `stretchEnabled` and `stretchTriggerDistance` on the header config, with an `onStretchTrigger` callback for pull-to-refresh.
 - Header config: `parallaxMultiplier` and `fadeOnCollapse`. Toolbar config: `height` and `alwaysElevated`. Title config: `collapsedScale` and `collapsedAlignment`. `maxHeight` on `HeaderHeight.Percentage` and `HeaderHeight.AspectRatio`.
@@ -823,6 +841,7 @@ need one edit or none.
 - The header fades over the collapse range rather than its full height, so it is fully hidden once covered.
 - Configuration types are plain `@Immutable` classes with `copy`, `equals`, `hashCode` and `toString` instead of data classes, so fields can be added without breaking compiled consumers.
 - Explicit API mode with a checked-in ABI dump verified in CI; API docs generated into the javadoc jar.
+- ktlint in CI with the IntelliJ code style, and a root `AGENTS.md` for coding agents working on the library.
 - Toolchain: Kotlin 2.4.20, Compose Multiplatform 1.12.1, Gradle 9.7.0, Android Gradle Plugin 9.3.3 with the `com.android.kotlin.multiplatform.library` plugin, Maven Publish Plugin 0.37.0. Minimum iOS is 15.0.
 
 ### Removed

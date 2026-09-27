@@ -28,7 +28,11 @@ import androidx.compose.ui.unit.dp
  * @param parallaxMultiplier How much of the scroll distance the header content moves by. 0f pins
  *   it, 1f scrolls it with the body, 0.5f is the classic parallax.
  * @param snapOnRelease When a drag or fling ends with the header partly collapsed, settle it to
- *   the nearer resting position instead of leaving it there.
+ *   a resting position instead of leaving it there. A fling settles in its direction; a plain
+ *   release settles by [snapThreshold].
+ * @param snapThreshold Collapse progress, 0f..1f, at or past which a plain release settles
+ *   collapsed rather than expanded. 0.5f settles to the nearer position; 0.75f favors expanded.
+ *   In [ScrollMode.EnterAlwaysCollapsed] the same threshold applies to the toolbar's exit.
  * @param scrollMode How the header and toolbar react to the body scrolling; see [ScrollMode].
  * @param fadeOnCollapse Fade the whole header out as it collapses. Turn off, together with a
  *   `parallaxMultiplier` of 0f, when header elements use the per-element modifiers of
@@ -53,11 +57,19 @@ public class ParallaxHeaderConfig(
     public val fadeOnCollapse: Boolean = true,
     public val stretchEnabled: Boolean = false,
     public val stretchTriggerDistance: Dp = ParallaxToolbarDefaults.StretchTriggerDistance,
-    public val animationSpec: AnimationSpec<Float> = ParallaxToolbarDefaults.AnimationSpec
+    public val animationSpec: AnimationSpec<Float> = ParallaxToolbarDefaults.AnimationSpec,
+    public val snapThreshold: Float = ParallaxToolbarDefaults.SnapThreshold,
 ) {
     init {
-        require(parallaxMultiplier.isFinite()) { "ParallaxHeaderConfig.parallaxMultiplier must be a finite number (0f pins the header, 0.5f is the classic parallax), was $parallaxMultiplier" }
-        require(stretchTriggerDistance > 0.dp) { "ParallaxHeaderConfig.stretchTriggerDistance must be greater than 0.dp, was $stretchTriggerDistance" }
+        require(snapThreshold in 0f..1f) {
+            "ParallaxHeaderConfig.snapThreshold must be in 0..1 (0.5f settles to the nearer position), was $snapThreshold"
+        }
+        require(parallaxMultiplier.isFinite()) {
+            "ParallaxHeaderConfig.parallaxMultiplier must be a finite number (0f pins the header, 0.5f is the classic parallax), was $parallaxMultiplier"
+        }
+        require(stretchTriggerDistance > 0.dp) {
+            "ParallaxHeaderConfig.stretchTriggerDistance must be greater than 0.dp, was $stretchTriggerDistance"
+        }
     }
 
     public fun copy(
@@ -70,23 +82,25 @@ public class ParallaxHeaderConfig(
         fadeOnCollapse: Boolean = this.fadeOnCollapse,
         stretchEnabled: Boolean = this.stretchEnabled,
         stretchTriggerDistance: Dp = this.stretchTriggerDistance,
-        animationSpec: AnimationSpec<Float> = this.animationSpec
+        animationSpec: AnimationSpec<Float> = this.animationSpec,
+        snapThreshold: Float = this.snapThreshold,
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height, gradient, isExpandedWhenFirstDisplayed, parallaxMultiplier, snapOnRelease, scrollMode,
-        fadeOnCollapse, stretchEnabled, stretchTriggerDistance, animationSpec
+        fadeOnCollapse, stretchEnabled, stretchTriggerDistance, animationSpec, snapThreshold,
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxHeaderConfig &&
-            height == other.height &&
-            gradient == other.gradient &&
-            isExpandedWhenFirstDisplayed == other.isExpandedWhenFirstDisplayed &&
-            parallaxMultiplier == other.parallaxMultiplier &&
-            snapOnRelease == other.snapOnRelease &&
-            scrollMode == other.scrollMode &&
-            fadeOnCollapse == other.fadeOnCollapse &&
-            stretchEnabled == other.stretchEnabled &&
-            stretchTriggerDistance == other.stretchTriggerDistance &&
-            animationSpec == other.animationSpec
+        height == other.height &&
+        gradient == other.gradient &&
+        isExpandedWhenFirstDisplayed == other.isExpandedWhenFirstDisplayed &&
+        parallaxMultiplier == other.parallaxMultiplier &&
+        snapOnRelease == other.snapOnRelease &&
+        scrollMode == other.scrollMode &&
+        fadeOnCollapse == other.fadeOnCollapse &&
+        stretchEnabled == other.stretchEnabled &&
+        stretchTriggerDistance == other.stretchTriggerDistance &&
+        animationSpec == other.animationSpec &&
+        snapThreshold == other.snapThreshold
 
     override fun hashCode(): Int {
         var result = height.hashCode()
@@ -99,15 +113,16 @@ public class ParallaxHeaderConfig(
         result = 31 * result + stretchEnabled.hashCode()
         result = 31 * result + stretchTriggerDistance.hashCode()
         result = 31 * result + animationSpec.hashCode()
+        result = 31 * result + snapThreshold.hashCode()
         return result
     }
 
     override fun toString(): String = "ParallaxHeaderConfig(height=$height, gradient=$gradient, " +
-            "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, " +
-            "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease, " +
-            "scrollMode=$scrollMode, fadeOnCollapse=$fadeOnCollapse, " +
-            "stretchEnabled=$stretchEnabled, stretchTriggerDistance=$stretchTriggerDistance, " +
-            "animationSpec=$animationSpec)"
+        "isExpandedWhenFirstDisplayed=$isExpandedWhenFirstDisplayed, " +
+        "parallaxMultiplier=$parallaxMultiplier, snapOnRelease=$snapOnRelease, " +
+        "scrollMode=$scrollMode, fadeOnCollapse=$fadeOnCollapse, " +
+        "stretchEnabled=$stretchEnabled, stretchTriggerDistance=$stretchTriggerDistance, " +
+        "animationSpec=$animationSpec, snapThreshold=$snapThreshold)"
 }
 
 /**
@@ -123,7 +138,7 @@ public class ParallaxToolbarConfig(
     public val elevation: Dp,
     public val animationSpec: AnimationSpec<Color>,
     public val height: Dp = ParallaxToolbarDefaults.ToolbarHeight,
-    public val alwaysElevated: Boolean = false
+    public val alwaysElevated: Boolean = false,
 ) {
     init {
         require(height > 0.dp) { "ParallaxToolbarConfig.height must be greater than 0.dp, was $height" }
@@ -136,16 +151,16 @@ public class ParallaxToolbarConfig(
         elevation: Dp = this.elevation,
         animationSpec: AnimationSpec<Color> = this.animationSpec,
         height: Dp = this.height,
-        alwaysElevated: Boolean = this.alwaysElevated
+        alwaysElevated: Boolean = this.alwaysElevated,
     ): ParallaxToolbarConfig = ParallaxToolbarConfig(initialColor, targetColor, elevation, animationSpec, height, alwaysElevated)
 
     override fun equals(other: Any?): Boolean = other is ParallaxToolbarConfig &&
-            initialColor == other.initialColor &&
-            targetColor == other.targetColor &&
-            elevation == other.elevation &&
-            animationSpec == other.animationSpec &&
-            height == other.height &&
-            alwaysElevated == other.alwaysElevated
+        initialColor == other.initialColor &&
+        targetColor == other.targetColor &&
+        elevation == other.elevation &&
+        animationSpec == other.animationSpec &&
+        height == other.height &&
+        alwaysElevated == other.alwaysElevated
 
     override fun hashCode(): Int {
         var result = initialColor.hashCode()
@@ -158,8 +173,8 @@ public class ParallaxToolbarConfig(
     }
 
     override fun toString(): String = "ParallaxToolbarConfig(initialColor=$initialColor, " +
-            "targetColor=$targetColor, elevation=$elevation, animationSpec=$animationSpec, " +
-            "height=$height, alwaysElevated=$alwaysElevated)"
+        "targetColor=$targetColor, elevation=$elevation, animationSpec=$animationSpec, " +
+        "height=$height, alwaysElevated=$alwaysElevated)"
 }
 
 /**
@@ -180,10 +195,12 @@ public class ParallaxTitleConfig(
     public val keepSubtitleAfterCollapse: Boolean,
     public val animateSubTitleHiding: Boolean,
     public val collapsedScale: Float = ParallaxToolbarDefaults.TitleCollapsedScale,
-    public val collapsedAlignment: Alignment.Horizontal = Alignment.Start
+    public val collapsedAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
     init {
-        require(collapsedScale > 0f && collapsedScale.isFinite()) { "ParallaxTitleConfig.collapsedScale must be a positive scale such as 0.8f, was $collapsedScale" }
+        require(collapsedScale > 0f && collapsedScale.isFinite()) {
+            "ParallaxTitleConfig.collapsedScale must be a positive scale such as 0.8f, was $collapsedScale"
+        }
     }
 
     public fun copy(
@@ -193,20 +210,25 @@ public class ParallaxTitleConfig(
         keepSubtitleAfterCollapse: Boolean = this.keepSubtitleAfterCollapse,
         animateSubTitleHiding: Boolean = this.animateSubTitleHiding,
         collapsedScale: Float = this.collapsedScale,
-        collapsedAlignment: Alignment.Horizontal = this.collapsedAlignment
+        collapsedAlignment: Alignment.Horizontal = this.collapsedAlignment,
     ): ParallaxTitleConfig = ParallaxTitleConfig(
-        paddingBottom, paddingStart, collapsedPaddingStart,
-        keepSubtitleAfterCollapse, animateSubTitleHiding, collapsedScale, collapsedAlignment
+        paddingBottom,
+        paddingStart,
+        collapsedPaddingStart,
+        keepSubtitleAfterCollapse,
+        animateSubTitleHiding,
+        collapsedScale,
+        collapsedAlignment,
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxTitleConfig &&
-            paddingBottom == other.paddingBottom &&
-            paddingStart == other.paddingStart &&
-            collapsedPaddingStart == other.collapsedPaddingStart &&
-            keepSubtitleAfterCollapse == other.keepSubtitleAfterCollapse &&
-            animateSubTitleHiding == other.animateSubTitleHiding &&
-            collapsedScale == other.collapsedScale &&
-            collapsedAlignment == other.collapsedAlignment
+        paddingBottom == other.paddingBottom &&
+        paddingStart == other.paddingStart &&
+        collapsedPaddingStart == other.collapsedPaddingStart &&
+        keepSubtitleAfterCollapse == other.keepSubtitleAfterCollapse &&
+        animateSubTitleHiding == other.animateSubTitleHiding &&
+        collapsedScale == other.collapsedScale &&
+        collapsedAlignment == other.collapsedAlignment
 
     override fun hashCode(): Int {
         var result = paddingBottom.hashCode()
@@ -220,19 +242,21 @@ public class ParallaxTitleConfig(
     }
 
     override fun toString(): String = "ParallaxTitleConfig(paddingBottom=$paddingBottom, " +
-            "paddingStart=$paddingStart, collapsedPaddingStart=$collapsedPaddingStart, " +
-            "keepSubtitleAfterCollapse=$keepSubtitleAfterCollapse, " +
-            "animateSubTitleHiding=$animateSubTitleHiding, collapsedScale=$collapsedScale, " +
-            "collapsedAlignment=$collapsedAlignment)"
+        "paddingStart=$paddingStart, collapsedPaddingStart=$collapsedPaddingStart, " +
+        "keepSubtitleAfterCollapse=$keepSubtitleAfterCollapse, " +
+        "animateSubTitleHiding=$animateSubTitleHiding, collapsedScale=$collapsedScale, " +
+        "collapsedAlignment=$collapsedAlignment)"
 }
 
 /** Body spacing. */
 @Immutable
 public class ParallaxBodyConfig(
-    public val minBottomSpacerHeight: Dp
+    public val minBottomSpacerHeight: Dp,
 ) {
     init {
-        require(minBottomSpacerHeight >= 0.dp) { "ParallaxBodyConfig.minBottomSpacerHeight must be 0.dp or more, was $minBottomSpacerHeight" }
+        require(minBottomSpacerHeight >= 0.dp) {
+            "ParallaxBodyConfig.minBottomSpacerHeight must be 0.dp or more, was $minBottomSpacerHeight"
+        }
     }
 
     public fun copy(minBottomSpacerHeight: Dp = this.minBottomSpacerHeight): ParallaxBodyConfig =
@@ -254,7 +278,7 @@ public class LazyColumnConfig(
     public val horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     public val flingBehavior: FlingBehavior? = null,
     public val userScrollEnabled: Boolean = true,
-    public val overscrollEffect: OverscrollEffect? = null
+    public val overscrollEffect: OverscrollEffect? = null,
 ) {
     public fun copy(
         contentPadding: PaddingValues = this.contentPadding,
@@ -262,19 +286,23 @@ public class LazyColumnConfig(
         horizontalAlignment: Alignment.Horizontal = this.horizontalAlignment,
         flingBehavior: FlingBehavior? = this.flingBehavior,
         userScrollEnabled: Boolean = this.userScrollEnabled,
-        overscrollEffect: OverscrollEffect? = this.overscrollEffect
+        overscrollEffect: OverscrollEffect? = this.overscrollEffect,
     ): LazyColumnConfig = LazyColumnConfig(
-        contentPadding, verticalArrangement, horizontalAlignment,
-        flingBehavior, userScrollEnabled, overscrollEffect
+        contentPadding,
+        verticalArrangement,
+        horizontalAlignment,
+        flingBehavior,
+        userScrollEnabled,
+        overscrollEffect,
     )
 
     override fun equals(other: Any?): Boolean = other is LazyColumnConfig &&
-            contentPadding == other.contentPadding &&
-            verticalArrangement == other.verticalArrangement &&
-            horizontalAlignment == other.horizontalAlignment &&
-            flingBehavior == other.flingBehavior &&
-            userScrollEnabled == other.userScrollEnabled &&
-            overscrollEffect == other.overscrollEffect
+        contentPadding == other.contentPadding &&
+        verticalArrangement == other.verticalArrangement &&
+        horizontalAlignment == other.horizontalAlignment &&
+        flingBehavior == other.flingBehavior &&
+        userScrollEnabled == other.userScrollEnabled &&
+        overscrollEffect == other.overscrollEffect
 
     override fun hashCode(): Int {
         var result = contentPadding.hashCode()
@@ -287,9 +315,9 @@ public class LazyColumnConfig(
     }
 
     override fun toString(): String = "LazyColumnConfig(contentPadding=$contentPadding, " +
-            "verticalArrangement=$verticalArrangement, horizontalAlignment=$horizontalAlignment, " +
-            "flingBehavior=$flingBehavior, userScrollEnabled=$userScrollEnabled, " +
-            "overscrollEffect=$overscrollEffect)"
+        "verticalArrangement=$verticalArrangement, horizontalAlignment=$horizontalAlignment, " +
+        "flingBehavior=$flingBehavior, userScrollEnabled=$userScrollEnabled, " +
+        "overscrollEffect=$overscrollEffect)"
 }
 
 /**
@@ -305,22 +333,25 @@ public class ParallaxSemanticsConfig(
     public val expandedStateDescription: String = "Expanded",
     public val collapsedStateDescription: String = "Collapsed",
     public val expandActionLabel: String = "Expand header",
-    public val collapseActionLabel: String = "Collapse header"
+    public val collapseActionLabel: String = "Collapse header",
 ) {
     public fun copy(
         expandedStateDescription: String = this.expandedStateDescription,
         collapsedStateDescription: String = this.collapsedStateDescription,
         expandActionLabel: String = this.expandActionLabel,
-        collapseActionLabel: String = this.collapseActionLabel
+        collapseActionLabel: String = this.collapseActionLabel,
     ): ParallaxSemanticsConfig = ParallaxSemanticsConfig(
-        expandedStateDescription, collapsedStateDescription, expandActionLabel, collapseActionLabel
+        expandedStateDescription,
+        collapsedStateDescription,
+        expandActionLabel,
+        collapseActionLabel,
     )
 
     override fun equals(other: Any?): Boolean = other is ParallaxSemanticsConfig &&
-            expandedStateDescription == other.expandedStateDescription &&
-            collapsedStateDescription == other.collapsedStateDescription &&
-            expandActionLabel == other.expandActionLabel &&
-            collapseActionLabel == other.collapseActionLabel
+        expandedStateDescription == other.expandedStateDescription &&
+        collapsedStateDescription == other.collapsedStateDescription &&
+        expandActionLabel == other.expandActionLabel &&
+        collapseActionLabel == other.collapseActionLabel
 
     override fun hashCode(): Int {
         var result = expandedStateDescription.hashCode()
@@ -331,6 +362,6 @@ public class ParallaxSemanticsConfig(
     }
 
     override fun toString(): String = "ParallaxSemanticsConfig(expandedStateDescription=$expandedStateDescription, " +
-            "collapsedStateDescription=$collapsedStateDescription, expandActionLabel=$expandActionLabel, " +
-            "collapseActionLabel=$collapseActionLabel)"
+        "collapsedStateDescription=$collapsedStateDescription, expandActionLabel=$expandActionLabel, " +
+        "collapseActionLabel=$collapseActionLabel)"
 }

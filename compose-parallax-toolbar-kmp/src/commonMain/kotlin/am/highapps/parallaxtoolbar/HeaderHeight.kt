@@ -23,8 +23,12 @@ public sealed class HeaderHeight {
      */
     public data class AspectRatio(val ratio: Float, val maxHeight: Dp = Dp.Unspecified) : HeaderHeight() {
         init {
-            require(ratio > 0f && ratio.isFinite()) { "HeaderHeight.AspectRatio ratio must be a positive width/height ratio such as 16f / 9f, was $ratio" }
-            require(!maxHeight.isSpecified || maxHeight >= 0.dp) { "HeaderHeight.AspectRatio maxHeight must be 0.dp or more, was $maxHeight" }
+            require(ratio > 0f && ratio.isFinite()) {
+                "HeaderHeight.AspectRatio ratio must be a positive width/height ratio such as 16f / 9f, was $ratio"
+            }
+            require(!maxHeight.isSpecified || maxHeight >= 0.dp) {
+                "HeaderHeight.AspectRatio maxHeight must be 0.dp or more, was $maxHeight"
+            }
         }
     }
 
@@ -34,8 +38,12 @@ public sealed class HeaderHeight {
      */
     public data class Percentage(val percentage: Float, val maxHeight: Dp = Dp.Unspecified) : HeaderHeight() {
         init {
-            require(percentage > 0f && percentage <= 1f) { "HeaderHeight.Percentage must be in 0..1 (0.4f is 40% of the height), was $percentage" }
-            require(!maxHeight.isSpecified || maxHeight >= 0.dp) { "HeaderHeight.Percentage maxHeight must be 0.dp or more, was $maxHeight" }
+            require(percentage > 0f && percentage <= 1f) {
+                "HeaderHeight.Percentage must be in 0..1 (0.4f is 40% of the height), was $percentage"
+            }
+            require(!maxHeight.isSpecified || maxHeight >= 0.dp) {
+                "HeaderHeight.Percentage maxHeight must be 0.dp or more, was $maxHeight"
+            }
         }
     }
 

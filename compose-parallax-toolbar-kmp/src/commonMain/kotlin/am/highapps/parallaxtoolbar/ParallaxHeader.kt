@@ -9,19 +9,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onPlaced
 
 /** The expanded header: user content with a parallax translation and fade, under a gradient. */
 @Composable
 internal fun ParallaxHeader(
     headerState: HeaderScrollState,
     headerHeightPx: Float,
+    layoutInfo: ParallaxToolbarLayoutInfo,
     parallaxMultiplier: Float,
     fadeOnCollapse: Boolean,
     gradientBrush: Brush?,
     initialColor: Color,
     targetColor: Color,
     modifier: Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier.graphicsLayer {
@@ -36,7 +38,7 @@ internal fun ParallaxHeader(
                 scaleX = zoom
                 scaleY = zoom
             }
-        }
+        }.onPlaced { layoutInfo.headerCoordinates = it },
     ) {
         content()
 
@@ -46,9 +48,9 @@ internal fun ParallaxHeader(
                 .background(
                     brush = gradientBrush ?: Brush.verticalGradient(
                         colors = listOf(initialColor, targetColor),
-                        startY = 3 * headerHeightPx / 4
-                    )
-                )
+                        startY = 3 * headerHeightPx / 4,
+                    ),
+                ),
         )
     }
 }

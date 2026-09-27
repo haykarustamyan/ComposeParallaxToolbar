@@ -25,5 +25,5 @@ public enum class ScrollMode {
      * once the toolbar has exited. Pair with `snapOnRelease` if a half-exited toolbar should
      * never rest on screen.
      */
-    EnterAlwaysCollapsed
+    EnterAlwaysCollapsed,
 }

@@ -2,18 +2,18 @@ package am.highapps.parallaxtoolbar
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.displayCutout
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.union
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,6 +50,9 @@ public object ParallaxToolbarDefaults {
     /** Spec used for snaps, stretch releases and `collapse()`/`expand()` unless overridden. */
     public val AnimationSpec: AnimationSpec<Float> = spring()
 
+    /** Snap threshold that settles a plain release to the nearer resting position. */
+    public const val SnapThreshold: Float = 0.5f
+
     /**
      * Insets the toolbar and body stay inside of by default: the top system bar plus the display
      * cutout, on the top and both sides. The same set Material's top app bar uses. Zero on desktop
@@ -70,7 +73,8 @@ public object ParallaxToolbarDefaults {
         fadeOnCollapse: Boolean = true,
         stretchEnabled: Boolean = false,
         stretchTriggerDistance: Dp = StretchTriggerDistance,
-        animationSpec: AnimationSpec<Float> = AnimationSpec
+        animationSpec: AnimationSpec<Float> = AnimationSpec,
+        snapThreshold: Float = SnapThreshold,
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = height,
         gradient = gradient,
@@ -81,7 +85,8 @@ public object ParallaxToolbarDefaults {
         fadeOnCollapse = fadeOnCollapse,
         stretchEnabled = stretchEnabled,
         stretchTriggerDistance = stretchTriggerDistance,
-        animationSpec = animationSpec
+        animationSpec = animationSpec,
+        snapThreshold = snapThreshold,
     )
 
     @Composable
@@ -89,11 +94,11 @@ public object ParallaxToolbarDefaults {
         aspectRatio: Float = 16f / 9f,
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true,
-        maxHeight: Dp = Dp.Unspecified
+        maxHeight: Dp = Dp.Unspecified,
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = HeaderHeight.AspectRatio(aspectRatio, maxHeight),
         gradient = gradient,
-        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
+        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed,
     )
 
     @Composable
@@ -101,11 +106,11 @@ public object ParallaxToolbarDefaults {
         heightPercentage: Float = 0.4f,
         gradient: Brush? = null,
         isExpandedWhenFirstDisplayed: Boolean = true,
-        maxHeight: Dp = Dp.Unspecified
+        maxHeight: Dp = Dp.Unspecified,
     ): ParallaxHeaderConfig = ParallaxHeaderConfig(
         height = HeaderHeight.Percentage(heightPercentage, maxHeight),
         gradient = gradient,
-        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed
+        isExpandedWhenFirstDisplayed = isExpandedWhenFirstDisplayed,
     )
 
     @Composable
@@ -115,14 +120,14 @@ public object ParallaxToolbarDefaults {
         elevation: Dp = 0.dp,
         animationSpec: AnimationSpec<Color> = tween(durationMillis = 300),
         height: Dp = ToolbarHeight,
-        alwaysElevated: Boolean = false
+        alwaysElevated: Boolean = false,
     ): ParallaxToolbarConfig = ParallaxToolbarConfig(
         initialColor = initialColor,
         targetColor = targetColor,
         elevation = elevation,
         animationSpec = animationSpec,
         height = height,
-        alwaysElevated = alwaysElevated
+        alwaysElevated = alwaysElevated,
     )
 
     @Composable
@@ -133,7 +138,7 @@ public object ParallaxToolbarDefaults {
         keepSubtitleAfterCollapse: Boolean = false,
         animateSubTitleHiding: Boolean = true,
         collapsedScale: Float = TitleCollapsedScale,
-        collapsedAlignment: Alignment.Horizontal = Alignment.Start
+        collapsedAlignment: Alignment.Horizontal = Alignment.Start,
     ): ParallaxTitleConfig = ParallaxTitleConfig(
         paddingBottom = paddingBottom,
         paddingStart = paddingStart,
@@ -141,7 +146,7 @@ public object ParallaxToolbarDefaults {
         keepSubtitleAfterCollapse = keepSubtitleAfterCollapse,
         animateSubTitleHiding = animateSubTitleHiding,
         collapsedScale = collapsedScale,
-        collapsedAlignment = collapsedAlignment
+        collapsedAlignment = collapsedAlignment,
     )
 
     @Composable
@@ -149,19 +154,19 @@ public object ParallaxToolbarDefaults {
         expandedStateDescription: String = "Expanded",
         collapsedStateDescription: String = "Collapsed",
         expandActionLabel: String = "Expand header",
-        collapseActionLabel: String = "Collapse header"
+        collapseActionLabel: String = "Collapse header",
     ): ParallaxSemanticsConfig = ParallaxSemanticsConfig(
         expandedStateDescription = expandedStateDescription,
         collapsedStateDescription = collapsedStateDescription,
         expandActionLabel = expandActionLabel,
-        collapseActionLabel = collapseActionLabel
+        collapseActionLabel = collapseActionLabel,
     )
 
     @Composable
     public fun bodyConfig(
-        minBottomSpacerHeight: Dp = BodyMinBottomSpacing
+        minBottomSpacerHeight: Dp = BodyMinBottomSpacing,
     ): ParallaxBodyConfig = ParallaxBodyConfig(
-        minBottomSpacerHeight = minBottomSpacerHeight
+        minBottomSpacerHeight = minBottomSpacerHeight,
     )
 
     @Composable
@@ -171,13 +176,13 @@ public object ParallaxToolbarDefaults {
         horizontalAlignment: Alignment.Horizontal = Alignment.Start,
         flingBehavior: FlingBehavior? = null,
         userScrollEnabled: Boolean = true,
-        overscrollEffect: OverscrollEffect? = null
+        overscrollEffect: OverscrollEffect? = null,
     ): LazyColumnConfig = LazyColumnConfig(
         contentPadding = contentPadding,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
         flingBehavior = flingBehavior ?: ScrollableDefaults.flingBehavior(),
         userScrollEnabled = userScrollEnabled,
-        overscrollEffect = overscrollEffect ?: rememberOverscrollEffect()
+        overscrollEffect = overscrollEffect ?: rememberOverscrollEffect(),
     )
 }

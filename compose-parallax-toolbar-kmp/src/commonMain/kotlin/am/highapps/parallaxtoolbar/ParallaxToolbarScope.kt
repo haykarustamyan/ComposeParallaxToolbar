@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
@@ -55,12 +56,50 @@ public interface ParallaxToolbarScope {
     /** Scales the element toward [collapsedScale] about [origin] as the header collapses. */
     public fun Modifier.scaleOnCollapse(
         collapsedScale: Float,
-        origin: TransformOrigin = TransformOrigin.Center
+        origin: TransformOrigin = TransformOrigin.Center,
     ): Modifier = graphicsLayer {
         val scale = 1f + (collapsedScale - 1f) * collapseFraction
         transformOrigin = origin
         scaleX = scale
         scaleY = scale
+    }
+
+    /**
+     * Keeps the element in view while the header collapses: it stays put until the header's
+     * bottom edge reaches it, then rides up with that edge. For elements at the bottom of the
+     * header, such as a search field or a chip row, that should stay visible for as long as
+     * possible. The element ignores the header's `parallaxMultiplier`.
+     *
+     * With [stopAtTop] the element stops once its top reaches the toolbar's top edge instead of
+     * ending under the toolbar. Header content is drawn under the toolbar and the body, so an
+     * element that must remain visible once collapsed belongs in `overlayContent` with
+     * [moveBetween] instead. Pair with `headerConfig(fadeOnCollapse = false)`.
+     */
+    public fun Modifier.pin(stopAtTop: Boolean = false): Modifier = layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+        layout(placeable.width, placeable.height) {
+            // The element's resting position inside the header slot, before any layer moves it.
+            val header = layoutInfo.headerCoordinates
+            val own = coordinates
+            val restTop = if (header != null && own != null && header.isAttached && own.isAttached) {
+                header.localPositionOf(own, Offset.Zero).y
+            } else {
+                Float.NaN
+            }
+            val restBottom = restTop + placeable.height
+            placeable.placeWithLayer(0, 0) {
+                val info = layoutInfo
+                // Undo the header layer's parallax so the element starts still.
+                val cancelParallax = info.headerOffsetPx * state.headerState.parallaxMultiplier
+                var ride = 0f
+                if (!restTop.isNaN()) {
+                    val headerBottom = info.topInsetPx + info.headerHeightPx - info.headerOffsetPx + info.stretchPx
+                    ride = (restBottom - headerBottom).coerceAtLeast(0f)
+                    if (stopAtTop) ride = ride.coerceAtMost((restTop - info.topInsetPx).coerceAtLeast(0f))
+                }
+                translationY = cancelParallax - ride
+            }
+        }
     }
 
     /**
@@ -77,7 +116,7 @@ public interface ParallaxToolbarScope {
         collapsed: Alignment,
         expandedPadding: PaddingValues = PaddingValues(0.dp),
         collapsedPadding: PaddingValues = PaddingValues(0.dp),
-        collapsedScale: Float = 1f
+        collapsedScale: Float = 1f,
     ): Modifier = layout { measurable, constraints ->
         // Measure with the constraints as given so an outer size modifier is honored.
         val placeable = measurable.measure(constraints)
@@ -93,7 +132,7 @@ public interface ParallaxToolbarScope {
         val ePadBottom = expandedPadding.calculateBottomPadding().roundToPx()
         val headerArea = IntSize(
             (info.widthPx.roundToInt() - ePadStart - ePadEnd).coerceAtLeast(0),
-            ((info.topInsetPx + info.headerHeightPx).roundToInt() - ePadTop - ePadBottom).coerceAtLeast(0)
+            ((info.topInsetPx + info.headerHeightPx).roundToInt() - ePadTop - ePadBottom).coerceAtLeast(0),
         )
         val eOffset = expanded.align(size, headerArea, direction)
         val expandedX = (if (direction == androidx.compose.ui.unit.LayoutDirection.Rtl) ePadEnd else ePadStart) + eOffset.x
@@ -106,7 +145,7 @@ public interface ParallaxToolbarScope {
         val cPadBottom = collapsedPadding.calculateBottomPadding().roundToPx()
         val toolbarArea = IntSize(
             (info.widthPx.roundToInt() - cPadStart - cPadEnd).coerceAtLeast(0),
-            (info.toolbarHeightPx.roundToInt() - cPadTop - cPadBottom).coerceAtLeast(0)
+            (info.toolbarHeightPx.roundToInt() - cPadTop - cPadBottom).coerceAtLeast(0),
         )
         val cOffset = collapsed.align(scaledSize, toolbarArea, direction)
         val collapsedX = (if (direction == androidx.compose.ui.unit.LayoutDirection.Rtl) cPadEnd else cPadStart) + cOffset.x
@@ -134,5 +173,5 @@ internal class ParallaxToolbarScopeImpl(override val state: ParallaxToolbarState
 
 internal class ParallaxActionsScopeImpl(
     scope: ParallaxToolbarScope,
-    row: RowScope
+    row: RowScope,
 ) : ParallaxActionsScope, ParallaxToolbarScope by scope, RowScope by row

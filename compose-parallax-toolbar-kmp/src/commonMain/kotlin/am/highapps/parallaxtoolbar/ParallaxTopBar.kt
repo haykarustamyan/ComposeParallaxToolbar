@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,16 +54,16 @@ internal fun ParallaxTopBar(
     actions: (@Composable ParallaxActionsScope.(Boolean) -> Unit)?,
     titleContent: @Composable ParallaxToolbarScope.(Boolean) -> Unit,
     subtitleContent: (@Composable ParallaxToolbarScope.(Boolean) -> Unit)?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = if (isCollapsed) toolbarConfig.targetColor else toolbarConfig.initialColor,
-        animationSpec = toolbarConfig.animationSpec
+        animationSpec = toolbarConfig.animationSpec,
     )
     // A shadow under a transparent bar would draw a band across the header, so it follows
     // collapse unless the caller asks for it always.
     val elevation by animateDpAsState(
-        targetValue = if (isCollapsed || toolbarConfig.alwaysElevated) toolbarConfig.elevation else 0.dp
+        targetValue = if (isCollapsed || toolbarConfig.alwaysElevated) toolbarConfig.elevation else 0.dp,
     )
 
     Layout(
@@ -85,7 +84,7 @@ internal fun ParallaxTopBar(
             if (subtitleContent != null) {
                 Box(Modifier.layoutId(SubtitleSlot)) { scope.subtitleContent(isCollapsed) }
             }
-        }
+        },
     ) { measurables, constraints ->
         val width = constraints.maxWidth
         val insetPx = topInset.roundToPx()
@@ -139,7 +138,7 @@ internal fun ParallaxTopBar(
         // Expanded: the block sits above the header's bottom edge, offset by paddingBottom. The
         // subtitle height counts twice here on purpose; it preserves the placement of 1.x.
         val expandedTop = insetPx + headerHeight.toPx() - blockHeight - subtitleHeight -
-                titleConfig.paddingBottom.toPx()
+            titleConfig.paddingBottom.toPx()
         // Collapsed: the title, or the whole block when the subtitle is kept, is centered in the
         // toolbar at its collapsed scale. The scale origin is the block's top-start corner.
         val centeredHeight = (if (keepSubtitle) blockHeight else title.height) * collapsedScale

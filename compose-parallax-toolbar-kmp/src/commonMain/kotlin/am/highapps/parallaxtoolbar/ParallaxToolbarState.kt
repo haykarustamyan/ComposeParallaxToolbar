@@ -23,7 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 public class ParallaxToolbarState internal constructor(
     public val scrollState: ScrollState,
     public val lazyListState: LazyListState,
-    internal val headerState: HeaderScrollState
+    internal val headerState: HeaderScrollState,
 ) {
     /** Measured geometry, updated on every layout pass. */
     public val layoutInfo: ParallaxToolbarLayoutInfo = ParallaxToolbarLayoutInfo(headerState)
@@ -59,8 +59,11 @@ public class ParallaxToolbarState internal constructor(
      * @param animationSpec Spec for the move; `null` uses the header config's `animationSpec`.
      */
     public suspend fun collapse(animated: Boolean = true, animationSpec: AnimationSpec<Float>? = null) {
-        if (animated) headerState.animateFractionTo(1f, animationSpec ?: headerState.animationSpec)
-        else headerState.snapFractionTo(1f)
+        if (animated) {
+            headerState.animateFractionTo(1f, animationSpec ?: headerState.animationSpec)
+        } else {
+            headerState.snapFractionTo(1f)
+        }
     }
 
     /**
@@ -69,8 +72,11 @@ public class ParallaxToolbarState internal constructor(
      * @param animationSpec Spec for the move; `null` uses the header config's `animationSpec`.
      */
     public suspend fun expand(animated: Boolean = true, animationSpec: AnimationSpec<Float>? = null) {
-        if (animated) headerState.animateFractionTo(0f, animationSpec ?: headerState.animationSpec)
-        else headerState.snapFractionTo(0f)
+        if (animated) {
+            headerState.animateFractionTo(0f, animationSpec ?: headerState.animationSpec)
+        } else {
+            headerState.snapFractionTo(0f)
+        }
     }
 }
 
@@ -85,7 +91,7 @@ public class ParallaxToolbarState internal constructor(
 public fun rememberParallaxToolbarState(
     scrollState: ScrollState = rememberScrollState(),
     lazyListState: LazyListState = rememberLazyListState(),
-    initiallyCollapsed: Boolean = false
+    initiallyCollapsed: Boolean = false,
 ): ParallaxToolbarState {
     val headerState = rememberSaveable(saver = HeaderScrollStateSaver) {
         HeaderScrollState(if (initiallyCollapsed) 1f else 0f)
@@ -97,5 +103,5 @@ public fun rememberParallaxToolbarState(
 
 private val HeaderScrollStateSaver = androidx.compose.runtime.saveable.listSaver<HeaderScrollState, Float>(
     save = { listOf(it.fraction, it.exitFraction) },
-    restore = { HeaderScrollState(it[0], it.getOrElse(1) { 0f }) }
+    restore = { HeaderScrollState(it[0], it.getOrElse(1) { 0f }) },
 )

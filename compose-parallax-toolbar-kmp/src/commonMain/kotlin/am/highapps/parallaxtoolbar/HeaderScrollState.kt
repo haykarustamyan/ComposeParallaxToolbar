@@ -62,6 +62,12 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     /** Spec for snaps, stretch releases and programmatic moves. Set by the layout. */
     var animationSpec: AnimationSpec<Float> = spring()
 
+    /** Progress within a segment at or past which a release without velocity settles forward. */
+    var snapThreshold: Float = 0.5f
+
+    /** The header layer's parallax multiplier, so pinned elements can cancel it. Set by the layout. */
+    var parallaxMultiplier: Float = ParallaxToolbarDefaults.HeaderParallaxMultiplier
+
     /**
      * Whether a pointer is currently pressed on the layout. A stretch must follow a held finger
      * or mouse button: wheel and trackpad scrolling also arrive as user input but never fling, so
@@ -190,7 +196,11 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     /** Animates the header to [target] and brings the toolbar back. Jumps before the layout has measured. */
     suspend fun animateFractionTo(target: Float, animationSpec: AnimationSpec<Float> = this.animationSpec) {
         val to = target.coerceIn(0f, 1f)
-        if (collapseRangePx <= 0f) { fraction = to; exitFraction = 0f; return }
+        if (collapseRangePx <= 0f) {
+            fraction = to
+            exitFraction = 0f
+            return
+        }
         scroll {
             val startExit = exitFraction
             val startFraction = fraction
@@ -224,7 +234,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
         return when {
             velocityPx > 0f -> above
             velocityPx < 0f -> below
-            else -> if (current - below <= above - current) below else above
+            else -> if ((current - below) / (above - below) >= snapThreshold) above else below
         }
     }
 

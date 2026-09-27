@@ -25,6 +25,7 @@ fun ComposeParallaxToolbarLayout(
     bodyConfig: ParallaxBodyConfig = ParallaxToolbarDefaults.bodyConfig(),
     semanticsConfig: ParallaxSemanticsConfig = ParallaxToolbarDefaults.semanticsConfig(),
     windowInsets: WindowInsets = ParallaxToolbarDefaults.windowInsets,
+    collapseEnabled: Boolean = true,
     state: ParallaxToolbarState = rememberParallaxToolbarState()
 )
 ```
@@ -44,6 +45,7 @@ fun ComposeParallaxToolbarLayout(
 | `onStretchTrigger` | Called when a stretch is released past `stretchTriggerDistance`. Needs `stretchEnabled`. |
 | `headerConfig`, `toolbarConfig`, `titleConfig`, `bodyConfig`, `semanticsConfig` | See [Configuration](#configuration). |
 | `windowInsets` | Insets the toolbar stays inside of. The top inset sits above the toolbar, under the header; the horizontal insets keep the navigation icon, actions and title clear of a display cutout. Default: system bars plus cutout, top and sides, as Material's top app bar. Pass `WindowInsets(0)` when the layout does not touch the window edge, such as in a dialog, a bottom sheet or a split pane. |
+| `collapseEnabled` | `false` locks the header: scrolling and dragging no longer move it, the body still scrolls, and `collapse()`/`expand()` still work. For loading, empty or editing states. |
 | `state` | See [ParallaxToolbarState](#parallaxtoolbarstate). |
 
 Every slot lambda runs with a [ParallaxToolbarScope](#parallaxtoolbarscope) receiver and receives
@@ -116,6 +118,7 @@ Receiver of every slot.
 | `Modifier.parallax(ratio = 0.5f)` | Moves the element up by `ratio` of the collapse distance. |
 | `Modifier.fadeOnCollapse(expandedAlpha = 1f, collapsedAlpha = 0f)` | Interpolates alpha with the collapse. |
 | `Modifier.scaleOnCollapse(collapsedScale, origin = TransformOrigin.Center)` | Scales toward `collapsedScale`. |
+| `Modifier.pin(stopAtTop = false)` | Keeps a header element still until the header's bottom edge reaches it, then rides that edge up. With `stopAtTop` it stops at the toolbar's top edge. Ignores `parallaxMultiplier`; pair with `fadeOnCollapse = false`. Header content ends under the toolbar, so use `moveBetween` in `overlayContent` for elements that must stay visible once collapsed. |
 | `Modifier.moveBetween(expanded, collapsed, expandedPadding, collapsedPadding, collapsedScale = 1f)` | Glides the element from an alignment in the header area to an alignment in the toolbar area, scaling on the way. For `overlayContent`. Put it outside any `size` modifier. |
 
 Reading `collapseFraction` in composition recomposes that slot on every scroll frame. The modifiers,
@@ -180,7 +183,8 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `gradient` | `null` | Brush drawn over the header. When null, a vertical gradient from the toolbar's initial color to its target color covers the lower quarter. |
 | `isExpandedWhenFirstDisplayed` | `true` | Start collapsed when false. |
 | `parallaxMultiplier` | `0.5f` | How much of the collapse distance the header content moves by. 0f pins it. |
-| `snapOnRelease` | `false` | Settle a partly collapsed header to the nearer resting position when a drag or fling ends. |
+| `snapOnRelease` | `false` | Settle a partly collapsed header to a resting position when a drag or fling ends. A fling settles in its direction; a plain release settles by `snapThreshold`. |
+| `snapThreshold` | `0.5f` | Collapse progress at or past which a plain release settles collapsed. `0.5f` is the nearer position; `0.75f` favors expanded. Applies to the toolbar exit in `EnterAlwaysCollapsed` too. |
 | `scrollMode` | `ExitUntilCollapsed` | See [ScrollMode](#scrollmode). |
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
 | `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
@@ -248,5 +252,5 @@ from accessibility.
 Constants: `HeaderHeightDp = 450.dp`, `HeaderParallaxMultiplier = 0.5f`, `ToolbarHeight = 64.dp`,
 `TitlePaddingBottom = (-16).dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
 `TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`,
-`AnimationSpec = spring()`. `windowInsets` is the default inset set: system bars plus display
+`AnimationSpec = spring()`, `SnapThreshold = 0.5f`. `windowInsets` is the default inset set: system bars plus display
 cutout, top and sides.
