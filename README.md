@@ -52,7 +52,7 @@ import am.highapps.parallaxtoolbar.ComposeParallaxToolbarLayout
 import am.highapps.parallaxtoolbar.ParallaxContent
 
 @Composable
-fun AlbumScreen(album: Album) {
+fun AlbumScreen(album: Album, onBack: () -> Unit, onShare: () -> Unit) {
     ComposeParallaxToolbarLayout(
         titleContent = { collapsed ->
             Text(
@@ -99,11 +99,11 @@ ComposeParallaxToolbarLayout(
         snapOnRelease = true,
         stretchEnabled = true
     ),
-    onStretchTrigger = { viewModel.refresh() },
-    toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = colorScheme.surface, elevation = 3.dp),
+    onStretchTrigger = { refresh() },
+    toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 3.dp),
     titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedScale = 0.8f, collapsedAlignment = Alignment.CenterHorizontally),
     bottomContent = { TabRow(/* ... */) },
-    contentPadding = scaffoldPadding
+    contentPadding = padding // from Scaffold
 )
 ```
 

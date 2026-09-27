@@ -72,7 +72,7 @@ and commit the output; the Docs workflow fails when it is stale.
 
 1. Branch from `main`.
 2. Keep the change focused; add or update tests; update the docs that describe the behavior.
-3. Add a line under the unreleased section of `CHANGELOG.md`.
+3. Add a line to the top version section of `CHANGELOG.md` under Added, Changed, Removed or Fixed.
 4. Make sure the tests above pass, then open the pull request. The template lists what to include.
 
 ## Releasing

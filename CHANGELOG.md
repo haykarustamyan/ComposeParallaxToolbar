@@ -9,44 +9,50 @@ All notable changes to this project are documented here. The format follows
 Breaking release. See [docs/MIGRATION.md](docs/MIGRATION.md) for the upgrade steps; most screens
 need one edit or none.
 
-- **NEW**: the header collapses through nested scrolling. Any vertically scrollable composable can be the body via `ParallaxContent.Custom`, including `LazyVerticalGrid`, `LazyVerticalStaggeredGrid` and pagers. Dragging on the header itself collapses it.
-- **NEW**: every slot runs in a `ParallaxToolbarScope` exposing `collapseFraction`, `isCollapsed` and `state`; the `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
-- **NEW**: invalid configuration values throw at construction with a message naming the field and the valid range.
-- **NEW**: compiled recipes in `docs/RECIPES.md`, an agent skill file, `llms.txt`, and a docs site published to GitHub Pages.
-- **NEW**: accessibility semantics: state description with expand and collapse actions, explicit reading order with the toolbar first, the title as a heading, and the faded header or exited toolbar hidden from screen readers. Strings are configurable through `semanticsConfig`.
-- **NEW**: `bottomContent` slot pinned under the toolbar for tabs or search; overscroll stretch with `stretchEnabled`, `stretchTriggerDistance` and an `onStretchTrigger` callback for pull-to-refresh; `collapsedAlignment` for a centered or end-aligned collapsed title; `maxHeight` on `HeaderHeight.Percentage` and `AspectRatio`; `alwaysElevated` on the toolbar config.
-- **NEW**: per-element behaviors on the slot scope: `Modifier.parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`; an `overlayContent` slot above the body and toolbar for elements that travel into the toolbar; `fadeOnCollapse` on the header config; and `state.layoutInfo` with the measured geometry.
-- **NEW**: `ScrollMode` on the header config: `ExitUntilCollapsed` (default), `EnterAlways`, and `EnterAlwaysCollapsed`, which also slides the toolbar off screen. `state.toolbarExitFraction` reports the exit.
-- **NEW**: `snapOnRelease` on the header config settles a half-collapsed header to the nearer end.
-- **NEW**: desktop (JVM) and web (Kotlin/Wasm) targets, plus desktop and web sample apps.
-- **NEW**: the collapse fraction is saved and restored across configuration changes and process death.
-- **CHANGED**: `collapse()` and `expand()` move only the header; the body keeps its scroll position. `rememberParallaxToolbarState(initiallyCollapsed = true)` is the state-side equivalent of `isExpandedWhenFirstDisplayed = false`.
-- **NEW**: explicit API mode, a checked-in ABI dump verified on every pull request, and generated API docs in the javadoc jar
-- **NEW**: `ParallaxToolbarState` and `rememberParallaxToolbarState()`: observe `collapseFraction` and `isCollapsed`, and call `collapse()` / `expand()` (animated or not). The `scrollState` parameter is replaced by `state`; the deprecated overload still accepts a `ScrollState`.
-- **NEW**: `parallaxMultiplier` on the header config, `height` on the toolbar config, and `collapsedScale` on the title config.
-- **REMOVED**: `iconSize` and `iconSpacing` from `ParallaxToolbarConfig` and `ToolbarMinWidth`, `ToolbarIconSize`, `ToolbarIconSpacing` from `ParallaxToolbarDefaults`. Nothing ever read them; size icons inside the slots.
-- **REMOVED**: the Material 3 dependency. The library now depends only on Compose UI and Foundation, so it works with any design system
-- **CHANGED**: the header fades out over the collapse range instead of its full height, so it is fully hidden once the toolbar covers it
-- **CHANGED**: the toolbar and title are measured in one pass by a custom layout instead of position callbacks, removing the one-frame jump on first display and rotation. The toolbar no longer uses Material's `TopAppBar` internally; its look is unchanged.
-- **UPDATED**: Kotlin 2.4.20, Compose Multiplatform 1.12.1
-- **UPGRADED**: Gradle 9.7.0, Android Gradle Plugin 9.3.3, Maven Publish Plugin 0.37.0
-- **CHANGED**: Migrated to the `com.android.kotlin.multiplatform.library` plugin required by AGP 9
-- **REMOVED**: `iosX64` target, since Compose Multiplatform no longer publishes artifacts for it
-- **REMOVED**: unused `components-resources` and `components-ui-tooling-preview` dependencies
-- **REMOVED**: sample screens, previews and iOS sample view controllers from the published artifact; they now live in the `sample` module. The library no longer depends on `material-icons-extended`.
-- **CHANGED**: configuration classes are plain classes with `copy`, `equals`, `hashCode` and `toString` instead of data classes, so fields can be added later without breaking compiled consumers
-- **CHANGED**: configuration classes are annotated `@Immutable` so the layout skips recomposition when its inputs are unchanged
-- **CHANGED**: the legacy overload taking `lazyContent` is now marked `@Deprecated` with a replacement; it delegates to the `ParallaxContent` overload
-- **FIXED**: `isExpandedWhenFirstDisplayed = false` now works for `ParallaxContent.Lazy`
-- **FIXED**: the last status-bar-inset height of the body could never be scrolled into view; the body is now padded by the inset instead of offset
-- **FIXED**: right-to-left layouts: content padding and the title's horizontal motion now follow the layout direction
-- **FIXED**: horizontal `contentPadding` is applied to `ParallaxContent.Regular`
-- **CHANGED**: the toolbar shadow (`elevation`) now appears only once the toolbar is collapsed, so it no longer draws a band across the expanded header
-- **CHANGED**: the bottom filler for short regular content is computed exactly, removing extra blank space
-- **FIXED**: Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0
-- **FIXED**: A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title
-- **NEW**: Compose Multiplatform sample playground with Android and iOS host apps
-- **TESTS**: Compose UI tests now run on Android (Robolectric) and the iOS simulator, with a Kover line-coverage gate
+### Added
+
+- Nested-scroll collapse: any vertically scrollable composable can be the body through `ParallaxContent.Custom`, including grids, staggered grids and pagers. Dragging on the header itself collapses it.
+- `ScrollMode` on the header config: `ExitUntilCollapsed` (default), `EnterAlways`, and `EnterAlwaysCollapsed`, which also slides the toolbar off screen. `state.toolbarExitFraction` reports the exit.
+- `snapOnRelease` on the header config settles a partly collapsed header to the nearest resting position.
+- `ParallaxToolbarState` from `rememberParallaxToolbarState()`: `collapseFraction`, `isCollapsed`, `collapse()`, `expand()`, `layoutInfo`, and the scroll states for both content kinds. The collapse fraction is saved across configuration changes and process death.
+- `ParallaxToolbarScope` as the receiver of every slot, with `collapseFraction`, `isCollapsed`, `state`, `layoutInfo` and the per-element modifiers `parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`. The `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
+- `overlayContent` slot above the body and toolbar, for elements that travel into the toolbar.
+- `bottomContent` slot pinned under the toolbar, for tabs or a search field.
+- Overscroll stretch: `stretchEnabled` and `stretchTriggerDistance` on the header config, with an `onStretchTrigger` callback for pull-to-refresh.
+- Header config: `parallaxMultiplier` and `fadeOnCollapse`. Toolbar config: `height` and `alwaysElevated`. Title config: `collapsedScale` and `collapsedAlignment`. `maxHeight` on `HeaderHeight.Percentage` and `HeaderHeight.AspectRatio`.
+- Accessibility: state description with expand and collapse actions, reading order with the toolbar first, the title as a heading, and the faded header or exited toolbar hidden from screen readers. Strings come from `semanticsConfig`.
+- Invalid configuration values throw at construction with a message naming the field and the valid range.
+- Desktop (JVM) and web (Kotlin/Wasm) targets.
+- Sample playground shared by Android, iOS, desktop and web hosts; compiled recipes in `docs/RECIPES.md`; `llms.txt` and an agent skill file; a docs site on GitHub Pages.
+
+### Changed
+
+- The `scrollState` parameter is replaced by `state`. The deprecated 1.x overload still accepts a `ScrollState` and now carries a real `@Deprecated` annotation with a replacement.
+- `collapse()` and `expand()` move only the header; the body keeps its scroll position.
+- The toolbar and title are measured in one pass by a custom layout instead of position callbacks, removing the one-frame jump on first display and rotation. The toolbar no longer uses Material's `TopAppBar` internally; its look is unchanged.
+- The toolbar shadow appears once collapsed, or always with `alwaysElevated`, instead of drawing a band across the expanded header.
+- The header fades over the collapse range rather than its full height, so it is fully hidden once covered.
+- Configuration types are plain `@Immutable` classes with `copy`, `equals`, `hashCode` and `toString` instead of data classes, so fields can be added without breaking compiled consumers.
+- Explicit API mode with a checked-in ABI dump verified in CI; API docs generated into the javadoc jar.
+- Toolchain: Kotlin 2.4.20, Compose Multiplatform 1.12.1, Gradle 9.7.0, Android Gradle Plugin 9.3.3 with the `com.android.kotlin.multiplatform.library` plugin, Maven Publish Plugin 0.37.0. Minimum iOS is 15.0.
+
+### Removed
+
+- The Material 3 dependency. The library depends only on Compose UI and Foundation.
+- Sample screens, previews and iOS sample view controllers from the published artifact; they live in the `sample` module. The library no longer depends on `material-icons-extended`.
+- `iconSize` and `iconSpacing` from `ParallaxToolbarConfig`, and `ToolbarMinWidth`, `ToolbarIconSize`, `ToolbarIconSpacing` from `ParallaxToolbarDefaults`. Nothing read them.
+- The `iosX64` target, which Compose Multiplatform no longer publishes.
+- Unused `components-resources` and `components-ui-tooling-preview` dependencies.
+
+### Fixed
+
+- A gap the height of the status bar inset appeared under the header in edge-to-edge apps and on iOS, hiding the title.
+- The last status-bar-inset height of the body could never be scrolled into view.
+- Lazy content reported the toolbar as expanded when the first visible item offset was exactly 0.
+- `isExpandedWhenFirstDisplayed = false` had no effect with lazy content.
+- Right-to-left layouts: content padding and the title's horizontal motion follow the layout direction.
+- Horizontal `contentPadding` was dropped for regular content.
+- Short regular content left extra blank space below it.
 
 ## 1.3.0
 
