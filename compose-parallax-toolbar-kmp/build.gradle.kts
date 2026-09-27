@@ -137,7 +137,7 @@ kover {
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
 
     configure(
         com.vanniktech.maven.publish.KotlinMultiplatform(
