@@ -18,6 +18,7 @@ need one edit or none.
 - `ParallaxToolbarScope` as the receiver of every slot, with `collapseFraction`, `isCollapsed`, `state`, `layoutInfo` and the per-element modifiers `parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`. The `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
 - `overlayContent` slot above the body and toolbar, for elements that travel into the toolbar.
 - `Modifier.pin()` for header elements that stay in view until the header's bottom edge reaches them, such as a chip row.
+- `backgroundColor` on the body config, drawn behind the body so gaps between items do not show the header sliding underneath.
 - `snapThreshold` on the header config decides where a plain release settles; `collapseEnabled` on the layout locks the header while the body keeps scrolling.
 - `bottomContent` slot pinned under the toolbar, for tabs or a search field.
 - Overscroll stretch: `stretchEnabled` and `stretchTriggerDistance` on the header config, with an `onStretchTrigger` callback for pull-to-refresh.
@@ -63,6 +64,7 @@ need one edit or none.
 - Mouse wheel and trackpad scrolling on desktop and web could leave the header stretched, since they never fling; a stretch now follows a held pointer only.
 - A downward fling on an expanded header stretched it for one frame.
 - The collapsed header is hidden from screen readers whether or not it fades.
+- Without a subtitle the expanded title hung 16dp below the header's bottom edge and was clipped by the body. `paddingBottom` now measures from the header's bottom edge to the bottom of the title block in both cases, and its default is `16.dp`; screens that pass their own value sit 16dp higher than in 1.x when they have a subtitle.
 
 ## 1.3.0
 

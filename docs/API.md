@@ -210,7 +210,7 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 
 | Field | Default | Description |
 |---|---|---|
-| `paddingBottom` | `(-16).dp` | Distance from the header's bottom edge to the title block while expanded. Negative lets it straddle the edge. |
+| `paddingBottom` | `16.dp` | Distance from the header's bottom edge to the bottom of the title block, subtitle included, while expanded. Negative lets it straddle the edge. |
 | `paddingStart` | `16.dp` | Start padding while expanded. |
 | `collapsedPaddingStart` | `64.dp` | Start padding once collapsed, when a navigation icon is present and `collapsedAlignment` is `Start`. |
 | `keepSubtitleAfterCollapse` | `false` | Keep the subtitle in the toolbar instead of hiding it. |
@@ -220,7 +220,12 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 
 ### ParallaxBodyConfig
 
-`bodyConfig(minBottomSpacerHeight = 0.dp)`: extra space added after the content of `Regular` and `Lazy` bodies.
+`bodyConfig(minBottomSpacerHeight = 0.dp, backgroundColor = Color.Unspecified)`
+
+| Field | Default | Description |
+|---|---|---|
+| `minBottomSpacerHeight` | `0.dp` | Extra space after the content of `Regular` and `Lazy` bodies. |
+| `backgroundColor` | `Color.Unspecified` | Drawn behind the body. The body slides over the header, so gaps between items would show it through; pass the screen background unless every item paints its own. |
 
 ### LazyColumnConfig
 
@@ -250,7 +255,7 @@ from accessibility.
 ## ParallaxToolbarDefaults
 
 Constants: `HeaderHeightDp = 450.dp`, `HeaderParallaxMultiplier = 0.5f`, `ToolbarHeight = 64.dp`,
-`TitlePaddingBottom = (-16).dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
+`TitlePaddingBottom = 16.dp`, `TitlePaddingStart = 16.dp`, `TitleCollapsedPaddingStart = 64.dp`,
 `TitleCollapsedScale = 1f`, `BodyMinBottomSpacing = 0.dp`, `StretchTriggerDistance = 100.dp`,
 `AnimationSpec = spring()`, `SnapThreshold = 0.5f`. `windowInsets` is the default inset set: system bars plus display
 cutout, top and sides.

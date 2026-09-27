@@ -248,10 +248,18 @@ public class ParallaxTitleConfig(
         "collapsedAlignment=$collapsedAlignment)"
 }
 
-/** Body spacing. */
+/**
+ * Body spacing and background.
+ *
+ * @param minBottomSpacerHeight Extra space under the content so the last item clears a bottom bar.
+ * @param backgroundColor Color drawn behind the body. The body slides over the header, so
+ *   transparent gaps between items would show the header through; set this to the screen
+ *   background unless every item paints its own. [Color.Unspecified] draws nothing.
+ */
 @Immutable
 public class ParallaxBodyConfig(
     public val minBottomSpacerHeight: Dp,
+    public val backgroundColor: Color = Color.Unspecified,
 ) {
     init {
         require(minBottomSpacerHeight >= 0.dp) {
@@ -259,15 +267,20 @@ public class ParallaxBodyConfig(
         }
     }
 
-    public fun copy(minBottomSpacerHeight: Dp = this.minBottomSpacerHeight): ParallaxBodyConfig =
-        ParallaxBodyConfig(minBottomSpacerHeight)
+    public fun copy(
+        minBottomSpacerHeight: Dp = this.minBottomSpacerHeight,
+        backgroundColor: Color = this.backgroundColor,
+    ): ParallaxBodyConfig = ParallaxBodyConfig(minBottomSpacerHeight, backgroundColor)
 
     override fun equals(other: Any?): Boolean =
-        other is ParallaxBodyConfig && minBottomSpacerHeight == other.minBottomSpacerHeight
+        other is ParallaxBodyConfig &&
+            minBottomSpacerHeight == other.minBottomSpacerHeight &&
+            backgroundColor == other.backgroundColor
 
-    override fun hashCode(): Int = minBottomSpacerHeight.hashCode()
+    override fun hashCode(): Int = 31 * minBottomSpacerHeight.hashCode() + backgroundColor.hashCode()
 
-    override fun toString(): String = "ParallaxBodyConfig(minBottomSpacerHeight=$minBottomSpacerHeight)"
+    override fun toString(): String =
+        "ParallaxBodyConfig(minBottomSpacerHeight=$minBottomSpacerHeight, backgroundColor=$backgroundColor)"
 }
 
 /** Options forwarded to the `LazyColumn` used by [ParallaxContent.Lazy]. */

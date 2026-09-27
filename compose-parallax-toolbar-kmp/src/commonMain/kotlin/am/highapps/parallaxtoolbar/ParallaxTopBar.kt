@@ -135,10 +135,9 @@ internal fun ParallaxTopBar(
             else -> collapsedStart
         }
 
-        // Expanded: the block sits above the header's bottom edge, offset by paddingBottom. The
-        // subtitle height counts twice here on purpose; it preserves the placement of 1.x.
-        val expandedTop = insetPx + headerHeight.toPx() - blockHeight - subtitleHeight -
-            titleConfig.paddingBottom.toPx()
+        // Expanded: the whole block, subtitle included, ends paddingBottom above the header's
+        // bottom edge, with or without a subtitle.
+        val expandedTop = insetPx + headerHeight.toPx() - blockHeight - titleConfig.paddingBottom.toPx()
         // Collapsed: the title, or the whole block when the subtitle is kept, is centered in the
         // toolbar at its collapsed scale. The scale origin is the block's top-start corner.
         val centeredHeight = (if (keepSubtitle) blockHeight else title.height) * collapsedScale

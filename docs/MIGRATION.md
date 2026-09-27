@@ -21,6 +21,10 @@
 
 - The header now collapses through nested scrolling. Scrolling feels the same, and any scrollable
   can be the body. Dragging on the header itself now collapses it too.
+- The expanded title block ends `titleConfig.paddingBottom` above the header's bottom edge, with
+  or without a subtitle, and the default is now `16.dp` instead of `(-16).dp`. With the default,
+  a title with a subtitle sits about 12dp higher than in 1.x and a title without one is no longer
+  clipped by the body. Pass `paddingBottom = 4.dp` to keep the old look with a subtitle.
 - `collapse()` and `expand()` move only the header; the body keeps its scroll position. To also
   scroll to the top, use `state.scrollState` or `state.lazyListState`.
 - The collapse fraction is saved across configuration changes and process death.

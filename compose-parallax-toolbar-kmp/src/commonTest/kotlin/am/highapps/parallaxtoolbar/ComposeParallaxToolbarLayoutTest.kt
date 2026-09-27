@@ -555,6 +555,8 @@ class ParallaxConfigEqualityTest {
         kotlin.test.assertTrue(title.toString().startsWith("ParallaxTitleConfig("))
 
         val body = ParallaxBodyConfig(8.dp)
+        kotlin.test.assertEquals(Color.Red, body.copy(backgroundColor = Color.Red).backgroundColor)
+        kotlin.test.assertEquals(body, ParallaxBodyConfig(8.dp, Color.Unspecified))
         kotlin.test.assertEquals(body, body.copy())
         kotlin.test.assertNotEquals(body, body.copy(minBottomSpacerHeight = 9.dp))
         kotlin.test.assertEquals(body.hashCode(), body.copy().hashCode())

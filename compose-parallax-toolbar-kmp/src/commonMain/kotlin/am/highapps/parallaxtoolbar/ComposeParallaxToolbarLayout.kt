@@ -4,6 +4,7 @@ import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
@@ -29,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -428,7 +430,10 @@ private fun ParallaxToolbarLayoutImpl(
                     content = { scope.headerContent() },
                 )
 
-                val bodyModifier = Modifier.layoutId(BodySlot).semantics { traversalIndex = 4f }
+                val bodyModifier = Modifier
+                    .layoutId(BodySlot)
+                    .semantics { traversalIndex = 4f }
+                    .then(if (bodyConfig.backgroundColor.isSpecified) Modifier.background(bodyConfig.backgroundColor) else Modifier)
                 when (body) {
                     is ParallaxBodySpec.Regular -> ParallaxBody(
                         scroll = state.scrollState,

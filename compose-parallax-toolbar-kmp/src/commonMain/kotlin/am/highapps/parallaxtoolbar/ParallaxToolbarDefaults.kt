@@ -34,7 +34,7 @@ public object ParallaxToolbarDefaults {
     public val ToolbarHeight: Dp = 64.dp
 
     // Title and subtitle defaults
-    public val TitlePaddingBottom: Dp = (-16).dp
+    public val TitlePaddingBottom: Dp = 16.dp
     public val TitlePaddingStart: Dp = 16.dp
     public val TitleCollapsedPaddingStart: Dp = 64.dp
     public const val TitleCollapsedScale: Float = 1f
@@ -165,8 +165,10 @@ public object ParallaxToolbarDefaults {
     @Composable
     public fun bodyConfig(
         minBottomSpacerHeight: Dp = BodyMinBottomSpacing,
+        backgroundColor: Color = Color.Unspecified,
     ): ParallaxBodyConfig = ParallaxBodyConfig(
         minBottomSpacerHeight = minBottomSpacerHeight,
+        backgroundColor = backgroundColor,
     )
 
     @Composable
