@@ -187,11 +187,3 @@ mavenPublishing {
         }
     }
 }
-
-// mavenPublishing {
-//    coordinates(
-//        groupId = "am.highapps.parallaxtoolbar",
-//        artifactId = "compose-parallax-toolbar-kmp",
-//        version = "1.0.0"
-//    )
-// }
