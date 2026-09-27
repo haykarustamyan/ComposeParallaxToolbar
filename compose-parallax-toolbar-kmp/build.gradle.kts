@@ -158,7 +158,7 @@ mavenPublishing {
         name = "ComposeParallaxToolbar"
         description =
             "Collapsing toolbar layout for Compose Multiplatform: parallax header, any scrollable body, scroll modes, " +
-                "pinned tabs, pull-to-refresh. Android, iOS, desktop and web."
+            "pinned tabs, pull-to-refresh. Android, iOS, desktop and web."
         inceptionYear = "2025"
         url = "https://github.com/haykarustamyan/ComposeParallaxToolbar"
         licenses {
