@@ -39,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -60,7 +59,7 @@ fun BasicListScreen(items: List<String>, onBack: () -> Unit) {
             Text(
                 text = "Playlist",
                 color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
-                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineMedium
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineMedium,
             )
         },
         subtitleContent = { collapsed -> if (!collapsed) Text("${items.size} tracks", color = Color.White) },
@@ -76,8 +75,8 @@ fun BasicListScreen(items: List<String>, onBack: () -> Unit) {
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 3.dp),
         content = ParallaxContent.Lazy(
             content = { _ -> items(items.size) { i -> ListItem(headlineContent = { Text(items[i]) }) } },
-            config = ParallaxToolbarDefaults.lazyColumnConfig(contentPadding = PaddingValues(vertical = 8.dp))
-        )
+            config = ParallaxToolbarDefaults.lazyColumnConfig(contentPadding = PaddingValues(vertical = 8.dp)),
+        ),
     )
 }
 // end recipe
@@ -96,11 +95,11 @@ fun PhotoGridScreen(photos: List<Int>) {
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(photos) { seed -> Box(Modifier.aspectRatio(1f).background(swatch(seed))) }
             }
-        }
+        },
     )
 }
 // end recipe
@@ -112,8 +111,11 @@ fun PhotoGridScreen(photos: List<Int>) {
 fun ProfileScreen(name: String, posts: List<String>) {
     ComposeParallaxToolbarLayout(
         titleContent = { collapsed ->
-            Text(name, color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
-                style = MaterialTheme.typography.headlineSmall)
+            Text(
+                name,
+                color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = MaterialTheme.typography.headlineSmall,
+            )
         },
         headerContent = {
             Box(Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse().background(swatch(7)))
@@ -127,16 +129,18 @@ fun ProfileScreen(name: String, posts: List<String>) {
                         collapsed = Alignment.CenterEnd,
                         expandedPadding = PaddingValues(start = 16.dp, bottom = 56.dp),
                         collapsedPadding = PaddingValues(end = 16.dp),
-                        collapsedScale = 0.5f
+                        collapsedScale = 0.5f,
                     )
-                    .background(Color(0xFFFFC107), CircleShape)
+                    .background(Color(0xFFFFC107), CircleShape),
             )
         },
         headerConfig = ParallaxToolbarDefaults.headerConfig(
-            height = HeaderHeight.Fixed(280.dp), parallaxMultiplier = 0f, fadeOnCollapse = false
+            height = HeaderHeight.Fixed(280.dp),
+            parallaxMultiplier = 0f,
+            fadeOnCollapse = false,
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface),
-        content = ParallaxContent.Lazy(content = { _ -> items(posts.size) { i -> ListItem(headlineContent = { Text(posts[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(posts.size) { i -> ListItem(headlineContent = { Text(posts[i]) }) } }),
     )
 }
 // end recipe
@@ -158,7 +162,7 @@ fun TabbedScreen(sections: List<String>) {
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface),
         content = ParallaxContent.Lazy(content = { _ ->
             items(40) { i -> ListItem(headlineContent = { Text("${sections[selected]} item ${i + 1}") }) }
-        })
+        }),
     )
 }
 // end recipe
@@ -173,10 +177,10 @@ fun RefreshableFeedScreen(feed: List<String>, onRefresh: () -> Unit) {
         headerConfig = ParallaxToolbarDefaults.headerConfig(
             height = HeaderHeight.Percentage(0.35f, maxHeight = 300.dp),
             stretchEnabled = true,
-            stretchTriggerDistance = 96.dp
+            stretchTriggerDistance = 96.dp,
         ),
         onStretchTrigger = onRefresh,
-        content = ParallaxContent.Lazy(content = { _ -> items(feed.size) { i -> ListItem(headlineContent = { Text(feed[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(feed.size) { i -> ListItem(headlineContent = { Text(feed[i]) }) } }),
     )
 }
 // end recipe
@@ -193,15 +197,17 @@ fun ScaffoldScreen(rows: List<String>) {
                     NavigationBarItem(selected = tab == i, onClick = { tab = i }, icon = {}, label = { Text(label) })
                 }
             }
-        }
+        },
     ) { padding ->
         ComposeParallaxToolbarLayout(
             titleContent = { Text("Home", color = Color.White, style = MaterialTheme.typography.headlineMedium) },
             headerContent = { HeaderArtwork() },
             contentPadding = padding,
             content = ParallaxContent.Regular { _ ->
-                rows.forEach { Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) { Text(it, Modifier.padding(16.dp)) } }
-            }
+                rows.forEach {
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) { Text(it, Modifier.padding(16.dp)) }
+                }
+            },
         )
     }
 }
@@ -213,16 +219,21 @@ fun ScaffoldScreen(rows: List<String>) {
 fun SettingsStyleScreen(rows: List<String>) {
     ComposeParallaxToolbarLayout(
         titleContent = { collapsed ->
-            Text("Settings", color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
-                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineLarge)
+            Text(
+                "Settings",
+                color = if (collapsed) MaterialTheme.colorScheme.onSurface else Color.White,
+                style = if (collapsed) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineLarge,
+            )
         },
         headerContent = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) },
         headerConfig = ParallaxToolbarDefaults.headerConfig(
-            height = HeaderHeight.Fixed(160.dp), scrollMode = ScrollMode.EnterAlways, snapOnRelease = true
+            height = HeaderHeight.Fixed(160.dp),
+            scrollMode = ScrollMode.EnterAlways,
+            snapOnRelease = true,
         ),
         toolbarConfig = ParallaxToolbarDefaults.toolbarConfig(targetColor = MaterialTheme.colorScheme.surface, elevation = 2.dp),
         titleConfig = ParallaxToolbarDefaults.titleConfig(collapsedAlignment = Alignment.CenterHorizontally, collapsedScale = 0.85f),
-        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } }),
     )
 }
 // end recipe
@@ -245,7 +256,7 @@ fun ControlledScreen(rows: List<String>) {
             }
         },
         state = state,
-        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } })
+        content = ParallaxContent.Lazy(content = { _ -> items(rows.size) { i -> ListItem(headlineContent = { Text(rows[i]) }) } }),
     )
 }
 // end recipe

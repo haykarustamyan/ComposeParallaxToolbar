@@ -33,10 +33,10 @@ fun DesktopListScreen(items: List<String>) {
                 }
                 VerticalScrollbar(
                     adapter = rememberScrollbarAdapter(state.lazyListState),
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
                 )
             }
-        }
+        },
     )
 }
 // end recipe

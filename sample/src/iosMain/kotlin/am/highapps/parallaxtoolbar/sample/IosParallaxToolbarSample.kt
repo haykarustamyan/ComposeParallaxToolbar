@@ -1,7 +1,6 @@
 package am.highapps.parallaxtoolbar.sample
 
 import am.highapps.parallaxtoolbar.*
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -108,7 +107,7 @@ fun AllSamplesViewController() = ComposeUIViewController {
         // Sample contains all examples to easily switch between them
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             // By default, show the simple sample
             SimpleParallaxToolbarScreen()
@@ -135,7 +134,7 @@ fun IOSSettingsStyleScreen() {
                 text = "Settings",
                 fontSize = if (isCollapsed) 18.sp else 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -145,11 +144,11 @@ fun IOSSettingsStyleScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF007AFF), // iOS Blue
-                                Color(0xFF0056CC)
-                            )
-                        )
+                                Color(0xFF0056CC),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -160,15 +159,15 @@ fun IOSSettingsStyleScreen() {
                         "Brightness",
                         "Text Size",
                         "Bold Text",
-                        "Dark Mode"
+                        "Dark Mode",
                     ),
                     "Privacy & Security" to listOf(
                         "Privacy Report",
                         "Analytics",
                         "Safety Check",
-                        "Lockdown Mode"
+                        "Lockdown Mode",
                     ),
-                    "Battery" to listOf("Battery Health", "Low Power Mode", "Battery Usage by App")
+                    "Battery" to listOf("Battery Health", "Low Power Mode", "Battery Usage by App"),
                 )
 
                 settingsSections.forEach { (sectionTitle, items) ->
@@ -178,7 +177,7 @@ fun IOSSettingsStyleScreen() {
                             text = sectionTitle,
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         )
                     }
 
@@ -190,24 +189,24 @@ fun IOSSettingsStyleScreen() {
                                 .padding(horizontal = 16.dp, vertical = 2.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            ),
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
                                     text = item,
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
                                 )
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Navigate",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -216,18 +215,18 @@ fun IOSSettingsStyleScreen() {
             },
             config = ParallaxToolbarDefaults.lazyColumnConfig(
                 contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            )
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
 
@@ -242,7 +241,7 @@ fun IOSPhotoGalleryScreen() {
                 text = "Photos",
                 fontSize = if (isCollapsed) 18.sp else 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         subtitleContent = { isCollapsed ->
@@ -250,7 +249,7 @@ fun IOSPhotoGalleryScreen() {
                 Text(
                     text = "All Photos • 1,234 items",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = Color.White.copy(alpha = 0.9f),
                 )
             }
         },
@@ -261,11 +260,11 @@ fun IOSPhotoGalleryScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF6C5CE7), // Purple
-                                Color(0xFF5A4FCF)
-                            )
-                        )
+                                Color(0xFF5A4FCF),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -277,14 +276,14 @@ fun IOSPhotoGalleryScreen() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         photoRow.forEach { photoIndex ->
                             Card(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(2.dp),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
                             ) {
                                 Box(
                                     modifier = Modifier
@@ -296,16 +295,16 @@ fun IOSPhotoGalleryScreen() {
                                                     Color(0xFFF093FB),
                                                     Color(0xFFF5576C),
                                                     Color(0xFF4FACFE),
-                                                    Color(0xFF00F2FE)
-                                                )
-                                            )
+                                                    Color(0xFF00F2FE),
+                                                ),
+                                            ),
                                         ),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
                                         text = "$photoIndex",
                                         color = Color.White,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
                             }
@@ -320,15 +319,15 @@ fun IOSPhotoGalleryScreen() {
             },
             config = ParallaxToolbarDefaults.lazyColumnConfig(
                 contentPadding = PaddingValues(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            )
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -337,9 +336,9 @@ fun IOSPhotoGalleryScreen() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }

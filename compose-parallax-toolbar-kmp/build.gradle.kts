@@ -41,7 +41,7 @@ kotlin {
 
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
             baseName = "compose-parallax-toolbar-kmp"
@@ -98,8 +98,6 @@ kotlin {
     }
 }
 
-
-
 dokka {
     moduleName.set("ComposeParallaxToolbar")
     dokkaSourceSets.configureEach {
@@ -126,7 +124,12 @@ kover {
         filters {
             excludes {
                 // Sample and preview code is documentation, not library behavior.
-                classes("am.highapps.parallaxtoolbar.*Sample*", "am.highapps.parallaxtoolbar.*Preview*", "am.highapps.parallaxtoolbar.*Screen*", "am.highapps.parallaxtoolbar.*ViewController*")
+                classes(
+                    "am.highapps.parallaxtoolbar.*Sample*",
+                    "am.highapps.parallaxtoolbar.*Preview*",
+                    "am.highapps.parallaxtoolbar.*Screen*",
+                    "am.highapps.parallaxtoolbar.*ViewController*",
+                )
                 annotatedBy("androidx.compose.ui.tooling.preview.Preview")
             }
         }
@@ -139,8 +142,8 @@ mavenPublishing {
     configure(
         com.vanniktech.maven.publish.KotlinMultiplatform(
             javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
-            sourcesJar = true
-        )
+            sourcesJar = true,
+        ),
     )
 
     signAllPublications()
@@ -148,7 +151,7 @@ mavenPublishing {
     coordinates(
         groupId = "am.highapps.parallaxtoolbar",
         artifactId = "compose-parallax-toolbar-kmp",
-        version = "2.0.0"
+        version = "2.0.0",
     )
 
     pom {
@@ -185,10 +188,10 @@ mavenPublishing {
     }
 }
 
-//mavenPublishing {
+// mavenPublishing {
 //    coordinates(
 //        groupId = "am.highapps.parallaxtoolbar",
 //        artifactId = "compose-parallax-toolbar-kmp",
 //        version = "1.0.0"
 //    )
-//}
+// }

@@ -1,7 +1,6 @@
 package am.highapps.parallaxtoolbar.sample
 
 import am.highapps.parallaxtoolbar.*
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +47,7 @@ fun SimpleParallaxToolbarScreen() {
                 text = "Simple Example",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -57,27 +56,27 @@ fun SimpleParallaxToolbarScreen() {
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.tertiary
-                        )
-                    )
-                ).fillMaxSize()
+                            MaterialTheme.colorScheme.tertiary,
+                        ),
+                    ),
+                ).fillMaxSize(),
             )
         },
         content = ParallaxContent.Regular {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 repeat(10) { index ->
                     Spacer(modifier = Modifier.height(16.dp))
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = "Regular Content Item ${index + 1}",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }
@@ -87,10 +86,10 @@ fun SimpleParallaxToolbarScreen() {
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
-        }
+        },
     )
 }
 
@@ -105,7 +104,7 @@ fun LazyParallaxToolbarScreen() {
                 text = "Lazy Content Example",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -115,11 +114,11 @@ fun LazyParallaxToolbarScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF4CAF50),
-                                Color(0xFF388E3C)
-                            )
-                        )
+                                Color(0xFF388E3C),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -128,31 +127,31 @@ fun LazyParallaxToolbarScreen() {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
                         ) {
                             Text(
                                 text = "Lazy Item ${index + 1}",
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
                                 text = "This is a lazy-loaded item that performs well with large lists",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             )
                         }
                     }
                 }
             },
-            lazyListState = rememberLazyListState()
+            lazyListState = rememberLazyListState(),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
         },
@@ -160,10 +159,10 @@ fun LazyParallaxToolbarScreen() {
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.Default.Share,
-                    contentDescription = "Share"
+                    contentDescription = "Share",
                 )
             }
-        }
+        },
     )
 }
 
@@ -178,7 +177,7 @@ fun LazyParallaxToolbarWithPaddingScreen() {
                 text = "Custom Padding",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -188,11 +187,11 @@ fun LazyParallaxToolbarWithPaddingScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF673AB7),
-                                Color(0xFF512DA8)
-                            )
-                        )
+                                Color(0xFF512DA8),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -200,29 +199,29 @@ fun LazyParallaxToolbarWithPaddingScreen() {
                 items(50) { index ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(
                             text = "Padded Item ${index + 1}",
                             modifier = Modifier.padding(20.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }
             },
             config = ParallaxToolbarDefaults.lazyColumnConfig(
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            )
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
-        }
+        },
     )
 }
 
@@ -237,7 +236,7 @@ fun LazyParallaxToolbarReversedScreen() {
                 text = "Reversed Layout",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -247,11 +246,11 @@ fun LazyParallaxToolbarReversedScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFFFF5722),
-                                Color(0xFFD84315)
-                            )
-                        )
+                                Color(0xFFD84315),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -262,21 +261,21 @@ fun LazyParallaxToolbarReversedScreen() {
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
                         colors = androidx.compose.material3.CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                        )
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        ),
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
                         ) {
                             Text(
                                 text = "Reversed Item ${index + 1}",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                             )
                             Text(
                                 text = "Items appear from bottom to top",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
                             )
                         }
                     }
@@ -284,14 +283,14 @@ fun LazyParallaxToolbarReversedScreen() {
             },
             config = ParallaxToolbarDefaults.lazyColumnConfig(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.Bottom
-            )
+                verticalArrangement = Arrangement.Bottom,
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
         },
@@ -299,10 +298,10 @@ fun LazyParallaxToolbarReversedScreen() {
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.Default.Share,
-                    contentDescription = "Share"
+                    contentDescription = "Share",
                 )
             }
-        }
+        },
     )
 }
 
@@ -317,7 +316,7 @@ fun LazyParallaxToolbarCenteredScreen() {
                 text = "Center Aligned",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -327,11 +326,11 @@ fun LazyParallaxToolbarCenteredScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF00BCD4),
-                                Color(0xFF0097A7)
-                            )
-                        )
+                                Color(0xFF0097A7),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -341,19 +340,19 @@ fun LazyParallaxToolbarCenteredScreen() {
                         modifier = Modifier.padding(horizontal = 32.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = androidx.compose.material3.CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                        )
+                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                        ),
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(24.dp),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Text(
                                 text = "Centered ${index + 1}",
                                 style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
@@ -362,17 +361,17 @@ fun LazyParallaxToolbarCenteredScreen() {
             config = ParallaxToolbarDefaults.lazyColumnConfig(
                 contentPadding = PaddingValues(vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            )
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
-        }
+        },
     )
 }
 
@@ -387,7 +386,7 @@ fun LazyParallaxToolbarWithSpacingScreen() {
                 text = if (isCollapsed) "Spaced List" else "Custom Spacing Example",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -397,11 +396,11 @@ fun LazyParallaxToolbarWithSpacingScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF4CAF50),
-                                Color(0xFF2E7D32)
-                            )
-                        )
+                                Color(0xFF2E7D32),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -413,21 +412,21 @@ fun LazyParallaxToolbarWithSpacingScreen() {
                             .padding(horizontal = 8.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
                     ) {
                         Column(
-                            modifier = Modifier.padding(20.dp)
+                            modifier = Modifier.padding(20.dp),
                         ) {
                             Text(
                                 text = "Spaced Item ${index + 1}",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
                                 text = "Items have custom spacing using Arrangement.spacedBy()",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                             )
                         }
                     }
@@ -435,15 +434,15 @@ fun LazyParallaxToolbarWithSpacingScreen() {
             },
             config = ParallaxToolbarDefaults.lazyColumnConfig(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            )
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -452,10 +451,10 @@ fun LazyParallaxToolbarWithSpacingScreen() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
 
@@ -470,7 +469,7 @@ fun LazyParallaxToolbarWithScrollControlScreen() {
                 text = if (isCollapsed) "Scroll Control" else "Custom Scroll Behavior",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         headerContent = {
@@ -480,11 +479,11 @@ fun LazyParallaxToolbarWithScrollControlScreen() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF9C27B0),
-                                Color(0xFF6A1B9A)
-                            )
-                        )
+                                Color(0xFF6A1B9A),
+                            ),
+                        ),
                     )
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         },
         content = ParallaxContent.Lazy(
@@ -496,32 +495,32 @@ fun LazyParallaxToolbarWithScrollControlScreen() {
                             .padding(horizontal = 12.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                        )
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        ),
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column {
                                 Text(
                                     text = "Scroll Item ${index + 1}",
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer,
                                 )
                                 Text(
                                     text = "Custom fling behavior and scroll control",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
                                 )
                             }
                             Icon(
                                 imageVector = Icons.Default.Share,
                                 contentDescription = "Action",
-                                tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.6f)
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.6f),
                             )
                         }
                     }
@@ -531,16 +530,16 @@ fun LazyParallaxToolbarWithScrollControlScreen() {
                 contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                userScrollEnabled = true
+                userScrollEnabled = true,
             ),
-            lazyListState = rememberLazyListState()
+            lazyListState = rememberLazyListState(),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -549,13 +548,12 @@ fun LazyParallaxToolbarWithScrollControlScreen() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
-
 
 @Composable
 fun ScaffoldIntegrationWithPaddingPreview1() {
@@ -565,13 +563,13 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                 BottomAppBar {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         repeat(4) { index ->
                             IconButton(onClick = {}) {
                                 Icon(
                                     imageVector = Icons.Default.Share,
-                                    contentDescription = "Tab ${index + 1}"
+                                    contentDescription = "Tab ${index + 1}",
                                 )
                             }
                         }
@@ -582,10 +580,10 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                 FloatingActionButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "FAB"
+                        contentDescription = "FAB",
                     )
                 }
-            }
+            },
         ) { paddingValues ->
             // ✅ FIXED: Using contentPadding to respect Scaffold padding
             ComposeParallaxToolbarLayout(
@@ -595,7 +593,7 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                         text = "Scaffold Fixed",
                         fontSize = if (isCollapsed) 18.sp else 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 },
                 subtitleContent = { isCollapsed ->
@@ -603,7 +601,7 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                         Text(
                             text = "Content respects bottom bar padding",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = Color.White.copy(alpha = 0.8f),
                         )
                     }
                 },
@@ -614,32 +612,32 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
                                         Color(0xFF2196F3),
-                                        Color(0xFF1976D2)
-                                    )
-                                )
+                                        Color(0xFF1976D2),
+                                    ),
+                                ),
                             )
-                            .fillMaxSize()
+                            .fillMaxSize(),
                     )
                 },
                 content = ParallaxContent.Regular { isCollapsed ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(16.dp),
                     ) {
                         repeat(15) { index ->
                             Spacer(modifier = Modifier.height(16.dp))
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (index >= 12) Color(0xFF4CAF50) else MaterialTheme.colorScheme.surface
-                                )
+                                    containerColor = if (index >= 12) Color(0xFF4CAF50) else MaterialTheme.colorScheme.surface,
+                                ),
                             ) {
                                 Text(
                                     text = if (index >= 12) "✅ Last items don't hide behind bottom bar" else "Content item ${index + 1}",
                                     modifier = Modifier.padding(16.dp),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (index >= 12) Color.White else MaterialTheme.colorScheme.onSurface
+                                    color = if (index >= 12) Color.White else MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
@@ -650,7 +648,7 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                         )
                     }
                 },
@@ -659,15 +657,14 @@ fun ScaffoldIntegrationWithPaddingPreview1() {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Share",
-                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                         )
                     }
-                }
+                },
             )
         }
     }
 }
-
 
 @Composable
 fun ScaffoldIntegrationWithoutPaddingPreview1() {
@@ -677,13 +674,13 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                 BottomAppBar {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         repeat(4) { index ->
                             IconButton(onClick = {}) {
                                 Icon(
                                     imageVector = Icons.Default.Share,
-                                    contentDescription = "Tab ${index + 1}"
+                                    contentDescription = "Tab ${index + 1}",
                                 )
                             }
                         }
@@ -694,10 +691,10 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                 FloatingActionButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "FAB"
+                        contentDescription = "FAB",
                     )
                 }
-            }
+            },
         ) { paddingValues ->
             // ❌ BROKEN: NOT using contentPadding (old behavior)
             ComposeParallaxToolbarLayout(
@@ -707,7 +704,7 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                         text = "Scaffold Broken",
                         fontSize = if (isCollapsed) 18.sp else 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 },
                 subtitleContent = { isCollapsed ->
@@ -715,7 +712,7 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                         Text(
                             text = "Content draws behind bottom bar",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = Color.White.copy(alpha = 0.8f),
                         )
                     }
                 },
@@ -726,32 +723,32 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
                                         Color(0xFFFF5722),
-                                        Color(0xFFD84315)
-                                    )
-                                )
+                                        Color(0xFFD84315),
+                                    ),
+                                ),
                             )
-                            .fillMaxSize()
+                            .fillMaxSize(),
                     )
                 },
                 content = ParallaxContent.Regular { isCollapsed ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(16.dp),
                     ) {
                         repeat(15) { index ->
                             Spacer(modifier = Modifier.height(16.dp))
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (index >= 12) Color(0xFFFF5722) else MaterialTheme.colorScheme.surface
-                                )
+                                    containerColor = if (index >= 12) Color(0xFFFF5722) else MaterialTheme.colorScheme.surface,
+                                ),
                             ) {
                                 Text(
                                     text = if (index >= 12) "❌ Last items hide behind bottom bar" else "Content item ${index + 1}",
                                     modifier = Modifier.padding(16.dp),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (index >= 12) Color.White else MaterialTheme.colorScheme.onSurface
+                                    color = if (index >= 12) Color.White else MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
@@ -762,7 +759,7 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                         )
                     }
                 },
@@ -771,10 +768,10 @@ fun ScaffoldIntegrationWithoutPaddingPreview1() {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Share",
-                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                            tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                         )
                     }
-                }
+                },
             )
         }
     }

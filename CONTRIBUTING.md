@@ -57,6 +57,15 @@ unrecorded change. Configuration types are plain classes on purpose; when adding
 it with a default, extend `equals`, `hashCode`, `toString` and `copy`, and keep the previous
 `copy` overload.
 
+## Code style
+
+ktlint with the IntelliJ style runs in CI; the rules are in `.editorconfig`. Format before
+committing:
+
+```bash
+./gradlew ktlintFormat
+```
+
 ## Generated docs
 
 `docs/RECIPES.md`, `llms.txt` and `llms-full.txt` are generated. After changing a recipe in

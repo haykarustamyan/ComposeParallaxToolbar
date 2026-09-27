@@ -43,7 +43,7 @@ class StateRestorationTest {
                 content = ParallaxContent.Regular {
                     Column { repeat(60) { i -> BasicText("Row $i", Modifier.height(48.dp)) } }
                 },
-                state = state
+                state = state,
             )
         }
         rule.runOnIdle { runBlocking { state.collapse(animated = false) } }

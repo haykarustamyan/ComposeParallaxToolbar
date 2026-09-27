@@ -17,6 +17,8 @@ need one edit or none.
 - `ParallaxToolbarState` from `rememberParallaxToolbarState()`: `collapseFraction`, `isCollapsed`, `collapse()`, `expand()`, `layoutInfo`, and the scroll states for both content kinds. The collapse fraction is saved across configuration changes and process death.
 - `ParallaxToolbarScope` as the receiver of every slot, with `collapseFraction`, `isCollapsed`, `state`, `layoutInfo` and the per-element modifiers `parallax()`, `fadeOnCollapse()`, `scaleOnCollapse()` and `moveBetween()`. The `actions` slot receives a `ParallaxActionsScope` that is also a `RowScope`. Existing `{ collapsed -> }` lambdas compile unchanged.
 - `overlayContent` slot above the body and toolbar, for elements that travel into the toolbar.
+- `Modifier.pin()` for header elements that stay in view until the header's bottom edge reaches them, such as a chip row.
+- `snapThreshold` on the header config decides where a plain release settles; `collapseEnabled` on the layout locks the header while the body keeps scrolling.
 - `bottomContent` slot pinned under the toolbar, for tabs or a search field.
 - Overscroll stretch: `stretchEnabled` and `stretchTriggerDistance` on the header config, with an `onStretchTrigger` callback for pull-to-refresh.
 - Header config: `parallaxMultiplier` and `fadeOnCollapse`. Toolbar config: `height` and `alwaysElevated`. Title config: `collapsedScale` and `collapsedAlignment`. `maxHeight` on `HeaderHeight.Percentage` and `HeaderHeight.AspectRatio`.
@@ -36,6 +38,7 @@ need one edit or none.
 - The header fades over the collapse range rather than its full height, so it is fully hidden once covered.
 - Configuration types are plain `@Immutable` classes with `copy`, `equals`, `hashCode` and `toString` instead of data classes, so fields can be added without breaking compiled consumers.
 - Explicit API mode with a checked-in ABI dump verified in CI; API docs generated into the javadoc jar.
+- ktlint in CI with the IntelliJ code style, and a root `AGENTS.md` for coding agents working on the library.
 - Toolchain: Kotlin 2.4.20, Compose Multiplatform 1.12.1, Gradle 9.7.0, Android Gradle Plugin 9.3.3 with the `com.android.kotlin.multiplatform.library` plugin, Maven Publish Plugin 0.37.0. Minimum iOS is 15.0.
 
 ### Removed

@@ -1,7 +1,6 @@
 package am.highapps.parallaxtoolbar.sample
 
 import am.highapps.parallaxtoolbar.*
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +47,7 @@ fun AspectRatioHeaderSample() {
                 text = "Video Gallery",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         subtitleContent = { isCollapsed ->
@@ -56,7 +55,7 @@ fun AspectRatioHeaderSample() {
                 Text(
                     text = "16:9 aspect ratio header",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f),
                 )
             }
         },
@@ -67,30 +66,30 @@ fun AspectRatioHeaderSample() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF1976D2),
-                                Color(0xFF1565C0)
-                            )
-                        )
+                                Color(0xFF1565C0),
+                            ),
+                        ),
                     )
                     .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = "🎬",
-                        style = MaterialTheme.typography.displayLarge
+                        style = MaterialTheme.typography.displayLarge,
                     )
                     Text(
                         text = "16:9 Video Header",
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                 }
             }
         },
         headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-            aspectRatio = 16f / 9f
+            aspectRatio = 16f / 9f,
         ),
         content = ParallaxContent.Lazy(
             content = { isCollapsed ->
@@ -98,52 +97,52 @@ fun AspectRatioHeaderSample() {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(60.dp)
                                     .background(
                                         color = MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(8.dp)
+                                        shape = RoundedCornerShape(8.dp),
                                     ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = "▶",
                                     color = Color.White,
-                                    style = MaterialTheme.typography.titleLarge
+                                    style = MaterialTheme.typography.titleLarge,
                                 )
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             Column {
                                 Text(
                                     text = "Video ${index + 1}",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
                                     text = "Aspect ratio header adapts to screen width",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 )
                             }
                         }
                     }
                 }
-            }
+            },
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -152,10 +151,10 @@ fun AspectRatioHeaderSample() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
 
@@ -171,7 +170,7 @@ fun PercentageHeaderSample() {
                 text = "Responsive Design",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         subtitleContent = { isCollapsed ->
@@ -179,7 +178,7 @@ fun PercentageHeaderSample() {
                 Text(
                     text = "40% of screen height - adapts to any device",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f),
                 )
             }
         },
@@ -190,49 +189,49 @@ fun PercentageHeaderSample() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF4CAF50),
-                                Color(0xFF388E3C)
-                            )
-                        )
+                                Color(0xFF388E3C),
+                            ),
+                        ),
                     )
                     .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = "📱",
-                        style = MaterialTheme.typography.displayLarge
+                        style = MaterialTheme.typography.displayLarge,
                     )
                     Text(
                         text = "40% Screen Height",
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
                         text = "Works on all devices",
                         color = Color.White.copy(alpha = 0.8f),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
         },
         headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
-            heightPercentage = 0.4f
+            heightPercentage = 0.4f,
         ),
         content = ParallaxContent.Regular { isCollapsed ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         text = "📊 Benefits of percentage-based headers:",
                         modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
 
@@ -241,27 +240,27 @@ fun PercentageHeaderSample() {
                     "Adapts to screen size",
                     "Perfect for responsive design",
                     "Works on phones and tablets",
-                    "Maintains visual hierarchy"
+                    "Maintains visual hierarchy",
                 )
 
                 benefits.forEachIndexed { index, benefit ->
                     Spacer(modifier = Modifier.height(12.dp))
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = "✓",
                                 color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.titleLarge,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = benefit,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -270,12 +269,12 @@ fun PercentageHeaderSample() {
                 repeat(5) { index ->
                     Spacer(modifier = Modifier.height(16.dp))
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = "Additional content ${index + 1}",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }
@@ -286,7 +285,7 @@ fun PercentageHeaderSample() {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -295,10 +294,10 @@ fun PercentageHeaderSample() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
 
@@ -314,7 +313,7 @@ fun SquareHeaderSample() {
                 text = "Profile",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         subtitleContent = { isCollapsed ->
@@ -322,7 +321,7 @@ fun SquareHeaderSample() {
                 Text(
                     text = "Square header perfect for profiles",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f),
                 )
             }
         },
@@ -333,46 +332,46 @@ fun SquareHeaderSample() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF9C27B0),
-                                Color(0xFF7B1FA2)
-                            )
-                        )
+                                Color(0xFF7B1FA2),
+                            ),
+                        ),
                     )
                     .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Box(
                         modifier = Modifier
                             .size(120.dp)
                             .background(
                                 color = Color.White.copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(60.dp)
+                                shape = RoundedCornerShape(60.dp),
                             ),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "👤",
-                            style = MaterialTheme.typography.displayLarge
+                            style = MaterialTheme.typography.displayLarge,
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "John Doe",
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
                         text = "1:1 Square Header",
                         color = Color.White.copy(alpha = 0.8f),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
         },
         headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-            aspectRatio = 1f
+            aspectRatio = 1f,
         ),
         content = ParallaxContent.Lazy(
             content = { isCollapsed ->
@@ -380,10 +379,10 @@ fun SquareHeaderSample() {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
                         ) {
                             Text(
                                 text = when (index) {
@@ -393,26 +392,26 @@ fun SquareHeaderSample() {
                                     3 -> "📍 Location: San Francisco, CA"
                                     else -> "📋 Profile item ${index - 3}"
                                 },
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                             if (index < 4) {
                                 Text(
                                     text = "Square headers work great for profile content",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 )
                             }
                         }
                     }
                 }
-            }
+            },
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -421,10 +420,10 @@ fun SquareHeaderSample() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
 
@@ -440,7 +439,7 @@ fun CompactHeaderSample() {
                 text = "Compact Design",
                 fontSize = if (isCollapsed) 18.sp else 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         subtitleContent = { isCollapsed ->
@@ -448,7 +447,7 @@ fun CompactHeaderSample() {
                 Text(
                     text = "25% header - more space for content",
                     fontSize = 13.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f),
                 )
             }
         },
@@ -459,22 +458,22 @@ fun CompactHeaderSample() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFFFF5722),
-                                Color(0xFFE64A19)
-                            )
-                        )
+                                Color(0xFFE64A19),
+                            ),
+                        ),
                     )
                     .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = "Compact Header (25%)",
                     color = Color.White,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             }
         },
         headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
-            heightPercentage = 0.25f
+            heightPercentage = 0.25f,
         ),
         content = ParallaxContent.Lazy(
             content = { isCollapsed ->
@@ -482,29 +481,29 @@ fun CompactHeaderSample() {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                     ) {
                         Text(
                             text = "Compact list item ${index + 1} - More content fits on screen with smaller headers",
                             modifier = Modifier.padding(12.dp),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
             },
             config = ParallaxToolbarDefaults.lazyColumnConfig(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            )
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ),
         ),
         navigationIcon = { isCollapsed ->
             IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }
 
@@ -520,7 +519,7 @@ fun UltrawideHeaderSample() {
                 text = "Cinema Mode",
                 fontSize = if (isCollapsed) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
             )
         },
         subtitleContent = { isCollapsed ->
@@ -528,7 +527,7 @@ fun UltrawideHeaderSample() {
                 Text(
                     text = "21:9 ultrawide cinematic experience",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f),
                 )
             }
         },
@@ -539,49 +538,49 @@ fun UltrawideHeaderSample() {
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF37474F),
-                                Color(0xFF263238)
-                            )
-                        )
+                                Color(0xFF263238),
+                            ),
+                        ),
                     )
                     .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = "🎭",
-                        style = MaterialTheme.typography.displayLarge
+                        style = MaterialTheme.typography.displayLarge,
                     )
                     Text(
                         text = "21:9 Ultrawide",
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
                         text = "Cinematic proportions",
                         color = Color.White.copy(alpha = 0.8f),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
         },
         headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-            aspectRatio = 21f / 9f
+            aspectRatio = 21f / 9f,
         ),
         content = ParallaxContent.Regular { isCollapsed ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         text = "🎬 Movie Collection",
                         modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 }
 
@@ -590,42 +589,42 @@ fun UltrawideHeaderSample() {
                     "The Dark Knight",
                     "Interstellar",
                     "Mad Max: Fury Road",
-                    "Dune"
+                    "Dune",
                 )
 
                 movies.forEachIndexed { index, movie ->
                     Spacer(modifier = Modifier.height(12.dp))
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(50.dp)
                                     .background(
                                         color = MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(8.dp)
+                                        shape = RoundedCornerShape(8.dp),
                                     ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = "🎥",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             Column {
                                 Text(
                                     text = movie,
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
                                     text = "Ultrawide aspect ratio perfect for cinematic content",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 )
                             }
                         }
@@ -638,7 +637,7 @@ fun UltrawideHeaderSample() {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
         },
@@ -647,9 +646,9 @@ fun UltrawideHeaderSample() {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             }
-        }
+        },
     )
 }

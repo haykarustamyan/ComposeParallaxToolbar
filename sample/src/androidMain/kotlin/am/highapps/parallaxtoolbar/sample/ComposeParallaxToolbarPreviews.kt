@@ -1,7 +1,6 @@
 package am.highapps.parallaxtoolbar.sample
 
 import am.highapps.parallaxtoolbar.*
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +39,7 @@ import androidx.compose.ui.unit.sp
     name = "Regular Content",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun RegularContentPreview() {
@@ -51,7 +50,7 @@ fun RegularContentPreview() {
                     text = "Regular Content Example",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             headerContent = {
@@ -61,29 +60,29 @@ fun RegularContentPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.tertiary
-                                )
-                            )
+                                    MaterialTheme.colorScheme.tertiary,
+                                ),
+                            ),
                         )
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 )
             },
             content = ParallaxContent.Regular {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     repeat(10) { index ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp)
+                                .padding(vertical = 8.dp),
                         ) {
                             Text(
                                 text = "Content item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -93,10 +92,10 @@ fun RegularContentPreview() {
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -105,7 +104,7 @@ fun RegularContentPreview() {
     name = "Lazy Content",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun LazyContentPreview() {
@@ -116,7 +115,7 @@ fun LazyContentPreview() {
                     text = "Lazy Content Example",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             headerContent = {
@@ -126,11 +125,11 @@ fun LazyContentPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF4CAF50),
-                                    Color(0xFF388E3C)
-                                )
-                            )
+                                    Color(0xFF388E3C),
+                                ),
+                            ),
                         )
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 )
             },
             content = ParallaxContent.Lazy(
@@ -139,31 +138,31 @@ fun LazyContentPreview() {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Column(
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.padding(16.dp),
                             ) {
                                 Text(
                                     text = "Lazy Item ${index + 1}",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
                                     text = "This is a lazy-loaded item that performs well with large lists",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 )
                             }
                         }
                     }
                 },
-                lazyListState = rememberLazyListState()
+                lazyListState = rememberLazyListState(),
             ),
             navigationIcon = { isCollapsed ->
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
                     )
                 }
             },
@@ -171,10 +170,10 @@ fun LazyContentPreview() {
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.Default.Share,
-                        contentDescription = "Share"
+                        contentDescription = "Share",
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -183,7 +182,7 @@ fun LazyContentPreview() {
     name = "Lazy Content with Custom Padding",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun LazyContentWithPaddingPreview() {
@@ -194,7 +193,7 @@ fun LazyContentWithPaddingPreview() {
                     text = "Custom Padding",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             headerContent = {
@@ -204,11 +203,11 @@ fun LazyContentWithPaddingPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF673AB7),
-                                    Color(0xFF512DA8)
-                                )
-                            )
+                                    Color(0xFF512DA8),
+                                ),
+                            ),
                         )
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 )
             },
             content = ParallaxContent.Lazy(
@@ -216,30 +215,30 @@ fun LazyContentWithPaddingPreview() {
                     items(20) { index ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
                         ) {
                             Text(
                                 text = "Padded Item ${index + 1}",
                                 modifier = Modifier.padding(20.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
                 },
                 config = ParallaxToolbarDefaults.lazyColumnConfig(
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ),
-                lazyListState = rememberLazyListState()
+                lazyListState = rememberLazyListState(),
             ),
             navigationIcon = { isCollapsed ->
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -248,7 +247,7 @@ fun LazyContentWithPaddingPreview() {
     name = "Lazy Content Center Aligned",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun LazyContentCenterAlignedPreview() {
@@ -259,7 +258,7 @@ fun LazyContentCenterAlignedPreview() {
                     text = "Center Aligned",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             headerContent = {
@@ -269,11 +268,11 @@ fun LazyContentCenterAlignedPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF00BCD4),
-                                    Color(0xFF0097A7)
-                                )
-                            )
+                                    Color(0xFF0097A7),
+                                ),
+                            ),
                         )
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 )
             },
             content = ParallaxContent.Lazy(
@@ -283,19 +282,19 @@ fun LazyContentCenterAlignedPreview() {
                             modifier = Modifier.padding(horizontal = 32.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                            )
+                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                            ),
                         ) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(24.dp),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = "Centered ${index + 1}",
                                     style = MaterialTheme.typography.headlineSmall,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                             }
                         }
@@ -304,18 +303,18 @@ fun LazyContentCenterAlignedPreview() {
                 config = ParallaxToolbarDefaults.lazyColumnConfig(
                     contentPadding = PaddingValues(vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ),
-                lazyListState = rememberLazyListState()
+                lazyListState = rememberLazyListState(),
             ),
             navigationIcon = { isCollapsed ->
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
                     )
                 }
-            }
+            },
         )
     }
-} 
+}

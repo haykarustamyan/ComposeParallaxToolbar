@@ -33,7 +33,7 @@ class MouseWheelTest : UiTestBase() {
                 content = ParallaxContent.Regular {
                     Column(Modifier.testTag("body")) { repeat(60) { Box(Modifier.height(48.dp)) } }
                 },
-                state = state
+                state = state,
             )
         }
         // Wheel over the body: collapse, then back up past the top.

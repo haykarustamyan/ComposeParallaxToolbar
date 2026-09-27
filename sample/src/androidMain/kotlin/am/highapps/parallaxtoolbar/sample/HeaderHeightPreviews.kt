@@ -1,7 +1,6 @@
 package am.highapps.parallaxtoolbar.sample
 
 import am.highapps.parallaxtoolbar.*
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +37,7 @@ import androidx.compose.ui.unit.sp
     name = "Fixed Height Header",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun FixedHeightHeaderPreview() {
@@ -49,7 +48,7 @@ fun FixedHeightHeaderPreview() {
                     text = "Fixed Height (450dp)",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             subtitleContent = { isCollapsed ->
@@ -57,7 +56,7 @@ fun FixedHeightHeaderPreview() {
                     Text(
                         text = "Traditional fixed height approach",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.8f),
                     )
                 }
             },
@@ -68,48 +67,48 @@ fun FixedHeightHeaderPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF2196F3),
-                                    Color(0xFF1976D2)
-                                )
-                            )
+                                    Color(0xFF1976D2),
+                                ),
+                            ),
                         )
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "450dp Fixed Height",
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineMedium,
                     )
                 }
             },
             headerConfig = ParallaxToolbarDefaults.headerConfig(
-                height = HeaderHeight.Fixed(450.dp)
+                height = HeaderHeight.Fixed(450.dp),
             ),
             content = ParallaxContent.Regular {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = "Fixed height works well for consistent layouts but may not adapt well to different screen sizes.",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
 
                     repeat(8) { index ->
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 text = "Content item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -120,10 +119,10 @@ fun FixedHeightHeaderPreview() {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -132,7 +131,7 @@ fun FixedHeightHeaderPreview() {
     name = "Aspect Ratio Header (16:9)",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun AspectRatioHeaderPreview() {
@@ -143,7 +142,7 @@ fun AspectRatioHeaderPreview() {
                     text = "Aspect Ratio Header",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             subtitleContent = { isCollapsed ->
@@ -151,7 +150,7 @@ fun AspectRatioHeaderPreview() {
                     Text(
                         text = "16:9 aspect ratio - adapts to screen width",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.8f),
                     )
                 }
             },
@@ -162,57 +161,58 @@ fun AspectRatioHeaderPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF4CAF50),
-                                    Color(0xFF388E3C)
-                                )
-                            )
+                                    Color(0xFF388E3C),
+                                ),
+                            ),
                         )
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "16:9 Aspect Ratio",
                             color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
                         )
                         Text(
                             text = "Adapts to screen width",
                             color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
             },
             headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-                aspectRatio = 16f / 9f
+                aspectRatio = 16f / 9f,
             ),
             content = ParallaxContent.Regular {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Aspect ratio headers maintain consistent proportions across different screen sizes, making them ideal for video-like layouts.",
+                            text = "Aspect ratio headers maintain consistent proportions across different screen sizes, " +
+                                "making them ideal for video-like layouts.",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
 
                     repeat(8) { index ->
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 text = "Content item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -223,10 +223,10 @@ fun AspectRatioHeaderPreview() {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -235,7 +235,7 @@ fun AspectRatioHeaderPreview() {
     name = "Percentage Height Header (40%)",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun PercentageHeightHeaderPreview() {
@@ -246,7 +246,7 @@ fun PercentageHeightHeaderPreview() {
                     text = "Percentage Header",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             subtitleContent = { isCollapsed ->
@@ -254,7 +254,7 @@ fun PercentageHeightHeaderPreview() {
                     Text(
                         text = "40% of screen height - responsive design",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.8f),
                     )
                 }
             },
@@ -265,57 +265,58 @@ fun PercentageHeightHeaderPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF9C27B0),
-                                    Color(0xFF7B1FA2)
-                                )
-                            )
+                                    Color(0xFF7B1FA2),
+                                ),
+                            ),
                         )
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "40% Screen Height",
                             color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
                         )
                         Text(
                             text = "Responsive to device",
                             color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
             },
             headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
-                heightPercentage = 0.4f
+                heightPercentage = 0.4f,
             ),
             content = ParallaxContent.Regular {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Percentage-based headers ensure consistent relative sizing across all devices, perfect for responsive designs.",
+                            text = "Percentage-based headers ensure consistent relative sizing across all devices, " +
+                                "perfect for responsive designs.",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
 
                     repeat(8) { index ->
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 text = "Content item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -326,10 +327,10 @@ fun PercentageHeightHeaderPreview() {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -338,7 +339,7 @@ fun PercentageHeightHeaderPreview() {
     name = "Square Aspect Ratio Header (1:1)",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun SquareAspectRatioHeaderPreview() {
@@ -349,7 +350,7 @@ fun SquareAspectRatioHeaderPreview() {
                     text = "Square Header",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             subtitleContent = { isCollapsed ->
@@ -357,7 +358,7 @@ fun SquareAspectRatioHeaderPreview() {
                     Text(
                         text = "1:1 square aspect ratio",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.8f),
                     )
                 }
             },
@@ -368,31 +369,31 @@ fun SquareAspectRatioHeaderPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFFFF9800),
-                                    Color(0xFFF57C00)
-                                )
-                            )
+                                    Color(0xFFF57C00),
+                                ),
+                            ),
                         )
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "Square",
                             color = Color.White,
-                            style = MaterialTheme.typography.headlineLarge
+                            style = MaterialTheme.typography.headlineLarge,
                         )
                         Text(
                             text = "1:1 Ratio",
                             color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.headlineSmall
+                            style = MaterialTheme.typography.headlineSmall,
                         )
                     }
                 }
             },
             headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-                aspectRatio = 1f
+                aspectRatio = 1f,
             ),
             content = ParallaxContent.Lazy(
                 content = { isCollapsed ->
@@ -400,23 +401,23 @@ fun SquareAspectRatioHeaderPreview() {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Text(
                                 text = "Lazy item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
-                }
+                },
             ),
             navigationIcon = { isCollapsed ->
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
             },
@@ -425,10 +426,10 @@ fun SquareAspectRatioHeaderPreview() {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -437,7 +438,7 @@ fun SquareAspectRatioHeaderPreview() {
     name = "Ultrawide Aspect Ratio Header (21:9)",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun UltrawideAspectRatioHeaderPreview() {
@@ -448,7 +449,7 @@ fun UltrawideAspectRatioHeaderPreview() {
                     text = "Ultrawide Header",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             subtitleContent = { isCollapsed ->
@@ -456,7 +457,7 @@ fun UltrawideAspectRatioHeaderPreview() {
                     Text(
                         text = "21:9 ultrawide aspect ratio",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.8f),
                     )
                 }
             },
@@ -467,57 +468,57 @@ fun UltrawideAspectRatioHeaderPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF607D8B),
-                                    Color(0xFF455A64)
-                                )
-                            )
+                                    Color(0xFF455A64),
+                                ),
+                            ),
                         )
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "21:9 Ultrawide",
                             color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
                         )
                         Text(
                             text = "Cinematic proportions",
                             color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
             },
             headerConfig = ParallaxToolbarDefaults.headerConfigWithAspectRatio(
-                aspectRatio = 21f / 9f
+                aspectRatio = 21f / 9f,
             ),
             content = ParallaxContent.Regular {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = "Ultrawide aspect ratios like 21:9 create cinematic headers perfect for immersive content.",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
 
                     repeat(8) { index ->
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 text = "Content item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -528,10 +529,10 @@ fun UltrawideAspectRatioHeaderPreview() {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -540,7 +541,7 @@ fun UltrawideAspectRatioHeaderPreview() {
     name = "Small Percentage Header (25%)",
     showBackground = true,
     device = "spec:width=411dp,height=891dp",
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun SmallPercentageHeaderPreview() {
@@ -551,7 +552,7 @@ fun SmallPercentageHeaderPreview() {
                     text = "Compact Header",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             subtitleContent = { isCollapsed ->
@@ -559,7 +560,7 @@ fun SmallPercentageHeaderPreview() {
                     Text(
                         text = "25% of screen height - compact design",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.8f),
                     )
                 }
             },
@@ -570,31 +571,31 @@ fun SmallPercentageHeaderPreview() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFFE91E63),
-                                    Color(0xFFC2185B)
-                                )
-                            )
+                                    Color(0xFFC2185B),
+                                ),
+                            ),
                         )
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "Compact",
                             color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
                         )
                         Text(
                             text = "25% Height",
                             color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
             },
             headerConfig = ParallaxToolbarDefaults.headerConfigWithPercentage(
-                heightPercentage = 0.25f
+                heightPercentage = 0.25f,
             ),
             content = ParallaxContent.Lazy(
                 content = { isCollapsed ->
@@ -602,26 +603,26 @@ fun SmallPercentageHeaderPreview() {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Text(
                                 text = "Compact design item ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
                 },
                 config = ParallaxToolbarDefaults.lazyColumnConfig(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                )
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ),
             ),
             navigationIcon = { isCollapsed ->
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
             },
@@ -630,11 +631,10 @@ fun SmallPercentageHeaderPreview() {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }
-

@@ -1,7 +1,6 @@
 package am.highapps.parallaxtoolbar.sample
 
 import am.highapps.parallaxtoolbar.*
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,13 +42,13 @@ fun ParallaxToolbarInScaffoldScreen() {
             BottomAppBar {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     repeat(4) { index ->
                         IconButton(onClick = {}) {
                             Icon(
                                 imageVector = Icons.Default.Share,
-                                contentDescription = "Tab ${index + 1}"
+                                contentDescription = "Tab ${index + 1}",
                             )
                         }
                     }
@@ -60,10 +59,10 @@ fun ParallaxToolbarInScaffoldScreen() {
             FloatingActionButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "FAB"
+                    contentDescription = "FAB",
                 )
             }
-        }
+        },
     ) { paddingValues ->
         // Use the paddingValues from Scaffold to prevent content from drawing behind bottom bar
         ComposeParallaxToolbarLayout(
@@ -73,7 +72,7 @@ fun ParallaxToolbarInScaffoldScreen() {
                     text = "Scaffold Example",
                     fontSize = if (isCollapsed) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                    color = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                 )
             },
             headerContent = {
@@ -83,28 +82,28 @@ fun ParallaxToolbarInScaffoldScreen() {
                             brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color(0xFF2196F3),
-                                    Color(0xFF1976D2)
-                                )
-                            )
+                                    Color(0xFF1976D2),
+                                ),
+                            ),
                         )
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 )
             },
             content = ParallaxContent.Regular { isCollapsed ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     repeat(20) { index ->
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 text = "Content respects Scaffold padding ${index + 1}",
                                 modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -115,7 +114,7 @@ fun ParallaxToolbarInScaffoldScreen() {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
             },
@@ -124,10 +123,10 @@ fun ParallaxToolbarInScaffoldScreen() {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share",
-                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White
+                        tint = if (isCollapsed) MaterialTheme.colorScheme.onSurface else Color.White,
                     )
                 }
-            }
+            },
         )
     }
 }

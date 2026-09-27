@@ -12,7 +12,7 @@ fun main(args: Array<String>) = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Compose Parallax Toolbar",
-        state = WindowState(size = DpSize(480.dp, 900.dp))
+        state = WindowState(size = DpSize(480.dp, 900.dp)),
     ) {
         SampleApp(args.getOrNull(0) ?: "playground", args.getOrNull(1) ?: "default")
     }
