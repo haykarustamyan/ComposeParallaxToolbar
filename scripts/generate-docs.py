@@ -60,7 +60,7 @@ def write_llms():
 
 > Collapsing toolbar with a parallax header for Compose Multiplatform (Android, iOS, desktop, web). Version {v}. Maven coordinate `am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:{v}`. Depends only on Compose UI and Foundation; works with any design system.
 
-Mental model: one composable, `ComposeParallaxToolbarLayout`, with slots (`titleContent`, `headerContent`, `content`, optional `subtitleContent`, `navigationIcon`, `actions`, `overlayContent`, `bottomContent`). The body is a `ParallaxContent` (`Regular`, `Lazy`, or `Custom` for any scrollable). The header collapses through nested scrolling. Behavior is set through immutable configs built by `ParallaxToolbarDefaults`. State is hoisted in `rememberParallaxToolbarState()`; every slot runs in a `ParallaxToolbarScope` with `collapseFraction` and per-element modifiers.
+Mental model: one composable, `ComposeParallaxToolbarLayout`, with slots (`titleContent`, `headerContent`, `content`, optional `subtitleContent`, `navigationIcon`, `actions`, `overlayContent`, `bottomContent`). The body is a `ParallaxContent` (`Regular`, `Lazy`, or `Custom` for any scrollable). The header collapses through nested scrolling. Behavior is set through immutable configs built by `ParallaxToolbarDefaults`. State is hoisted in `rememberParallaxToolbarState()`; every slot runs in a `ParallaxToolbarScope` with `collapseFraction` and per-element modifiers (`parallax`, `fadeOnCollapse`, `scaleOnCollapse`, `pin`, `moveBetween`). The layout also takes `windowInsets` and `collapseEnabled`; the body config takes a `backgroundColor`.
 
 ## Docs
 

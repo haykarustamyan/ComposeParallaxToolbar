@@ -90,8 +90,9 @@ the state's `lazyListState` or `scrollState` feeds the adapter. See the
 ## Web
 
 Add the dependency to the `wasmJs` source set or `commonMain` and mount your screen with
-`ComposeViewport`. Wheel and touch input behave as on desktop and mobile. Resizing the browser
-window restarts the Compose viewport, which is standard Compose for Web behavior.
+`ComposeViewport`. Touch behaves as on mobile; wheel and trackpad behave as on desktop, including
+the two wheel notes above. Resizing the browser window restarts the Compose viewport, which is
+standard Compose for Web behavior.
 
 ## Insets and the toolbar height
 

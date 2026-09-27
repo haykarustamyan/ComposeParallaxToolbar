@@ -84,6 +84,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -579,7 +580,12 @@ private fun SampleCard(index: Int, collapsed: Boolean) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(cardTitles[index % cardTitles.size], fontWeight = FontWeight.SemiBold, maxLines = 1)
-                Text(cardLines[index % cardLines.size], style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                // Numbers first would be reordered by the bidi algorithm in RTL; keep the line LTR.
+                Text(
+                    cardLines[index % cardLines.size],
+                    style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Ltr),
+                    maxLines = 1,
+                )
             }
             Box(
                 Modifier.size(8.dp).background(

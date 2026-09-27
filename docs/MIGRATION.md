@@ -43,7 +43,9 @@
 
 ## New in 2.0 worth adopting
 
-`ParallaxContent.Custom` for grids, `ScrollMode`, `snapOnRelease`, per-element modifiers with the
-`overlayContent` slot, `bottomContent` for tabs, `stretchEnabled` with `onStretchTrigger`,
-`collapsedAlignment`, `maxHeight` on relative header heights, and `semanticsConfig` for
-localized accessibility strings. All are described in the [API reference](API.md).
+`ParallaxContent.Custom` for grids, `ScrollMode`, `snapOnRelease` with `snapThreshold`,
+per-element modifiers including `pin` and the `overlayContent` slot, `bottomContent` for tabs,
+`stretchEnabled` with `onStretchTrigger`, `collapsedAlignment`, `maxHeight` on relative header
+heights, `windowInsets` and `collapseEnabled` on the layout, `animationSpec` and
+`backgroundColor` on the configs, and `semanticsConfig` for localized accessibility strings.
+All are described in the [API reference](API.md).

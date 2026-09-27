@@ -32,12 +32,12 @@ configured through immutable config objects.
 | **Any scrollable body** | A column, a `LazyColumn`, or anything else that scrolls: grids, staggered grids, pagers. The header collapses through nested scrolling. |
 | **Scroll modes** | Exit until collapsed, enter always, or enter always collapsed with the toolbar sliding away. Optional snap on release. |
 | **Header height** | A fixed size, an aspect ratio or a fraction of the screen, each with a cap. |
-| **Per-element behaviors** | Give any header element its own parallax, fade or scale, and glide elements such as an avatar from the header into the toolbar. |
+| **Per-element behaviors** | Give any header element its own parallax, fade or scale, pin a chip row so it stays in view as long as possible, and glide elements such as an avatar from the header into the toolbar. |
 | **Bottom slot** | Tabs or a search field pinned under the toolbar. |
 | **Overscroll stretch** | With a trigger callback for pull-to-refresh. |
 | **Hoisted state** | The collapse fraction, `collapse()` and `expand()`, saved across configuration changes and process death. |
 | **Accessibility** | State announcements, expand and collapse actions, reading order, a heading for the title. |
-| **Platforms** | Right-to-left layouts, edge-to-edge insets and the iPhone status bar handled for you. |
+| **Platforms** | Right-to-left layouts, window insets and display cutouts, the iPhone status bar, and mouse wheel and trackpad on desktop and web handled for you. |
 
 ## Installation
 
@@ -120,13 +120,16 @@ ComposeParallaxToolbarLayout(
 
 | Config | What it controls |
 |---|---|
-| `headerConfig` | Height, gradient, initial state, parallax factor, scroll mode, snap, fade, stretch |
+| `headerConfig` | Height, gradient, initial state, parallax factor, scroll mode, snap and its threshold, fade, stretch, animation spec |
 | `toolbarConfig` | Colors and their animation, elevation, height |
 | `titleConfig` | Title and subtitle padding, collapsed scale and alignment, subtitle behavior |
-| `bodyConfig` | Extra space after the content |
+| `bodyConfig` | Extra space after the content and the background behind it |
 | `semanticsConfig` | Strings announced to screen readers |
 
-The [API reference](docs/API.md) lists every parameter and default.
+Two parameters sit on the layout itself: `windowInsets`, which defaults to the status bar plus
+the display cutout and takes `WindowInsets(0)` when the layout does not touch the window edge,
+and `collapseEnabled`, which locks the header for loading or editing states. The
+[API reference](docs/API.md) lists every parameter and default.
 
 ## Scroll modes
 
@@ -203,6 +206,7 @@ headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fad
 headerContent = {
     Image(cover, null, Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse())
     Text("Est. 1998", Modifier.align(Alignment.BottomEnd).scaleOnCollapse(0.6f).fadeOnCollapse())
+    ChipRow(Modifier.align(Alignment.BottomStart).pin(stopAtTop = true))  // stays in view until the header's edge reaches it
 }
 ```
 
@@ -223,9 +227,11 @@ current signatures, the rules that matter, and the 1.x habits to avoid.
 
 ## Sample app
 
-The `sample` module is an interactive playground shared by Android, iOS, desktop and web. Every
-option above is a switch or slider in its configuration sheet, and the library's fixed sample
-screens are one tap away. See [sample/README.md](sample/README.md) for how to run each host.
+The `sample` module is an interactive playground shared by Android, iOS, desktop and web. It
+opens on a photo header with the library defaults; a bar at the bottom moves the header, shows
+the collapse progress and switches the scroll mode, and its gear opens a sheet with presets,
+the fixed example screens and every setting. See [sample/README.md](sample/README.md) for how
+to run each host.
 
 ## Compatibility
 

@@ -76,7 +76,7 @@ sealed class ParallaxContent {
   pagers all work.
 
 The header collapses through nested scrolling: scrolling up collapses it before the body scrolls,
-and a drag that starts on the header collapses it directly. When it expands depends on the
+and a drag that starts on the header or the toolbar collapses it directly. When it expands depends on the
 [ScrollMode](#scrollmode).
 
 ## ParallaxToolbarState

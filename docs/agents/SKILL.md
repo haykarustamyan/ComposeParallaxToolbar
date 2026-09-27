@@ -37,14 +37,15 @@ ComposeParallaxToolbarLayout(
 1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size.
 2. Configure through `ParallaxToolbarDefaults.headerConfig / toolbarConfig / titleConfig / bodyConfig / lazyColumnConfig / semanticsConfig`. Do not construct config classes by hand unless you need to.
 3. Header height: `HeaderHeight.Fixed(dp)`, `HeaderHeight.AspectRatio(ratio, maxHeight)`, `HeaderHeight.Percentage(fraction 0..1, maxHeight)`; or the `headerConfigWithAspectRatio` / `headerConfigWithPercentage` factories.
-4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true, snapThreshold = 0.5f)`. `collapseEnabled = false` on the layout locks the header for loading or editing states.
+4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true, snapThreshold = 0.5f)`. Turn `snapOnRelease` on for desktop and web screens, where wheel input has no fling. `collapseEnabled = false` on the layout locks the header for loading or editing states.
 5. Programmatic control: `val state = rememberParallaxToolbarState()`; `state.collapseFraction`, `state.isCollapsed`, `scope.launch { state.collapse() }`, `state.expand()`. The body keeps its own scroll position; use `state.scrollState` or `state.lazyListState` to scroll it.
 6. Inside any slot, `collapseFraction`, `isCollapsed`, `state` and `layoutInfo` are available from the scope. Read `collapseFraction` inside `graphicsLayer { }` for per-frame effects, not in composition.
 7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`, `.pin(stopAtTop)` for an element that stays put until the header's bottom edge reaches it. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
-8. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset. If the layout does not touch the window edge (dialog, bottom sheet, split pane), pass `windowInsets = WindowInsets(0)`. The layout needs a bounded height: never place it in a vertically scrolling parent.
-9. Animation: `headerConfig(animationSpec = ...)` sets the spring used for snaps, stretch releases and `collapse()`/`expand()`; both also accept a per-call `animationSpec`. `state.isScrollInProgress` is true while the header moves.
-10. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
-11. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
+8. Body background: the body slides over the header, so give it the screen background with `bodyConfig(backgroundColor = MaterialTheme.colorScheme.background)` unless every item paints its own.
+9. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset. If the layout does not touch the window edge (dialog, bottom sheet, split pane), pass `windowInsets = WindowInsets(0)`. The layout needs a bounded height: never place it in a vertically scrolling parent.
+10. Animation: `headerConfig(animationSpec = ...)` sets the spring used for snaps, stretch releases and `collapse()`/`expand()`; both also accept a per-call `animationSpec`. `state.isScrollInProgress` is true while the header moves.
+11. iOS: expose the screen with `ComposeUIViewController` from the shared module and add `CADisableMinimumFrameDurationOnPhone = true` to Info.plist, or the app crashes at launch.
+12. Validation: invalid values throw `IllegalArgumentException` at construction with a message that names the field and the valid range.
 
 ## Mistakes to avoid (1.x habits)
 
@@ -57,5 +58,5 @@ ComposeParallaxToolbarLayout(
 ## Where to look
 
 - `docs/API.md` for every parameter and default.
-- `docs/RECIPES.md` for complete screens: list, grid, profile with avatar, tabs, pull-to-refresh, Scaffold, centered title, programmatic control, iOS hosting.
+- `docs/RECIPES.md` for complete screens: list, grid, profile with avatar, tabs, pull-to-refresh, Scaffold, centered title, programmatic control, iOS hosting, desktop scrollbar.
 - `docs/PLATFORMS.md` for platform specifics. `docs/MIGRATION.md` for 1.x upgrades.
