@@ -12,7 +12,7 @@ Thanks for helping. Bug reports, feature requests and pull requests are all welc
 
 ## Setup
 
-Requirements: JDK 17 or newer, Android SDK with API 37, and Xcode for the iOS targets.
+Requirements: JDK 21 or newer, Android SDK with API 37, and Xcode for the iOS targets.
 
 ```bash
 git clone https://github.com/haykarustamyan/ComposeParallaxToolbar.git

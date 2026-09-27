@@ -173,7 +173,7 @@ screens are one tap away. See [sample/README.md](sample/README.md) for how to ru
 | Compose Multiplatform | 1.12.1 |
 | Android | API 24+ |
 | iOS | 15.0+, arm64 devices and Apple Silicon simulators |
-| Desktop | JVM 17+ |
+| Desktop | JVM 21+ |
 | Web | Kotlin/Wasm |
 
 The library depends only on `org.jetbrains.compose.ui:ui` and `org.jetbrains.compose.foundation:foundation`.
