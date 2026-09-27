@@ -2,19 +2,19 @@
 
 # ComposeParallaxToolbar
 
-**A collapsing toolbar with a parallax header for Compose Multiplatform.**<br>
-Android · iOS · Desktop · Web
+**Collapsing toolbar layout for Compose Multiplatform.**<br>
+<sub>Parallax header · any scrollable body · scroll modes · pinned tabs · pull-to-refresh · elements that move into the toolbar</sub>
 
 [![Maven Central](https://img.shields.io/maven-central/v/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp?label=Maven%20Central&color=4c8cff)](https://central.sonatype.com/artifact/am.highapps.parallaxtoolbar/compose-parallax-toolbar-kmp)
-[![CI](https://github.com/haykarustamyan/ComposeParallaxToolbar/actions/workflows/gradle.yml/badge.svg)](https://github.com/haykarustamyan/ComposeParallaxToolbar/actions/workflows/gradle.yml)
-[![Docs](https://img.shields.io/badge/docs-site-2ea44f.svg)](https://haykarustamyan.github.io/ComposeParallaxToolbar/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7f52ff.svg?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12.1-4285f4.svg)](https://github.com/JetBrains/compose-multiplatform)
+[![Platforms](https://img.shields.io/badge/Android%20%C2%B7%20iOS%20%C2%B7%20Desktop%20%C2%B7%20Web-2ea44f.svg)](#compatibility)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-The header collapses as the body scrolls, the title glides into the toolbar, and every slot knows
-how far along it is. Depends only on Compose UI and Foundation, so it fits Material 2, Material 3
-or your own design system.
+`ComposeParallaxToolbarLayout` provides slots for a header, a title and a scrollable body. The
+header collapses through nested scrolling, so any vertically scrollable composable can be the
+body. State is hoisted, the collapse fraction is available to every slot, and behavior is
+configured through immutable config objects.
 
 <table>
   <tr>
