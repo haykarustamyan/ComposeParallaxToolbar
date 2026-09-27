@@ -12,6 +12,9 @@ plugins {
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        filter { exclude { it.file.path.contains("/build/generated/") } }
+        filter {
+            exclude("**/generated/**")
+            exclude { it.file.path.contains("/build/") }
+        }
     }
 }

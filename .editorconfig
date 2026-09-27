@@ -27,3 +27,7 @@ ktlint_standard_function-naming = disabled
 
 [*.md]
 trim_trailing_whitespace = false
+
+# Generated sources (Compose resources accessors) are not ours to format.
+[**/build/generated/**]
+ktlint = disabled
