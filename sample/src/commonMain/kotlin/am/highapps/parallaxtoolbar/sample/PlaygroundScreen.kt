@@ -121,7 +121,7 @@ data class PlaygroundConfig(
     val percentage: Float = 0.4f,
     val gradient: Boolean = true,
     val startExpanded: Boolean = true,
-    val snapOnRelease: Boolean = false,
+    val snapOnRelease: Boolean = true,
     val snapThreshold: Float = 0.5f,
     val scrollMode: ScrollMode = ScrollMode.ExitUntilCollapsed,
     val collapseEnabled: Boolean = true,

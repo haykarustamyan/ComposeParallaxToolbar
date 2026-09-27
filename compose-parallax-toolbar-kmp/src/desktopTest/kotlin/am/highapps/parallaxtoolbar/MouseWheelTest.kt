@@ -51,3 +51,49 @@ class MouseWheelTest : UiTestBase() {
         assertEquals(0f, state.stretchPx, "wheel left no stretch on the header path")
     }
 }
+
+@OptIn(ExperimentalTestApi::class)
+class MouseWheelSnapTest : UiTestBase() {
+
+    private fun androidx.compose.ui.test.ComposeUiTest.setUp(snap: Boolean): ParallaxToolbarState {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Box(Modifier.height(20.dp)) },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp), snapOnRelease = snap),
+                content = ParallaxContent.Regular {
+                    Column(Modifier.testTag("body")) { repeat(60) { Box(Modifier.height(48.dp)) } }
+                },
+                state = state,
+            )
+        }
+        return state
+    }
+
+    @Test
+    fun oneWheelTick_leavesTheHeaderPartWay_withoutSnap() = runComposeUiTest {
+        val state = setUp(snap = false)
+        onNodeWithTag("body").performMouseInput { scroll(1f) }
+        waitForIdle()
+        val f = state.collapseFraction
+        assertTrue(f > 0f && f < 1f, "a wheel tick has no fling to carry the header through: $f")
+    }
+
+    @Test
+    fun oneWheelTick_settles_withSnap() = runComposeUiTest {
+        val state = setUp(snap = true)
+        onNodeWithTag("body").performMouseInput { scroll(1f) }
+        waitForIdle()
+        assertTrue(state.collapseFraction == 0f || state.collapseFraction == 1f, "settled: ${state.collapseFraction}")
+
+        // Also over the header's own scrollable, in the other direction.
+        onNodeWithTag("body").performMouseInput { scroll(3f) }
+        waitForIdle()
+        assertEquals(1f, state.collapseFraction, "three ticks settle collapsed")
+        onNodeWithTag("header").performMouseInput { scroll(-1f) }
+        waitForIdle()
+        assertTrue(state.collapseFraction == 0f || state.collapseFraction == 1f, "settled after the header tick: ${state.collapseFraction}")
+    }
+}

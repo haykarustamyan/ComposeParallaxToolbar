@@ -73,6 +73,11 @@ header through nested scroll, including expansion when scrolling back up. Draggi
 with the mouse works as on touch. A stretch follows a held pointer only, so the wheel never
 leaves the header stretched.
 
+**Wheel and trackpad have no fling.** Each tick is a short fixed step and nothing "releases", so
+the header can stop part way, where a touch fling would have carried it through. With
+`snapOnRelease` the header settles once wheel input has been quiet for a moment, the same way
+it settles after a touch release. Turn it on for desktop and web screens.
+
 **Scrollbar.** Put the list and a `VerticalScrollbar` in one `Box` as `ParallaxContent.Custom`;
 the state's `lazyListState` or `scrollState` feeds the adapter. See the
 [Desktop scrollbar](RECIPES.md#desktop-scrollbar) recipe.

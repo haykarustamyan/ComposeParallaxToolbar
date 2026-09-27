@@ -16,6 +16,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * How far the header has collapsed and, in [ScrollMode.EnterAlwaysCollapsed], how far the toolbar
@@ -30,6 +34,9 @@ import androidx.compose.ui.unit.Velocity
  * Negative deltas expand in the reverse order: the toolbar re-enters, then the header expands.
  */
 private const val PostScrollThresholdPx = 0.5f
+
+/** Quiet time after the last wheel or trackpad delta before the header settles. */
+private const val WheelSettleDelayMs = 150L
 
 @Stable
 internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Float = 0f) : ScrollableState {
@@ -75,6 +82,34 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
      */
     var isPointerPressed: Boolean = false
 
+    /** Whether releases settle to a resting position. Set by the layout. */
+    var snapOnRelease: Boolean = false
+
+    /** Scope for the settle that follows wheel scrolling. Set by the layout. */
+    var settleScope: CoroutineScope? = null
+    private var wheelSettleJob: Job? = null
+
+    /**
+     * Wheel and trackpad scrolling never fling, so nothing releases them. Any user delta that
+     * arrives without a pressed pointer restarts a short timer; when it runs out the header
+     * settles as it would after a touch release.
+     */
+    /** A fling settles on its own; drop a pending wheel settle so it cannot cut the fling short. */
+    fun cancelWheelSettle() {
+        wheelSettleJob?.cancel()
+        wheelSettleJob = null
+    }
+
+    private fun noteWheelInput() {
+        if (isPointerPressed || !snapOnRelease) return
+        val scope = settleScope ?: return
+        wheelSettleJob?.cancel()
+        wheelSettleJob = scope.launch {
+            delay(WheelSettleDelayMs)
+            settle()
+        }
+    }
+
     val offsetPx: Float
         get() = fraction * collapseRangePx
 
@@ -85,12 +120,16 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
         get() = fraction >= 1f
 
     private val scrollScope = object : ScrollScope {
-        override fun scrollBy(pixels: Float): Float = dispatchRawDelta(pixels)
+        // Internal animations bypass the wheel timer; only user deltas restart it.
+        override fun scrollBy(pixels: Float): Float = dispatch(pixels, allowHeaderExpand = true, allowStretch = isPointerPressed)
     }
     private val mutex = MutatorMutex()
 
     /** Consumes [delta] into the header, then the exit. Returns the amount actually consumed. */
-    override fun dispatchRawDelta(delta: Float): Float = dispatch(delta, allowHeaderExpand = true, allowStretch = isPointerPressed)
+    override fun dispatchRawDelta(delta: Float): Float {
+        noteWheelInput()
+        return dispatch(delta, allowHeaderExpand = true, allowStretch = isPointerPressed)
+    }
 
     /** Like [dispatchRawDelta] but never expands the header; used while the body is not at its top. */
     fun dispatchExitOnly(delta: Float): Float = dispatch(delta, allowHeaderExpand = false, allowStretch = false)
@@ -270,6 +309,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
             val delta = -available.y
             val fromFinger = source == NestedScrollSource.UserInput
+            if (fromFinger) noteWheelInput()
             val consumed = when {
                 // Scrolling up: the header (and then the toolbar) leaves before the body scrolls.
                 delta > 0f -> dispatchRawDelta(delta)
@@ -289,11 +329,18 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
             // Lazy lists leave sub-pixel remainders from rounding even while they can still scroll.
             // Only a real leftover means the body is at its top and the header should expand.
             if (available.y < PostScrollThresholdPx) return Offset.Zero
+            if (source == NestedScrollSource.UserInput) noteWheelInput()
             val used = dispatchRawDelta(-available.y, allowStretch = source == NestedScrollSource.UserInput)
             return Offset(0f, -used)
         }
 
+        override suspend fun onPreFling(available: Velocity): Velocity {
+            cancelWheelSettle()
+            return Velocity.Zero
+        }
+
         override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+            cancelWheelSettle()
             releaseStretch()
             if (snapOnRelease) settle(velocityPx = -available.y)
             return Velocity.Zero

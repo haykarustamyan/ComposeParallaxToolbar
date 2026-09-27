@@ -183,7 +183,7 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `gradient` | `null` | Brush drawn over the header. When null, a vertical gradient from the toolbar's initial color to its target color covers the lower quarter. |
 | `isExpandedWhenFirstDisplayed` | `true` | Start collapsed when false. |
 | `parallaxMultiplier` | `0.5f` | How much of the collapse distance the header content moves by. 0f pins it. |
-| `snapOnRelease` | `false` | Settle a partly collapsed header to a resting position when a drag or fling ends. A fling settles in its direction; a plain release settles by `snapThreshold`. |
+| `snapOnRelease` | `false` | Settle a partly collapsed header to a resting position when a drag or fling ends, or once wheel and trackpad input has been quiet for a moment. A fling settles in its direction; a plain release settles by `snapThreshold`. |
 | `snapThreshold` | `0.5f` | Collapse progress at or past which a plain release settles collapsed. `0.5f` is the nearer position; `0.75f` favors expanded. Applies to the toolbar exit in `EnterAlwaysCollapsed` too. |
 | `scrollMode` | `ExitUntilCollapsed` | See [ScrollMode](#scrollmode). |
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |

@@ -386,6 +386,8 @@ private fun ParallaxToolbarLayoutImpl(
             headerState.stretchTriggerPx = stretchTriggerPx
             headerState.onStretchTrigger = onStretchTrigger
             headerState.animationSpec = headerConfig.animationSpec
+            headerState.snapOnRelease = headerConfig.snapOnRelease
+            headerState.settleScope = semanticsScope
             headerState.snapThreshold = headerConfig.snapThreshold
             headerState.parallaxMultiplier = headerConfig.parallaxMultiplier
         }
@@ -562,6 +564,7 @@ private class HeaderFlingBehavior(
     private val decay = exponentialDecay<Float>(frictionMultiplier = 2f)
 
     override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        headerState.cancelWheelSettle()
         var lastValue = 0f
         var remaining = initialVelocity
         AnimationState(initialValue = 0f, initialVelocity = initialVelocity).animateDecay(decay) {
