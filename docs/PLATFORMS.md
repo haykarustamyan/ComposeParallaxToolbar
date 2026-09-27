@@ -29,6 +29,11 @@ Scaffold(bottomBar = { NavigationBar { /* ... */ } }) { padding ->
 
 ## iOS
 
+**Swift-only apps.** Compose UI has no Swift API, so the library, like every Compose
+Multiplatform library, is used from Kotlin. An existing Swift app adds one Kotlin Multiplatform
+module, which can be a single file holding the screen, and keeps everything else in Swift. The
+1.x XCFramework only exposed the sample screens; it could not be used to build your own.
+
 Add the dependency to your shared module's `commonMain` and build screens there. Expose them to
 Swift through a `ComposeUIViewController`, as with any Compose Multiplatform screen:
 

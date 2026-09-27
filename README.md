@@ -50,9 +50,10 @@ dependencies {
 }
 ```
 
-iOS, desktop and web apps consume it through their shared Kotlin module; nothing is imported on
-the Swift or JavaScript side. The [platform guide](docs/PLATFORMS.md) has the one iOS
-`Info.plist` key Compose needs.
+iOS, desktop and web apps use it from their Kotlin shared module; nothing is imported on the
+Swift or JavaScript side. A Swift-only app adds one small Kotlin module for the screen, since
+Compose has no Swift API. The [platform guide](docs/PLATFORMS.md) shows the setup and the one
+iOS `Info.plist` key Compose needs.
 
 ## Quick start
 
