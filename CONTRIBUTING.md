@@ -70,6 +70,9 @@ and commit the output; the Docs workflow fails when it is stale.
 
 ## Pull requests
 
+By opening a pull request you agree that your contribution is licensed under the project's
+[MIT License](LICENSE), like the rest of the code.
+
 1. Branch from `main`.
 2. Keep the change focused; add or update tests; update the docs that describe the behavior.
 3. Add a line to the top version section of `CHANGELOG.md` under Added, Changed, Removed or Fixed.
