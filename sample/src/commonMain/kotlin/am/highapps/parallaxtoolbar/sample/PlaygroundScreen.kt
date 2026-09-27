@@ -121,6 +121,7 @@ data class PlaygroundConfig(
     val minBottomSpacer: Float = 0f,
     val itemCount: Int = 30,
     val darkTheme: Boolean = false,
+    val rightToLeft: Boolean = false,
     val headerImage: HeaderImage = HeaderImage.None,
     /** Presentation mode for recordings: captions instead of debug text, no floating controls. */
     val showcase: Boolean = false
@@ -136,6 +137,7 @@ val playgroundPresets: Map<String, PlaygroundConfig> = mapOf(
     "grid-avatar" to PlaygroundConfig(content = ContentKind.Grid, overlayAvatar = true),
     "enter-always-collapsed" to PlaygroundConfig(scrollMode = ScrollMode.EnterAlwaysCollapsed),
     "tabs-stretch" to PlaygroundConfig(bottomTabs = true, stretch = true),
+    "rtl" to PlaygroundConfig(rightToLeft = true, titleAlignment = TitleAlign.Center, collapsedTitleScale = 0.85f),
     "centered-title" to PlaygroundConfig(
         scrollMode = ScrollMode.EnterAlways, snapOnRelease = true,
         titleAlignment = TitleAlign.Center, collapsedTitleScale = 0.85f, toolbarColor = ToolbarColor.White
@@ -184,6 +186,10 @@ fun PlaygroundHost(initialScreen: String = "playground", preset: String = "defau
     val scope = rememberCoroutineScope()
 
     MaterialTheme(colorScheme = if (config.darkTheme) darkColorScheme() else lightColorScheme()) {
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalLayoutDirection provides
+                if (config.rightToLeft) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+    ) {
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // Scroll position lives inside the state, so recreate it when the initial state changes.
         key(screen, config.content, config.startExpanded) {
@@ -226,6 +232,7 @@ fun PlaygroundHost(initialScreen: String = "playground", preset: String = "defau
                 )
             }
         }
+    }
     }
     }
 }
@@ -443,6 +450,7 @@ private fun ConfigSheet(
 
         Section("Appearance")
         SwitchRow("Dark theme", config.darkTheme) { onChange(config.copy(darkTheme = it)) }
+        SwitchRow("Right-to-left", config.rightToLeft) { onChange(config.copy(rightToLeft = it)) }
         Choice(HeaderImage.entries, config.headerImage) { onChange(config.copy(headerImage = it)) }
 
         Section("Content")

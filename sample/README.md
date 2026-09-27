@@ -22,7 +22,7 @@ Names: `playground`, `simple`, `lazy`, `lazyPadding`, `lazyReversed`, `lazyCente
 A playground preset starts with a known configuration and the sheet closed, useful for demos:
 `--es preset <name>` on Android, the second argument on desktop, `?preset=<name>` on the web,
 `SAMPLE_PRESET` on iOS. Presets: `default`, `grid-avatar`, `enter-always-collapsed`,
-`tabs-stretch`, `centered-title`, and the dark photo `showcase-basic`, `showcase-grid-avatar`,
+`tabs-stretch`, `centered-title`, `rtl`, and the dark photo `showcase-basic`, `showcase-grid-avatar`,
 `showcase-exit`, `showcase-exit-until`, `showcase-enter-always`, `showcase-snap`, `showcase-centered`,
 `showcase-tabs` used for the README recordings. Header photos come from
 [Picsum](https://picsum.photos).
