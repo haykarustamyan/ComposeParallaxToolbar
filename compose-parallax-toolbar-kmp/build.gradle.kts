@@ -157,7 +157,8 @@ mavenPublishing {
     pom {
         name = "ComposeParallaxToolbar"
         description =
-            "ComposeParallaxToolbar is a Jetpack Compose Multiplatform library that provides a customizable collapsing toolbar/app bar with a parallax background effect for both iOS and Android."
+            "Collapsing toolbar layout for Compose Multiplatform: parallax header, any scrollable body, scroll modes, " +
+                "pinned tabs, pull-to-refresh. Android, iOS, desktop and web."
         inceptionYear = "2025"
         url = "https://github.com/haykarustamyan/ComposeParallaxToolbar"
         licenses {
