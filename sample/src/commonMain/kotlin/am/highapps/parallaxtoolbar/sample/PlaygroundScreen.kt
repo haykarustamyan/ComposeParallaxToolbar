@@ -13,6 +13,7 @@ import am.highapps.parallaxtoolbar.sample.resources.header_mountains
 import am.highapps.parallaxtoolbar.sample.resources.header_river
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -637,8 +639,18 @@ private fun ConfigSheet(
         }
 
         Section("Behavior")
-        Choice(ScrollMode.entries, config.scrollMode, label = { it.label().replace(" ", "\n") }) { onChange(config.copy(scrollMode = it)) }
-        Text(config.scrollMode.hint(), style = MaterialTheme.typography.bodySmall)
+        ScrollMode.entries.forEach { mode ->
+            Row(
+                Modifier.fillMaxWidth().clickable { onChange(config.copy(scrollMode = mode)) }.padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = mode == config.scrollMode, onClick = { onChange(config.copy(scrollMode = mode)) })
+                Column(Modifier.padding(start = 4.dp)) {
+                    Text(mode.label(), style = MaterialTheme.typography.bodyLarge)
+                    Text(mode.hint(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
         SwitchRow("Snap on release", config.snapOnRelease) { onChange(config.copy(snapOnRelease = it)) }
         if (config.snapOnRelease) {
             SliderRow("Snap threshold: ${(config.snapThreshold * 100).toInt()} %", config.snapThreshold, 0f..1f) {
