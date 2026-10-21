@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 
 /*
  * Configuration holders. They are immutable so the layout can skip recomposition when the parent
@@ -39,7 +40,9 @@ import androidx.compose.ui.unit.dp
  *   [ParallaxToolbarScope] instead.
  * @param stretchEnabled Let a downward drag past the top stretch the header, which zooms its
  *   content and pushes the body down, then springs back on release. Pair with the layout's
- *   `onStretchTrigger` for pull-to-refresh.
+ *   `onStretchTrigger` for pull-to-refresh. A stretch only starts while the body is at its top;
+ *   a [ParallaxContent.Custom] body's position is not visible to the layout, so drags on the
+ *   header or toolbar can stretch it anywhere.
  * @param stretchTriggerDistance How far the header must be stretched when released for
  *   `onStretchTrigger` to fire.
  * @param animationSpec Animation used when the header settles on its own: snaps, stretch
@@ -201,6 +204,11 @@ public class ParallaxTitleConfig(
         require(collapsedScale > 0f && collapsedScale.isFinite()) {
             "ParallaxTitleConfig.collapsedScale must be a positive scale such as 0.8f, was $collapsedScale"
         }
+        require(paddingBottom.isSpecified) { "ParallaxTitleConfig.paddingBottom must be a specified Dp such as 16.dp, was $paddingBottom" }
+        require(paddingStart.isSpecified) { "ParallaxTitleConfig.paddingStart must be a specified Dp such as 16.dp, was $paddingStart" }
+        require(collapsedPaddingStart.isSpecified) {
+            "ParallaxTitleConfig.collapsedPaddingStart must be a specified Dp such as 72.dp, was $collapsedPaddingStart"
+        }
     }
 
     public fun copy(
@@ -283,7 +291,11 @@ public class ParallaxBodyConfig(
         "ParallaxBodyConfig(minBottomSpacerHeight=$minBottomSpacerHeight, backgroundColor=$backgroundColor)"
 }
 
-/** Options forwarded to the `LazyColumn` used by [ParallaxContent.Lazy]. */
+/**
+ * Options forwarded to the `LazyColumn` used by [ParallaxContent.Lazy]. A null [flingBehavior]
+ * uses the platform fling; a null [overscrollEffect] turns overscroll off. The
+ * [ParallaxToolbarDefaults.lazyColumnConfig] factory fills both with the platform defaults.
+ */
 @Immutable
 public class LazyColumnConfig(
     public val contentPadding: PaddingValues = PaddingValues(0.dp),

@@ -171,7 +171,9 @@ internal fun ParallaxTopBar(
                 translationY = (expandedTop - collapsedTop) * (1f - fraction) + headerState.stretchPx
             }
 
-            subtitle?.placeWithLayer(titleX, titleY + title.height) {
+            // The subtitle shares the title's start edge, which in RTL is the right one.
+            val subtitleX = if (isRtl && subtitle != null) titleX + title.width - subtitle.width else titleX
+            subtitle?.placeWithLayer(subtitleX, titleY + title.height) {
                 val fraction = headerState.fraction
                 val scale = 1f + (collapsedScale - 1f) * fraction
                 transformOrigin = TransformOrigin(if (isRtl) 1f else 0f, 0f)

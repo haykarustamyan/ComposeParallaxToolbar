@@ -187,7 +187,7 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `snapThreshold` | `0.5f` | Collapse progress at or past which a plain release settles collapsed. `0.5f` is the nearer position; `0.75f` favors expanded. Applies to the toolbar exit in `EnterAlwaysCollapsed` too. |
 | `scrollMode` | `ExitUntilCollapsed` | See [ScrollMode](#scrollmode). |
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
-| `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
+| `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. A stretch only starts while the body is at its top; with a `Custom` body the layout cannot see the scroll position, so a drag on the header or toolbar can stretch it anywhere. |
 | `stretchTriggerDistance` | `100.dp` | Stretch required at release for `onStretchTrigger` to fire. |
 | `animationSpec` | `spring()` | Used when the header settles on its own: snaps, stretch releases and `collapse()`/`expand()` without a spec. Use `snap()` or a short `tween` to honor a reduced-motion setting. |
 
@@ -239,6 +239,11 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `flingBehavior` | platform default |
 | `userScrollEnabled` | `true` |
 | `overscrollEffect` | platform default |
+
+The defaults above are the factory's. `ParallaxContent.Lazy(content)` without a `config` uses the
+plain `LazyColumnConfig()` constructor, whose `overscrollEffect` is `null`: the list has no
+overscroll effect. Pass `config = ParallaxToolbarDefaults.lazyColumnConfig()` to get the platform
+default.
 
 ### ParallaxSemanticsConfig
 

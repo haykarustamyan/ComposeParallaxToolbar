@@ -101,7 +101,8 @@ public fun rememberParallaxToolbarState(
     }
 }
 
+// A state saved by 2.0.0 has no third entry; its layout had already applied the initial state.
 private val HeaderScrollStateSaver = androidx.compose.runtime.saveable.listSaver<HeaderScrollState, Float>(
-    save = { listOf(it.fraction, it.exitFraction) },
-    restore = { HeaderScrollState(it[0], it.getOrElse(1) { 0f }) },
+    save = { listOf(it.fraction, it.exitFraction, if (it.initialStateApplied) 1f else 0f) },
+    restore = { HeaderScrollState(it[0], it.getOrElse(1) { 0f }, it.getOrElse(2) { 1f } == 1f) },
 )
