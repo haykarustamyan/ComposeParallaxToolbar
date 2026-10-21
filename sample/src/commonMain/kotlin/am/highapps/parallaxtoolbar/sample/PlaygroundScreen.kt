@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -79,6 +80,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -99,6 +101,9 @@ enum class TitleAlign(val alignment: Alignment.Horizontal) {
     End(Alignment.End),
 }
 enum class HeaderKind { Fixed, AspectRatio, Percentage }
+
+/** Which per-element modifier the rating badge in the header shows off. */
+enum class HeaderEffect { None, Parallax, Fade, Scale }
 enum class ToolbarColor(val color: Color) {
     /** Resolved to the theme's surface color at draw time. */
     Surface(Color.Unspecified),
@@ -130,6 +135,8 @@ data class PlaygroundConfig(
     val overlayAvatar: Boolean = false,
     /** A chip row at the bottom of the header that stays in view with `Modifier.pin`. */
     val pinnedChips: Boolean = false,
+    /** A rating badge in the header driven by one per-element modifier. */
+    val headerEffect: HeaderEffect = HeaderEffect.None,
     val stretch: Boolean = false,
     val bottomTabs: Boolean = false,
     val titleAlignment: TitleAlign = TitleAlign.Start,
@@ -214,6 +221,40 @@ val playgroundPresets: Map<String, PlaygroundConfig> = mapOf(
         scrollMode = ScrollMode.EnterAlways,
         titleAlignment = TitleAlign.Center,
         collapsedTitleScale = 0.85f,
+    ),
+    "showcase-pin" to PlaygroundConfig(
+        showcase = true,
+        darkTheme = true,
+        headerImage = HeaderImage.Mountains,
+        pinnedChips = true,
+        fadeHeader = false,
+        itemCount = 20,
+    ),
+    // The header layer stays still so the photo and the badge each move at their own ratio.
+    "showcase-parallax" to PlaygroundConfig(
+        showcase = true,
+        darkTheme = true,
+        headerImage = HeaderImage.Forest,
+        headerEffect = HeaderEffect.Parallax,
+        parallaxMultiplier = 0f,
+        fadeHeader = false,
+        itemCount = 20,
+    ),
+    "showcase-fade" to PlaygroundConfig(
+        showcase = true,
+        darkTheme = true,
+        headerImage = HeaderImage.River,
+        headerEffect = HeaderEffect.Fade,
+        fadeHeader = false,
+        itemCount = 20,
+    ),
+    "showcase-scale" to PlaygroundConfig(
+        showcase = true,
+        darkTheme = true,
+        headerImage = HeaderImage.Mountains,
+        headerEffect = HeaderEffect.Scale,
+        fadeHeader = false,
+        itemCount = 20,
     ),
 )
 
@@ -409,16 +450,36 @@ private fun Playground(config: PlaygroundConfig, state: ParallaxToolbarState, co
                     scaleX = zoom
                     scaleY = zoom
                 }
+            // With the parallax badge the header layer is still (multiplier 0), so the photo
+            // drifts at its own slow ratio and the badge at a faster one.
+            val photoModifier = if (config.headerEffect == HeaderEffect.Parallax) zoomModifier.parallax(0.25f) else zoomModifier
             val image = config.headerImage.res
             if (image != null) {
                 Image(
                     painter = painterResource(image),
                     contentDescription = null,
-                    modifier = zoomModifier,
+                    modifier = photoModifier,
                     contentScale = ContentScale.Crop,
                 )
             } else {
-                Box(zoomModifier.background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))))
+                Box(photoModifier.background(Brush.linearGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))))
+            }
+            if (config.headerEffect != HeaderEffect.None) {
+                Box(Modifier.fillMaxSize()) {
+                    RatingBadge(
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 112.dp, end = 20.dp)
+                            .then(
+                                when (config.headerEffect) {
+                                    HeaderEffect.Parallax -> Modifier.parallax(0.9f)
+                                    HeaderEffect.Fade -> Modifier.fadeOnCollapse()
+                                    HeaderEffect.Scale -> Modifier.scaleOnCollapse(0.4f, TransformOrigin(1f, 0f))
+                                    HeaderEffect.None -> Modifier
+                                },
+                            ),
+                    )
+                }
             }
             if (config.pinnedChips) {
                 // Sits at the end so the title can glide past it. pin keeps it still until the
@@ -691,6 +752,8 @@ private fun ConfigSheet(
         SwitchRow("Gradient overlay", config.gradient) { onChange(config.copy(gradient = it)) }
         SwitchRow("Fade header on collapse", config.fadeHeader) { onChange(config.copy(fadeHeader = it)) }
         SwitchRow("Pinned chip row (pin)", config.pinnedChips) { onChange(config.copy(pinnedChips = it)) }
+        Text("Header badge", style = MaterialTheme.typography.bodyMedium)
+        Choice(HeaderEffect.entries, config.headerEffect) { onChange(config.copy(headerEffect = it)) }
         SwitchRow("Overlay avatar (moveBetween)", config.overlayAvatar) { onChange(config.copy(overlayAvatar = it)) }
         SwitchRow("Bottom tabs slot", config.bottomTabs) { onChange(config.copy(bottomTabs = it)) }
 
@@ -729,6 +792,21 @@ private fun ConfigSheet(
         Section("Appearance")
         SwitchRow("Dark theme", config.darkTheme) { onChange(config.copy(darkTheme = it)) }
         SwitchRow("Right-to-left", config.rightToLeft) { onChange(config.copy(rightToLeft = it)) }
+    }
+}
+
+/** A rating card for the header, to show one per-element modifier at a time. */
+@Composable
+private fun RatingBadge(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(20.dp))
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("4.9", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        Text("★★★★★", color = Color(0xFFFFC94A), fontSize = 14.sp)
+        Text("1.2k reviews", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
     }
 }
 

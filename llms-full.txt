@@ -868,6 +868,9 @@ Bug fixes and docs. No API change.
 - `docs/API.md` and the KDoc say that `ParallaxContent.Lazy` without a `config` has no overscroll
   effect, and that `ParallaxToolbarDefaults.lazyColumnConfig()` gives the platform one.
 - The README links the browser playground near the top and names the View classes it replaces.
+- The README shows a clip for each per-element modifier: `pin`, `parallax`, `fadeOnCollapse` and
+  `scaleOnCollapse`. The playground gained a header badge that demonstrates them and matching
+  showcase presets.
 - `AGENTS.md` gives the full Maven coordinate.
 
 ## 2.0.0 - 2026-09-27

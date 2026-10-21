@@ -193,7 +193,32 @@ overlayContent = {
 }
 ```
 
-## State and effects
+## Per-element effects
+
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/modifier-pin.gif" width="240" alt="A chip row that stays in view and stops at the toolbar"><br><sub><b>pin</b>(stopAtTop = true)</sub></td>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/modifier-parallax.gif" width="240" alt="A badge moving faster than the photo behind it"><br><sub><b>parallax</b>(ratio)</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/modifier-fade.gif" width="240" alt="A badge fading out as the header collapses"><br><sub><b>fadeOnCollapse</b>()</sub></td>
+    <td width="50%" align="center" valign="top"><img src="raw/main/images/modifier-scale.gif" width="240" alt="A badge shrinking toward its corner as the header collapses"><br><sub><b>scaleOnCollapse</b>(scale, origin)</sub></td>
+  </tr>
+</table>
+
+Inside any slot the scope offers modifiers that give one element its own collapse behavior. Turn
+the header-wide parallax and fade off when the elements set their own:
+
+```kotlin
+headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
+headerContent = {
+    Image(cover, null, Modifier.fillMaxSize().parallax(0.25f))
+    Badge(Modifier.align(Alignment.TopEnd).parallax(0.9f))  // or .fadeOnCollapse(), .scaleOnCollapse(0.4f, TransformOrigin(1f, 0f))
+    ChipRow(Modifier.align(Alignment.BottomEnd).pin(stopAtTop = true))  // stays in view until the header's edge reaches it
+}
+```
+
+## State
 
 ```kotlin
 val state = rememberParallaxToolbarState()
@@ -203,17 +228,6 @@ ComposeParallaxToolbarLayout(/* ... */, state = state)
 
 Text("${(state.collapseFraction * 100).toInt()} %")
 Button(onClick = { scope.launch { state.collapse() } }) { Text("Collapse") }
-```
-
-Inside any slot the scope offers modifiers for per-element effects:
-
-```kotlin
-headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
-headerContent = {
-    Image(cover, null, Modifier.fillMaxSize().parallax(0.5f).fadeOnCollapse())
-    Text("Est. 1998", Modifier.align(Alignment.BottomEnd).scaleOnCollapse(0.6f).fadeOnCollapse())
-    ChipRow(Modifier.align(Alignment.BottomStart).pin(stopAtTop = true))  // stays in view until the header's edge reaches it
-}
 ```
 
 ## Documentation
