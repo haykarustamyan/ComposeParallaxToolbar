@@ -1,6 +1,6 @@
 # Repository guidelines for coding agents
 
-This repository publishes `am.highapps:compose-parallax-toolbar-kmp`, a collapsing toolbar layout
+This repository publishes `am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp`, a collapsing toolbar layout
 for Compose Multiplatform. Most work is incremental library evolution: fixing behavior, adding a
 config field or a scope modifier, and keeping the sample and docs aligned.
 

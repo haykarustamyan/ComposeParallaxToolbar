@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/): breaking changes only ship in a major version.
 
+## 2.0.1 - 2026-10-22
+
+No API or behavior change; the artifact is the same code as 2.0.0.
+
+### Fixed
+
+- The published POM description now names every supported platform (Android, iOS, desktop and
+  web) instead of only iOS and Android, so Maven Central and the indexes that copy it describe the
+  library correctly.
+- Docs and the agent guide state the full Maven coordinate and the current version.
+
 ## 2.0.0 - 2026-09-27
 
 Breaking release. See [docs/MIGRATION.md](docs/MIGRATION.md) for the upgrade steps; most screens
