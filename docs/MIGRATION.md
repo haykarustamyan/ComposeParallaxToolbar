@@ -33,7 +33,7 @@
 
 ## Step by step
 
-1. Bump the dependency to `2.0.0`.
+1. Bump the dependency to `2.0.1` (the current 2.0 patch).
 2. If you passed `scrollState`, wrap it: `state = rememberParallaxToolbarState(scrollState = yourState)`.
 3. If a Swift file called a sample view controller from the framework, create the equivalent
    `ComposeUIViewController` in your shared module. The [platform guide](PLATFORMS.md#ios) shows the pattern.

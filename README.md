@@ -48,7 +48,7 @@ Multiplatform project, the app module in an Android-only project.
 
 ```kotlin
 dependencies {
-    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.0")
+    implementation("am.highapps.parallaxtoolbar:compose-parallax-toolbar-kmp:2.0.1")
 }
 ```
 

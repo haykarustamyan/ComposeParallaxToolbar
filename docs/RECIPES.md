@@ -1,6 +1,6 @@
 # Recipes
 
-Complete screens for common tasks, version 2.0.0. Every Kotlin block is compiled as part of the
+Complete screens for common tasks, version 2.0.1. Every Kotlin block is compiled as part of the
 `sample` module on each CI run, so it is known to build against the current API. Imports are in
 [Recipes.kt](../sample/src/commonMain/kotlin/am/highapps/parallaxtoolbar/sample/recipes/Recipes.kt);
 the examples use Material 3 for their own widgets, which the library does not require.
