@@ -23,6 +23,8 @@ configured through immutable config objects.
   </tr>
 </table>
 
+**New in 2.0:** [read the release story on the HighApps blog](https://highapps.am/blog/compose-parallax-toolbar-2-0/), with a live demo and how it works under the hood.
+
 </div>
 
 ## Features
@@ -219,6 +221,7 @@ headerContent = {
 | [Platform guide](docs/PLATFORMS.md) | Android edge-to-edge and `Scaffold`, iOS hosting, desktop, web |
 | [Migrating from 1.x](docs/MIGRATION.md) | Every change and the upgrade steps |
 | [Changelog](CHANGELOG.md) | Release notes |
+| [2.0 release article](https://highapps.am/blog/compose-parallax-toolbar-2-0/) | What changed in 2.0, with a live demo and how the layout works |
 | [Docs site](https://haykarustamyan.github.io/ComposeParallaxToolbar/) | Generated API docs and all guides |
 
 **Using an AI coding assistant?** Point it at [llms.txt](llms.txt), or drop
