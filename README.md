@@ -213,8 +213,10 @@ the header-wide parallax and fade off when the elements set their own:
 headerConfig = ParallaxToolbarDefaults.headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false),
 headerContent = {
     Image(cover, null, Modifier.fillMaxSize().parallax(0.25f))
-    Badge(Modifier.align(Alignment.TopEnd).parallax(0.9f))  // or .fadeOnCollapse(), .scaleOnCollapse(0.4f, TransformOrigin(1f, 0f))
-    ChipRow(Modifier.align(Alignment.BottomEnd).pin(stopAtTop = true))  // stays in view until the header's edge reaches it
+    Box(Modifier.fillMaxSize()) {
+        Badge(Modifier.align(Alignment.TopEnd).parallax(0.9f))  // or .fadeOnCollapse(), .scaleOnCollapse(0.4f, TransformOrigin(1f, 0f))
+        ChipRow(Modifier.align(Alignment.BottomEnd).pin(stopAtTop = true))  // stays in view until the header's edge reaches it
+    }
 }
 ```
 

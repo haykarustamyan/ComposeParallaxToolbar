@@ -45,6 +45,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -805,7 +806,8 @@ private fun RatingBadge(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("4.9", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
-        Text("★★★★★", color = Color(0xFFFFC94A), fontSize = 14.sp)
+        // Icons rather than U+2605: the web host has no font fallback for it.
+        Row { repeat(5) { Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC94A), modifier = Modifier.size(14.dp)) } }
         Text("1.2k reviews", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
     }
 }

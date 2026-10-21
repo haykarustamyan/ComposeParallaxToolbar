@@ -64,7 +64,7 @@ ComposeParallaxToolbarLayout(
 4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true, snapThreshold = 0.5f)`. Turn `snapOnRelease` on for desktop and web screens, where wheel input has no fling. `collapseEnabled = false` on the layout locks the header for loading or editing states.
 5. Programmatic control: `val state = rememberParallaxToolbarState()`; `state.collapseFraction`, `state.isCollapsed`, `scope.launch { state.collapse() }`, `state.expand()`. The body keeps its own scroll position; use `state.scrollState` or `state.lazyListState` to scroll it.
 6. Inside any slot, `collapseFraction`, `isCollapsed`, `state` and `layoutInfo` are available from the scope. Read `collapseFraction` inside `graphicsLayer { }` for per-frame effects, not in composition.
-7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`, `.pin(stopAtTop)` for an element that stays put until the header's bottom edge reaches it. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
+7. Per-element effects in the header: `Modifier.parallax(ratio)`, `.fadeOnCollapse()`, `.scaleOnCollapse(scale)`, `.pin(stopAtTop)` for an element that stays put until the header's bottom edge reaches it. Pair with `headerConfig(parallaxMultiplier = 0f, fadeOnCollapse = false)`. The header slot is not a `BoxScope`: wrap elements in `Box(Modifier.fillMaxSize()) { }` to use `Modifier.align`. Elements that must stay visible when collapsed go in `overlayContent` with `Modifier.moveBetween(expandedAlignment, collapsedAlignment, ...)`, placed outside any `size` modifier.
 8. Body background: the body slides over the header, so give it the screen background with `bodyConfig(backgroundColor = MaterialTheme.colorScheme.background)` unless every item paints its own.
 9. Scaffold: pass the Scaffold padding as `contentPadding`. Do not add status bar padding; the layout handles the inset. If the layout does not touch the window edge (dialog, bottom sheet, split pane), pass `windowInsets = WindowInsets(0)`. The layout needs a bounded height: never place it in a vertically scrolling parent.
 10. Animation: `headerConfig(animationSpec = ...)` sets the spring used for snaps, stretch releases and `collapse()`/`expand()`; both also accept a per-call `animationSpec`. `state.isScrollInProgress` is true while the header moves.
@@ -856,8 +856,9 @@ Bug fixes and docs. No API change.
 - Absolute `contentPadding`, such as `PaddingValues.Absolute` or insets converted with
   `asPaddingValues()`, stays on its side in right-to-left layouts when `minBottomSpacerHeight`
   is set.
-- `ParallaxTitleConfig` rejects `Dp.Unspecified` paddings at construction with a message naming
-  the field, instead of crashing later in layout.
+- `ParallaxTitleConfig` rejects a `Dp.Unspecified` `paddingStart` or `paddingBottom` at
+  construction with a message naming the field. Before, the title was misplaced or the layout
+  crashed rounding NaN.
 - The overlay slot is measured after the layout publishes its geometry, so `moveBetween` never
   reads sizes from the previous pass.
 - The published POM description names every supported platform (Android, iOS, desktop and web)

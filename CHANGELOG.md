@@ -25,8 +25,9 @@ Bug fixes and docs. No API change.
 - Absolute `contentPadding`, such as `PaddingValues.Absolute` or insets converted with
   `asPaddingValues()`, stays on its side in right-to-left layouts when `minBottomSpacerHeight`
   is set.
-- `ParallaxTitleConfig` rejects `Dp.Unspecified` paddings at construction with a message naming
-  the field, instead of crashing later in layout.
+- `ParallaxTitleConfig` rejects a `Dp.Unspecified` `paddingStart` or `paddingBottom` at
+  construction with a message naming the field. Before, the title was misplaced or the layout
+  crashed rounding NaN.
 - The overlay slot is measured after the layout publishes its geometry, so `moveBetween` never
   reads sizes from the previous pass.
 - The published POM description names every supported platform (Android, iOS, desktop and web)
