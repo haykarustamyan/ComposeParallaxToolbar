@@ -1725,6 +1725,64 @@ class ComposeParallaxToolbarPatchTest : UiTestBase() {
     }
 
     @Test
+    fun remainingValidation_failsWithActionableMessages() {
+        kotlin.test.assertFailsWith<IllegalArgumentException> { HeaderHeight.AspectRatio(1f, maxHeight = (-1).dp) }
+            .also { kotlin.test.assertTrue(it.message!!.contains("AspectRatio maxHeight must be 0.dp or more")) }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            ParallaxHeaderConfig(HeaderHeight.Fixed(100.dp), null, snapThreshold = 1.5f)
+        }.also { kotlin.test.assertTrue(it.message!!.contains("snapThreshold must be in 0..1")) }
+    }
+
+    @Test
+    fun semanticsConfig_comparesByValue_andCopyOverridesSelectively() {
+        val base = ParallaxSemanticsConfig()
+        kotlin.test.assertEquals(base, ParallaxSemanticsConfig())
+        kotlin.test.assertEquals(base, base.copy())
+        kotlin.test.assertEquals(base.hashCode(), ParallaxSemanticsConfig().hashCode())
+        val copy = base.copy(collapseActionLabel = "Fold")
+        kotlin.test.assertEquals("Fold", copy.collapseActionLabel)
+        kotlin.test.assertEquals(base.expandActionLabel, copy.expandActionLabel)
+        kotlin.test.assertTrue(base != copy)
+        kotlin.test.assertTrue(base != Any())
+        kotlin.test.assertTrue(copy.toString().contains("collapseActionLabel=Fold"))
+    }
+
+    @Test
+    fun programmaticMoves_beforeTheFirstMeasure_jumpToTheTarget() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent { state = rememberParallaxToolbarState() }
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse() } }
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        runOnIdle { kotlinx.coroutines.runBlocking { state.expand() } }
+        kotlin.test.assertEquals(0f, state.collapseFraction)
+    }
+
+    @Test
+    fun parallax_withTheDefaultRatio_movesAtTheHeaderRate() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            state = rememberParallaxToolbarState()
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("Title") },
+                headerContent = {
+                    Box(Modifier.fillMaxSize()) {
+                        Box(Modifier.align(Alignment.Center).size(20.dp).parallax().testTag("dot"))
+                    }
+                },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(300.dp), parallaxMultiplier = 0f),
+                content = ParallaxContent.Regular { Column { repeat(40) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+                state = state,
+            )
+        }
+        val before = onNodeWithTag("dot", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.top
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        val after = onNodeWithTag("dot", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.top
+        val expected = state.layoutInfo.collapseRangePx * ParallaxToolbarDefaults.HeaderParallaxMultiplier
+        kotlin.test.assertEquals(expected, before - after, 1.5f)
+    }
+
+    @Test
     fun titleConfig_rejectsUnspecifiedPaddings() {
         val u = androidx.compose.ui.unit.Dp.Unspecified
         kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(u, 0.dp, 0.dp, false, true) }

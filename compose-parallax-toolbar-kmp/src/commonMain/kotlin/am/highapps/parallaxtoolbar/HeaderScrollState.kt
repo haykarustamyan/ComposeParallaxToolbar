@@ -251,7 +251,7 @@ internal class HeaderScrollState(
     override val canScrollBackward: Boolean get() = fraction > 0f || exitFraction > 0f || (stretchMaxPx > 0f && stretchPx < stretchMaxPx)
 
     /** Animates the header to [target] and brings the toolbar back. Jumps before the layout has measured. */
-    suspend fun animateFractionTo(target: Float, animationSpec: AnimationSpec<Float> = this.animationSpec) {
+    suspend fun animateFractionTo(target: Float, animationSpec: AnimationSpec<Float>) {
         val to = target.coerceIn(0f, 1f)
         if (collapseRangePx <= 0f) {
             fraction = to
@@ -306,7 +306,7 @@ internal class HeaderScrollState(
      * Same as [settle] but driven through an already running scroll [scope], for use from a
      * fling that holds the scroll mutex; starting a new [scroll] there would cancel the fling.
      */
-    suspend fun settleIn(scope: ScrollScope, velocityPx: Float = 0f) {
+    suspend fun settleIn(scope: ScrollScope, velocityPx: Float) {
         val targetPx = settleTargetPx(velocityPx) ?: return
         settleWithin(scope, targetPx)
     }

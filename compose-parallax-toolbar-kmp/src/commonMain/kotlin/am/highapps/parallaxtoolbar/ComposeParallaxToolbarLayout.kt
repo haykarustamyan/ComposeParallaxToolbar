@@ -573,14 +573,11 @@ private fun PaddingValues.withExtraBottom(extra: Dp): PaddingValues =
     if (extra <= 0.dp) this else ExtraBottomPadding(this, extra)
 
 /** [base] with [extra] added at the bottom; delegating keeps relative and absolute sides as given. */
-private class ExtraBottomPadding(private val base: PaddingValues, private val extra: Dp) : PaddingValues {
+private data class ExtraBottomPadding(private val base: PaddingValues, private val extra: Dp) : PaddingValues {
     override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp = base.calculateLeftPadding(layoutDirection)
     override fun calculateTopPadding(): Dp = base.calculateTopPadding()
     override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp = base.calculateRightPadding(layoutDirection)
     override fun calculateBottomPadding(): Dp = base.calculateBottomPadding() + extra
-
-    override fun equals(other: Any?): Boolean = other is ExtraBottomPadding && base == other.base && extra == other.extra
-    override fun hashCode(): Int = 31 * base.hashCode() + extra.hashCode()
 }
 
 /** Flings on the header itself decelerate the header frame by frame, then optionally settle it. */
