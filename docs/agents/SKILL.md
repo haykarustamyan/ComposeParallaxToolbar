@@ -34,7 +34,7 @@ ComposeParallaxToolbarLayout(
 
 ## Rules
 
-1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size.
+1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size. A `Lazy` body without a `config` has no overscroll effect; pass `config = ParallaxToolbarDefaults.lazyColumnConfig()` for the platform one.
 2. Configure through `ParallaxToolbarDefaults.headerConfig / toolbarConfig / titleConfig / bodyConfig / lazyColumnConfig / semanticsConfig`. Do not construct config classes by hand unless you need to.
 3. Header height: `HeaderHeight.Fixed(dp)`, `HeaderHeight.AspectRatio(ratio, maxHeight)`, `HeaderHeight.Percentage(fraction 0..1, maxHeight)`; or the `headerConfigWithAspectRatio` / `headerConfigWithPercentage` factories.
 4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true, snapThreshold = 0.5f)`. Turn `snapOnRelease` on for desktop and web screens, where wheel input has no fling. `collapseEnabled = false` on the layout locks the header for loading or editing states.

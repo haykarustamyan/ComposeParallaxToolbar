@@ -39,7 +39,11 @@ private const val PostScrollThresholdPx = 0.5f
 private const val WheelSettleDelayMs = 150L
 
 @Stable
-internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Float = 0f) : ScrollableState {
+internal class HeaderScrollState(
+    initialFraction: Float,
+    initialExitFraction: Float = 0f,
+    initialStateApplied: Boolean = false,
+) : ScrollableState {
 
     var fraction: Float by mutableFloatStateOf(initialFraction.coerceIn(0f, 1f))
         private set
@@ -65,6 +69,20 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
 
     /** Called on release once a stretch reached [stretchTriggerPx]. */
     var onStretchTrigger: (() -> Unit)? = null
+
+    /**
+     * The body's scroll state, or null when the layout cannot see it (custom content). A stretch
+     * only starts while the body is at its top: a drag on the header or the toolbar, or an
+     * [ScrollMode.EnterAlways] expand, must not pull the header past its height in the middle of
+     * the content. Set by the layout.
+     */
+    var bodyScrollState: ScrollableState? = null
+
+    /**
+     * Whether a layout has applied `isExpandedWhenFirstDisplayed` to this state. Saved with the
+     * fractions so a layout that leaves and re-enters composition keeps the user's position.
+     */
+    var initialStateApplied: Boolean by mutableStateOf(initialStateApplied)
 
     /** Spec for snaps, stretch releases and programmatic moves. Set by the layout. */
     var animationSpec: AnimationSpec<Float> = spring()
@@ -152,7 +170,7 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
             remaining -= moveExit(remaining)
             if (allowHeaderExpand) {
                 remaining -= moveCollapse(remaining)
-                if (allowStretch) remaining -= moveStretch(remaining)
+                if (allowStretch && bodyScrollState?.canScrollBackward != true) remaining -= moveStretch(remaining)
             }
         }
         return delta - remaining
@@ -309,15 +327,16 @@ internal class HeaderScrollState(initialFraction: Float, initialExitFraction: Fl
     fun connection(mode: ScrollMode, snapOnRelease: Boolean): NestedScrollConnection = object : NestedScrollConnection {
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
             val delta = -available.y
-            val fromFinger = source == NestedScrollSource.UserInput
-            if (fromFinger) noteWheelInput()
+            if (source == NestedScrollSource.UserInput) noteWheelInput()
             val consumed = when {
                 // Scrolling up: the header (and then the toolbar) leaves before the body scrolls.
                 delta > 0f -> dispatchRawDelta(delta)
                 // Scrolling down: EnterAlways expands right away; EnterAlwaysCollapsed only brings
-                // the toolbar back; ExitUntilCollapsed waits for the body to reach its top.
+                // the toolbar back; ExitUntilCollapsed waits for the body to reach its top. None
+                // stretch here: the body has not scrolled yet, so a stretch waits for the
+                // leftover that onPostScroll sees once the body is at its top.
                 delta < 0f -> when (mode) {
-                    ScrollMode.EnterAlways -> dispatchRawDelta(delta, allowStretch = fromFinger)
+                    ScrollMode.EnterAlways -> dispatchRawDelta(delta, allowStretch = false)
                     ScrollMode.EnterAlwaysCollapsed -> dispatchExitOnly(delta)
                     ScrollMode.ExitUntilCollapsed -> 0f
                 }

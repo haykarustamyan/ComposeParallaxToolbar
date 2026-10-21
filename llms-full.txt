@@ -58,7 +58,7 @@ ComposeParallaxToolbarLayout(
 
 ## Rules
 
-1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size.
+1. Choose the body: `ParallaxContent.Regular { }` for a column, `ParallaxContent.Lazy(content = { _ -> items(...) })` for a list, `ParallaxContent.Custom { }` for a grid, staggered grid, pager or any other vertical scrollable that fills its size. A `Lazy` body without a `config` has no overscroll effect; pass `config = ParallaxToolbarDefaults.lazyColumnConfig()` for the platform one.
 2. Configure through `ParallaxToolbarDefaults.headerConfig / toolbarConfig / titleConfig / bodyConfig / lazyColumnConfig / semanticsConfig`. Do not construct config classes by hand unless you need to.
 3. Header height: `HeaderHeight.Fixed(dp)`, `HeaderHeight.AspectRatio(ratio, maxHeight)`, `HeaderHeight.Percentage(fraction 0..1, maxHeight)`; or the `headerConfigWithAspectRatio` / `headerConfigWithPercentage` factories.
 4. Scroll behavior: `headerConfig(scrollMode = ScrollMode.ExitUntilCollapsed | EnterAlways | EnterAlwaysCollapsed, snapOnRelease = true, snapThreshold = 0.5f)`. Turn `snapOnRelease` on for desktop and web screens, where wheel input has no fling. `collapseEnabled = false` on the layout locks the header for loading or editing states.
@@ -278,7 +278,7 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `snapThreshold` | `0.5f` | Collapse progress at or past which a plain release settles collapsed. `0.5f` is the nearer position; `0.75f` favors expanded. Applies to the toolbar exit in `EnterAlwaysCollapsed` too. |
 | `scrollMode` | `ExitUntilCollapsed` | See [ScrollMode](#scrollmode). |
 | `fadeOnCollapse` | `true` | Fade the whole header out as it collapses. Turn off, with `parallaxMultiplier = 0f`, when elements use the scope modifiers. |
-| `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. |
+| `stretchEnabled` | `false` | Let a pull past the top stretch the header. Its content zooms and the body moves down; release springs back. A stretch only starts while the body is at its top; with a `Custom` body the layout cannot see the scroll position, so a drag on the header or toolbar can stretch it anywhere. |
 | `stretchTriggerDistance` | `100.dp` | Stretch required at release for `onStretchTrigger` to fire. |
 | `animationSpec` | `spring()` | Used when the header settles on its own: snaps, stretch releases and `collapse()`/`expand()` without a spec. Use `snap()` or a short `tween` to honor a reduced-motion setting. |
 
@@ -330,6 +330,11 @@ them with the `ParallaxToolbarDefaults` factories, which supply every default.
 | `flingBehavior` | platform default |
 | `userScrollEnabled` | `true` |
 | `overscrollEffect` | platform default |
+
+The defaults above are the factory's. `ParallaxContent.Lazy(content)` without a `config` uses the
+plain `LazyColumnConfig()` constructor, whose `overscrollEffect` is `null`: the list has no
+overscroll effect. Pass `config = ParallaxToolbarDefaults.lazyColumnConfig()` to get the platform
+default.
 
 ### ParallaxSemanticsConfig
 
@@ -832,14 +837,38 @@ All notable changes to this project are documented here. The format follows
 
 ## 2.0.1 - 2026-10-22
 
-No API or behavior change; the artifact is the same code as 2.0.0.
+Bug fixes and docs. No API change.
 
 ### Fixed
 
-- The published POM description now names every supported platform (Android, iOS, desktop and
-  web) instead of only iOS and Android, so Maven Central and the indexes that copy it describe the
-  library correctly.
-- Docs and the agent guide state the full Maven coordinate and the current version.
+- With `stretchEnabled`, a downward drag in the middle of the body no longer stretches the header
+  or fires `onStretchTrigger`. This hit `ScrollMode.EnterAlways`, and drags on the header or the
+  toolbar in any mode; a pull-to-refresh could start far from the top of a list. A stretch now
+  only starts while a `Regular` or `Lazy` body is at its top.
+- The deprecated 1.x overload passed `overlayContent`, `bottomContent` and `onStretchTrigger` on
+  to the layout as null, so those slots never showed. Its IDE quick fix produced code that did
+  not compile; it now uses named arguments and keeps every slot.
+- `isExpandedWhenFirstDisplayed = false` is remembered by the hoisted state rather than by the
+  layout. A layout that leaves and re-enters composition with the same state, such as a pager
+  page or a branch of an `if`, keeps the user's position instead of collapsing again.
+- In right-to-left layouts the subtitle lines up with the title's start edge, expanded and
+  collapsed, instead of with its left edge.
+- Absolute `contentPadding`, such as `PaddingValues.Absolute` or insets converted with
+  `asPaddingValues()`, stays on its side in right-to-left layouts when `minBottomSpacerHeight`
+  is set.
+- `ParallaxTitleConfig` rejects `Dp.Unspecified` paddings at construction with a message naming
+  the field, instead of crashing later in layout.
+- The overlay slot is measured after the layout publishes its geometry, so `moveBetween` never
+  reads sizes from the previous pass.
+- The published POM description names every supported platform (Android, iOS, desktop and web)
+  instead of only iOS and Android.
+
+### Documentation
+
+- `docs/API.md` and the KDoc say that `ParallaxContent.Lazy` without a `config` has no overscroll
+  effect, and that `ParallaxToolbarDefaults.lazyColumnConfig()` gives the platform one.
+- The README links the browser playground near the top and names the View classes it replaces.
+- `AGENTS.md` gives the full Maven coordinate.
 
 ## 2.0.0 - 2026-09-27
 

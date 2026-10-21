@@ -14,7 +14,8 @@
 `ComposeParallaxToolbarLayout` provides slots for a header, a title and a scrollable body. The
 header collapses through nested scrolling, so any vertically scrollable composable can be the
 body. State is hoisted, the collapse fraction is available to every slot, and behavior is
-configured through immutable config objects.
+configured through immutable config objects. It covers what `CollapsingToolbarLayout` inside an
+`AppBarLayout` and a `CoordinatorLayout` did for Android views, in Compose and on every platform.
 
 <table>
   <tr>
@@ -22,6 +23,9 @@ configured through immutable config objects.
     <td width="50%" align="center" valign="top"><img src="raw/main/images/hero-grid-avatar.gif" width="300" alt="Grid body with an avatar that travels into the toolbar"></td>
   </tr>
 </table>
+
+**[Try it in your browser](https://haykarustamyan.github.io/ComposeParallaxToolbar/playground/)**: the
+live playground, no install needed.
 
 **New in 2.0:** [read the release story on the HighApps blog](https://highapps.am/blog/compose-parallax-toolbar-2-0/), with a live demo and how it works under the hood.
 

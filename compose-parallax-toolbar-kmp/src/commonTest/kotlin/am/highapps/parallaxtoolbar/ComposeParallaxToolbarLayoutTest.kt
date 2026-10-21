@@ -1483,3 +1483,257 @@ class ComposeParallaxToolbarPinTest : UiTestBase() {
         kotlin.test.assertEquals(1f, state.collapseFraction, "programmatic moves still work")
     }
 }
+
+/** Regressions fixed in 2.0.1. */
+@OptIn(ExperimentalTestApi::class)
+class ComposeParallaxToolbarPatchTest : UiTestBase() {
+
+    @Composable
+    private fun StretchList(mode: ScrollMode, state: ParallaxToolbarState, onTrigger: () -> Unit) {
+        ComposeParallaxToolbarLayout(
+            titleContent = { Text(if (it) "collapsed" else "expanded", Modifier.testTag("title")) },
+            headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue)) },
+            headerConfig = ParallaxToolbarDefaults.headerConfig(
+                height = HeaderHeight.Fixed(200.dp),
+                scrollMode = mode,
+                stretchEnabled = true,
+                stretchTriggerDistance = 40.dp,
+            ),
+            onStretchTrigger = onTrigger,
+            content = ParallaxContent.Lazy(content = { _ ->
+                items(300) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) }
+            }),
+            modifier = Modifier.testTag("layout"),
+            state = state,
+        )
+    }
+
+    /** Holds a long downward drag on [tag], reads the stretch while held, then releases. */
+    private fun androidx.compose.ui.test.ComposeUiTest.longPullOn(tag: String, state: ParallaxToolbarState): Float {
+        onNodeWithTag(tag).performTouchInput {
+            down(topCenter + androidx.compose.ui.geometry.Offset(0f, 10f))
+            repeat(6) { moveBy(androidx.compose.ui.geometry.Offset(0f, 100f)) }
+            advanceEventTime(300)
+        }
+        waitForIdle()
+        val held = state.stretchPx
+        onNodeWithTag(tag).performTouchInput { up() }
+        waitForIdle()
+        return held
+    }
+
+    @Test
+    fun enterAlways_expandsMidList_withoutStretchingOrTriggering() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var triggers = 0
+        setContent {
+            state = rememberParallaxToolbarState()
+            StretchList(ScrollMode.EnterAlways, state) { triggers++ }
+        }
+        repeat(4) { onNodeWithTag("layout").performTouchInput { swipeUp() } }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+
+        val held = longPullOn("layout", state)
+        kotlin.test.assertEquals(0f, held, "no stretch while the list is mid-way")
+        kotlin.test.assertEquals(0, triggers, "a mid-list drag never fires the trigger")
+        kotlin.test.assertTrue(state.collapseFraction < 1f, "EnterAlways still expands mid-list")
+
+        // At the top the same mode still stretches and fires.
+        runOnIdle { kotlinx.coroutines.runBlocking { state.lazyListState.scrollToItem(0) } }
+        waitForIdle()
+        kotlin.test.assertTrue(longPullOn("layout", state) > 0f, "stretches at the top")
+        kotlin.test.assertEquals(1, triggers, "a pull at the top still fires")
+    }
+
+    @Test
+    fun toolbarDrag_midList_expandsWithoutTriggering() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var triggers = 0
+        setContent {
+            state = rememberParallaxToolbarState()
+            StretchList(ScrollMode.ExitUntilCollapsed, state) { triggers++ }
+        }
+        repeat(4) { onNodeWithTag("layout").performTouchInput { swipeUp() } }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        onNodeWithTag("title").performTouchInput {
+            down(center)
+            repeat(6) { moveBy(androidx.compose.ui.geometry.Offset(0f, 100f)) }
+            advanceEventTime(300)
+            up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(0, triggers, "a toolbar drag mid-list never fires the trigger")
+        kotlin.test.assertEquals(0f, state.stretchPx)
+    }
+
+    @Test
+    fun legacyOverload_forwardsOverlayBottomAndStretchTrigger() = runComposeUiTest {
+        var triggers = 0
+        setContent {
+            @Suppress("DEPRECATION")
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text(if (it) "collapsed" else "expanded") },
+                headerContent = { Box(Modifier.fillMaxSize().background(Color.Blue).testTag("header")) },
+                content = { _ -> Column { repeat(40) { i -> Text("Row $i", Modifier.fillMaxWidth().height(48.dp)) } } },
+                overlayContent = { Box(Modifier.size(20.dp).testTag("overlay")) },
+                bottomContent = { Box(Modifier.fillMaxWidth().height(20.dp).testTag("bottom")) },
+                onStretchTrigger = { triggers++ },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(
+                    height = HeaderHeight.Fixed(200.dp),
+                    stretchEnabled = true,
+                    stretchTriggerDistance = 40.dp,
+                ),
+            )
+        }
+        onNodeWithTag("overlay").assertIsDisplayed()
+        onNodeWithTag("bottom").assertIsDisplayed()
+        onNodeWithTag("header").performTouchInput {
+            down(center)
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 200f))
+            moveBy(androidx.compose.ui.geometry.Offset(0f, 200f))
+            advanceEventTime(300)
+            up()
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(1, triggers)
+    }
+
+    @Test
+    fun startCollapsed_isCollapsedInTheFirstComposition() = runComposeUiTest {
+        val seen = mutableListOf<Boolean>()
+        setContent {
+            ComposeParallaxToolbarLayout(
+                titleContent = { collapsed ->
+                    androidx.compose.runtime.SideEffect { seen += collapsed }
+                    Text(if (collapsed) "collapsed" else "expanded")
+                },
+                headerContent = { Box(Modifier.fillMaxSize()) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(isExpandedWhenFirstDisplayed = false),
+                content = ParallaxContent.Regular { Column { repeat(40) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+            )
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(listOf(true), seen.distinct(), "never composed as expanded: $seen")
+    }
+
+    @Test
+    fun startCollapsed_isNotReappliedWhenTheLayoutReentersComposition() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        var shown by androidx.compose.runtime.mutableStateOf(true)
+        setContent {
+            state = rememberParallaxToolbarState()
+            if (shown) {
+                ComposeParallaxToolbarLayout(
+                    titleContent = { Text(if (it) "collapsed" else "expanded") },
+                    headerContent = { Box(Modifier.fillMaxSize()) },
+                    headerConfig = ParallaxToolbarDefaults.headerConfig(isExpandedWhenFirstDisplayed = false),
+                    content = ParallaxContent.Regular { Column { repeat(40) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+                    state = state,
+                )
+            }
+        }
+        waitForIdle()
+        kotlin.test.assertEquals(1f, state.collapseFraction)
+        runOnIdle { kotlinx.coroutines.runBlocking { state.expand(animated = false) } }
+        shown = false
+        waitForIdle()
+        shown = true
+        waitForIdle()
+        kotlin.test.assertEquals(0f, state.collapseFraction, "kept the user's position")
+        onNodeWithText("expanded").assertIsDisplayed()
+    }
+
+    @Test
+    fun subtitle_sharesTheTitleStartEdge_inRtl() = runComposeUiTest {
+        lateinit var state: ParallaxToolbarState
+        setContent {
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl,
+            ) {
+                state = rememberParallaxToolbarState()
+                ComposeParallaxToolbarLayout(
+                    titleContent = { Text("A much longer title", Modifier.testTag("title")) },
+                    subtitleContent = { Text("Sub", Modifier.testTag("subtitle")) },
+                    headerContent = { Box(Modifier.fillMaxSize()) },
+                    titleConfig = ParallaxToolbarDefaults.titleConfig(keepSubtitleAfterCollapse = true),
+                    content = ParallaxContent.Regular { Column { repeat(40) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+                    state = state,
+                )
+            }
+        }
+        fun assertAligned(label: String) {
+            val title = onNodeWithTag("title", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+            val subtitle = onNodeWithTag("subtitle", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+            kotlin.test.assertTrue(subtitle.width < title.width)
+            kotlin.test.assertTrue(kotlin.math.abs(title.right - subtitle.right) <= 1.5f, "$label: title $title, subtitle $subtitle")
+        }
+        waitForIdle()
+        assertAligned("expanded")
+        runOnIdle { kotlinx.coroutines.runBlocking { state.collapse(animated = false) } }
+        waitForIdle()
+        assertAligned("collapsed")
+    }
+
+    @Test
+    fun absoluteContentPadding_staysOnItsSide_inRtl_withBottomSpacer() = runComposeUiTest {
+        var density = 1f
+        setContent {
+            density = androidx.compose.ui.platform.LocalDensity.current.density
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl,
+            ) {
+                ComposeParallaxToolbarLayout(
+                    titleContent = { Text("Title") },
+                    headerContent = { Box(Modifier.fillMaxSize()) },
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues.Absolute(left = 40.dp),
+                    bodyConfig = ParallaxToolbarDefaults.bodyConfig(minBottomSpacerHeight = 8.dp),
+                    content = ParallaxContent.Regular { Box(Modifier.fillMaxWidth().height(48.dp).testTag("row")) },
+                )
+            }
+        }
+        val row = onNodeWithTag("row").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertEquals(40f * density, row.left, 1f, "left padding kept on the left: $row")
+    }
+
+    @Test
+    fun moveBetween_isInPlaceOnTheFirstFrame() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent {
+            ComposeParallaxToolbarLayout(
+                titleContent = { Text("Title") },
+                headerContent = { Box(Modifier.fillMaxSize()) },
+                headerConfig = ParallaxToolbarDefaults.headerConfig(height = HeaderHeight.Fixed(200.dp)),
+                overlayContent = {
+                    Box(
+                        Modifier
+                            .size(40.dp)
+                            .moveBetween(
+                                expanded = androidx.compose.ui.Alignment.BottomCenter,
+                                collapsed = androidx.compose.ui.Alignment.CenterEnd,
+                            )
+                            .testTag("avatar"),
+                    )
+                },
+                content = ParallaxContent.Regular { Column { repeat(40) { i -> Text("Row $i", Modifier.height(48.dp)) } } },
+            )
+        }
+        val avatar = onNodeWithTag("avatar").fetchSemanticsNode().boundsInRoot
+        kotlin.test.assertTrue(avatar.top > 0f && avatar.left > 0f, "placed in the header on the first frame: $avatar")
+        mainClock.autoAdvance = true
+    }
+
+    @Test
+    fun titleConfig_rejectsUnspecifiedPaddings() {
+        val u = androidx.compose.ui.unit.Dp.Unspecified
+        kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(u, 0.dp, 0.dp, false, true) }
+            .also { kotlin.test.assertTrue(it.message!!.contains("paddingBottom")) }
+        kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(0.dp, u, 0.dp, false, true) }
+            .also { kotlin.test.assertTrue(it.message!!.contains("paddingStart")) }
+        kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(0.dp, 0.dp, u, false, true) }
+            .also { kotlin.test.assertTrue(it.message!!.contains("collapsedPaddingStart")) }
+        // Negative paddings stay allowed.
+        ParallaxTitleConfig((-4).dp, (-4).dp, (-4).dp, false, true)
+    }
+}

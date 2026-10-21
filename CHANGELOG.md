@@ -6,14 +6,38 @@ All notable changes to this project are documented here. The format follows
 
 ## 2.0.1 - 2026-10-22
 
-No API or behavior change; the artifact is the same code as 2.0.0.
+Bug fixes and docs. No API change.
 
 ### Fixed
 
-- The published POM description now names every supported platform (Android, iOS, desktop and
-  web) instead of only iOS and Android, so Maven Central and the indexes that copy it describe the
-  library correctly.
-- Docs and the agent guide state the full Maven coordinate and the current version.
+- With `stretchEnabled`, a downward drag in the middle of the body no longer stretches the header
+  or fires `onStretchTrigger`. This hit `ScrollMode.EnterAlways`, and drags on the header or the
+  toolbar in any mode; a pull-to-refresh could start far from the top of a list. A stretch now
+  only starts while a `Regular` or `Lazy` body is at its top.
+- The deprecated 1.x overload passed `overlayContent`, `bottomContent` and `onStretchTrigger` on
+  to the layout as null, so those slots never showed. Its IDE quick fix produced code that did
+  not compile; it now uses named arguments and keeps every slot.
+- `isExpandedWhenFirstDisplayed = false` is remembered by the hoisted state rather than by the
+  layout. A layout that leaves and re-enters composition with the same state, such as a pager
+  page or a branch of an `if`, keeps the user's position instead of collapsing again.
+- In right-to-left layouts the subtitle lines up with the title's start edge, expanded and
+  collapsed, instead of with its left edge.
+- Absolute `contentPadding`, such as `PaddingValues.Absolute` or insets converted with
+  `asPaddingValues()`, stays on its side in right-to-left layouts when `minBottomSpacerHeight`
+  is set.
+- `ParallaxTitleConfig` rejects `Dp.Unspecified` paddings at construction with a message naming
+  the field, instead of crashing later in layout.
+- The overlay slot is measured after the layout publishes its geometry, so `moveBetween` never
+  reads sizes from the previous pass.
+- The published POM description names every supported platform (Android, iOS, desktop and web)
+  instead of only iOS and Android.
+
+### Documentation
+
+- `docs/API.md` and the KDoc say that `ParallaxContent.Lazy` without a `config` has no overscroll
+  effect, and that `ParallaxToolbarDefaults.lazyColumnConfig()` gives the platform one.
+- The README links the browser playground near the top and names the View classes it replaces.
+- `AGENTS.md` gives the full Maven coordinate.
 
 ## 2.0.0 - 2026-09-27
 

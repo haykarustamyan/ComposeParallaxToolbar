@@ -26,11 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -209,11 +206,17 @@ public fun ComposeParallaxToolbarLayout(
  * main overload. It will be removed in 3.0.
  */
 @Deprecated(
-    message = "Use the overload that takes ParallaxContent.",
+    message = "Use the overload that takes ParallaxContent. Lazy content becomes " +
+        "ParallaxContent.Lazy(lazyContent, lazyColumnConfig).",
     replaceWith = ReplaceWith(
-        "ComposeParallaxToolbarLayout(titleContent, headerContent, ParallaxContent.Regular(content), " +
-            "modifier, contentPadding, subtitleContent, navigationIcon, actions, headerConfig, " +
-            "toolbarConfig, titleConfig, bodyConfig, rememberParallaxToolbarState(scroll, lazyListState))",
+        "ComposeParallaxToolbarLayout(titleContent = titleContent, headerContent = headerContent, " +
+            "content = ParallaxContent.Regular(content), modifier = modifier, contentPadding = contentPadding, " +
+            "subtitleContent = subtitleContent, navigationIcon = navigationIcon, actions = actions, " +
+            "overlayContent = overlayContent, bottomContent = bottomContent, onStretchTrigger = onStretchTrigger, " +
+            "headerConfig = headerConfig, toolbarConfig = toolbarConfig, titleConfig = titleConfig, " +
+            "bodyConfig = bodyConfig, state = rememberParallaxToolbarState(scroll, lazyListState))",
+        "am.highapps.parallaxtoolbar.ParallaxContent",
+        "am.highapps.parallaxtoolbar.rememberParallaxToolbarState",
     ),
 )
 @Composable
@@ -251,9 +254,9 @@ public fun ComposeParallaxToolbarLayout(
         subtitleContent = subtitleContent,
         navigationIcon = navigationIcon,
         actions = actions,
-        overlayContent = null,
-        bottomContent = null,
-        onStretchTrigger = null,
+        overlayContent = overlayContent,
+        bottomContent = bottomContent,
+        onStretchTrigger = onStretchTrigger,
         headerConfig = headerConfig,
         toolbarConfig = toolbarConfig,
         titleConfig = titleConfig,
@@ -311,18 +314,16 @@ private fun ParallaxToolbarLayoutImpl(
     val rightInset = with(density) { windowInsets.getRight(this, LocalLayoutDirection.current).toDp() }
     val toolbarHeight = toolbarConfig.height
     val headerState = state.headerState
+    // The first composition honors the config; later ones, and later layouts sharing the state,
+    // keep the saved fraction. Applied before anything reads the fraction so the first frame is
+    // already collapsed instead of animating there.
+    if (!headerState.initialStateApplied) {
+        headerState.initialStateApplied = true
+        if (!headerConfig.isExpandedWhenFirstDisplayed) headerState.snapFractionTo(1f)
+    }
     val isCollapsed by remember(headerState) { derivedStateOf { headerState.isCollapsed } }
     val isToolbarExited by remember(headerState) { derivedStateOf { headerState.exitFraction >= 1f } }
     val scope = remember(state) { ParallaxToolbarScopeImpl(state) }
-
-    // The first composition honors the config; later ones keep the saved fraction.
-    var appliedInitialState by rememberSaveable { mutableStateOf(false) }
-    SideEffect {
-        if (!appliedInitialState) {
-            appliedInitialState = true
-            if (!headerConfig.isExpandedWhenFirstDisplayed) headerState.snapFractionTo(1f)
-        }
-    }
 
     val connection = remember(headerState, headerConfig.scrollMode, headerConfig.snapOnRelease) {
         headerState.connection(mode = headerConfig.scrollMode, snapOnRelease = headerConfig.snapOnRelease)
@@ -393,6 +394,12 @@ private fun ParallaxToolbarLayoutImpl(
             headerState.settleScope = semanticsScope
             headerState.snapThreshold = headerConfig.snapThreshold
             headerState.parallaxMultiplier = headerConfig.parallaxMultiplier
+            headerState.bodyScrollState = when (body) {
+                is ParallaxBodySpec.Regular -> state.scrollState
+                is ParallaxBodySpec.Lazy -> body.lazyListState
+                // Custom bodies keep their scroll state to themselves.
+                is ParallaxBodySpec.Custom -> null
+            }
         }
 
         Layout(
@@ -512,13 +519,11 @@ private fun ParallaxToolbarLayoutImpl(
                 .measure(Constraints.fixedWidth(width))
             val topBar = measurables.first { it.layoutId == TopBarSlot }
                 .measure(Constraints.fixedWidth(width))
-            val overlay = measurables.firstOrNull { it.layoutId == OverlaySlot }
-                ?.measure(Constraints.fixed(width, height))
             val bottom = measurables.firstOrNull { it.layoutId == BottomSlot }
                 ?.measure(Constraints.fixedWidth(width))
             val bottomPx = bottom?.height ?: 0
 
-            // Publish the geometry before placement so overlay elements can position themselves.
+            // Publish the geometry before the overlay is measured and placed.
             val info = state.layoutInfo
             info.widthPx = width.toFloat()
             info.heightPx = height.toFloat()
@@ -527,6 +532,9 @@ private fun ParallaxToolbarLayoutImpl(
             info.toolbarHeightPx = toolbarPx.toFloat()
             info.bottomHeightPx = bottomPx.toFloat()
             info.isMeasured = true
+            // Measured after the geometry is published: moveBetween reads it while measuring.
+            val overlay = measurables.firstOrNull { it.layoutId == OverlaySlot }
+                ?.measure(Constraints.fixed(width, height))
             // The body gets the space below the collapsed toolbar, plus whatever the toolbar can
             // vacate by exiting. While the header is expanded it is pushed down and its tail is off
             // screen; it slides up as the header collapses and the toolbar exits.
@@ -562,16 +570,18 @@ private const val OverlaySlot = "overlay"
 private const val BottomSlot = "bottom"
 
 private fun PaddingValues.withExtraBottom(extra: Dp): PaddingValues =
-    if (extra <= 0.dp) {
-        this
-    } else {
-        PaddingValues(
-            start = calculateLeftPadding(LayoutDirection.Ltr),
-            top = calculateTopPadding(),
-            end = calculateRightPadding(LayoutDirection.Ltr),
-            bottom = calculateBottomPadding() + extra,
-        )
-    }
+    if (extra <= 0.dp) this else ExtraBottomPadding(this, extra)
+
+/** [base] with [extra] added at the bottom; delegating keeps relative and absolute sides as given. */
+private class ExtraBottomPadding(private val base: PaddingValues, private val extra: Dp) : PaddingValues {
+    override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp = base.calculateLeftPadding(layoutDirection)
+    override fun calculateTopPadding(): Dp = base.calculateTopPadding()
+    override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp = base.calculateRightPadding(layoutDirection)
+    override fun calculateBottomPadding(): Dp = base.calculateBottomPadding() + extra
+
+    override fun equals(other: Any?): Boolean = other is ExtraBottomPadding && base == other.base && extra == other.extra
+    override fun hashCode(): Int = 31 * base.hashCode() + extra.hashCode()
+}
 
 /** Flings on the header itself decelerate the header frame by frame, then optionally settle it. */
 /**
