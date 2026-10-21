@@ -1783,14 +1783,29 @@ class ComposeParallaxToolbarPatchTest : UiTestBase() {
     }
 
     @Test
+    fun savedState_roundTrips_andA200SaveRestoresAsApplied() {
+        val scope = androidx.compose.runtime.saveable.SaverScope { true }
+        val saved = with(HeaderScrollStateSaver) { scope.save(HeaderScrollState(0.4f, 0.2f, initialStateApplied = true)) }!!
+        val restored = HeaderScrollStateSaver.restore(saved)!!
+        kotlin.test.assertEquals(0.4f, restored.fraction)
+        kotlin.test.assertEquals(0.2f, restored.exitFraction)
+        kotlin.test.assertTrue(restored.initialStateApplied)
+        kotlin.test.assertFalse(HeaderScrollStateSaver.restore(listOf(0f, 0f, 0f))!!.initialStateApplied)
+        // 2.0.0 saved only the two fractions; its layout had already applied the initial state.
+        val legacy = HeaderScrollStateSaver.restore(listOf(1f, 0f))!!
+        kotlin.test.assertEquals(1f, legacy.fraction)
+        kotlin.test.assertTrue(legacy.initialStateApplied)
+    }
+
+    @Test
     fun titleConfig_rejectsUnspecifiedPaddings() {
         val u = androidx.compose.ui.unit.Dp.Unspecified
         kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(u, 0.dp, 0.dp, false, true) }
             .also { kotlin.test.assertTrue(it.message!!.contains("paddingBottom")) }
         kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(0.dp, u, 0.dp, false, true) }
             .also { kotlin.test.assertTrue(it.message!!.contains("paddingStart")) }
-        kotlin.test.assertFailsWith<IllegalArgumentException> { ParallaxTitleConfig(0.dp, 0.dp, u, false, true) }
-            .also { kotlin.test.assertTrue(it.message!!.contains("collapsedPaddingStart")) }
+        // Only read next to a navigation icon, so 2.0.0 accepted it; still accepted.
+        ParallaxTitleConfig(0.dp, 0.dp, u, false, true)
         // Negative paddings stay allowed.
         ParallaxTitleConfig((-4).dp, (-4).dp, (-4).dp, false, true)
     }

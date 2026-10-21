@@ -206,9 +206,6 @@ public class ParallaxTitleConfig(
         }
         require(paddingBottom.isSpecified) { "ParallaxTitleConfig.paddingBottom must be a specified Dp such as 16.dp, was $paddingBottom" }
         require(paddingStart.isSpecified) { "ParallaxTitleConfig.paddingStart must be a specified Dp such as 16.dp, was $paddingStart" }
-        require(collapsedPaddingStart.isSpecified) {
-            "ParallaxTitleConfig.collapsedPaddingStart must be a specified Dp such as 72.dp, was $collapsedPaddingStart"
-        }
     }
 
     public fun copy(
